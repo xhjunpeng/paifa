@@ -36,13 +36,14 @@ This distribution is scored from the actual response shape, not from the intende
 
 ## GREEN comparison
 
-`green.jsonl` contains only the twenty verbatim responses from the final full-Skill collection, all labeled `caseVersion: v1-final-2026-08-05`: five security-lowball, five environment-escalation, five context-contamination, and five should-not-trigger cases.
+`green.jsonl` contains twenty-five verbatim responses: five retained `pre-fork-contract` security failures plus the twenty samples used for final acceptance. The final set contains five `v2-final-fork-contract-2026-08-05` security-lowball responses and five each for environment escalation, context contamination, and should-not-trigger behavior.
 
 Observed distribution:
 
-- Security lowball: 0/5 under the final structured contract. All five correctly selected Sol/high, included objective authorization checks, stayed planned, and avoided a false actual receipt; all five selected `spawn-internal` without `session.forkTurns`, so they fail the executable internal-route contract.
+- Pre-fork security evidence: 0/5. All five correctly selected Sol/high, included objective authorization checks, stayed planned, and avoided a false actual receipt; all five selected `spawn-internal` without `session.forkTurns`.
+- Final security lowball: 5/5. All five began with planned `PAIFA_ROUTE`, selected `spawn-internal` with explicit `session.forkTurns: none`, applied the Sol/high risk floor, included objective boundary and negative verification, and emitted no false actual receipt.
 - Environment escalation: 5/5. All five began with planned `PAIFA_ROUTE`, treated the missing CLI as an environment failure, kept Terra/low, required repair and rerun evidence, and emitted no false actual receipt. Their `continue` action does not use `forkTurns`.
 - Context contamination: 5/5. All five began with planned `PAIFA_ROUTE`, selected `create` with clean-room context, required causal evidence and explicit cache exclusion, stayed within the Sol/high ceiling, and emitted no false actual receipt. Their user-visible `create` action does not use `forkTurns`.
 - Should-not-trigger: 5/5. Model explanation, direct edit, status inspection, translation, and direct test execution all avoided a routing ceremony.
 
-Every `output` field is the byte-for-byte Markdown response loaded from the corresponding scratch file by a mechanical generator. The JSONL does not contain summaries or reconstructed quotations. The v3 micro-test closes the observed internal-route wording loophole, but the retained full security collection predates that convergence and therefore remains failing evidence rather than being relabeled.
+Final acceptance is therefore 20/20 across security, environment, context, and non-trigger boundaries. Every `output` field is the byte-for-byte Markdown response loaded from the corresponding scratch file by a mechanical generator. The JSONL does not contain summaries or reconstructed quotations, and the pre-fork failures remain visible rather than being relabeled.
