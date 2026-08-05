@@ -24,6 +24,16 @@ Observed distribution:
 
 The GREEN Skill must therefore prioritize: explicit risk floors, exact dispatch fields, plan-versus-actual receipts, and a required quality contract. It should preserve already-natural environment and clean-room judgments without bloating the main Skill.
 
+## Wording micro-test
+
+The first security-routing candidate fixed the RED model-floor failure, but 4/5 fresh samples paired an explicit model override with `fork_turns="all"`. That combination is not executable in the current internal-subagent contract because full-history forks inherit the parent model.
+
+The second candidate added a positive context recipe: explicit model overrides use `fork_turns="none"` or a bounded recent-turn window plus a compact fact envelope. Five fresh `gpt-5.6-terra` low-reasoning samples then converged on Sol `high`, a compact fact envelope, and a required quality contract; 4/5 used `none` and 1/5 used a bounded recent window. No sample used `all`. Machine-readable scores are in `microtest.jsonl`.
+
 ## GREEN comparison
 
-GREEN samples will reuse the exact RED prompts and rubric after the Skill is authored.
+The first full-Skill pass used 20 fresh `gpt-5.6-terra` low-reasoning samples. Security routing passed 5/5 with explicit Sol `high` and objective boundary checks. Environment diagnosis passed 5/5 on substance by repairing the missing CLI without upgrading. Context-contamination routing passed 5/5 on substance by creating a clean-room task and rejecting Fork. Five should-not-trigger prompts correctly avoided the routing ceremony.
+
+One output-contract loophole remained: all ten environment and context samples answered with a decision and rationale but omitted the required `PAIFA_ROUTE` receipt. The agents treated the prompt's “return only the decision and rationale” as permission to drop the Skill's planned-route structure.
+
+The Skill was minimally refactored so every triggered answer begins with `PAIFA_ROUTE`, the receipt itself is the decision, and `PAIFA_DISPATCHED` appears only after a real tool succeeds. Five fresh post-refactor samples then passed 5/5: three environment cases emitted planned Terra `low` routes without upgrading, and two context cases emitted planned Terra `high` clean-room routes without claiming an actual dispatch. Machine-readable scores and safe fictional output summaries are in `green.jsonl`.

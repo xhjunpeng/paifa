@@ -16,12 +16,12 @@ Use before creating, continuing, retrying, forking, or spawning a delegated task
 1. Confirm delegation and safe split boundaries; select `create`, `continue`, `spawn-internal`, or `fork`.
 2. Apply the risk floor before cost scoring. Authentication, authorization, identity, tenant, billing, payment, migration, security, and production work are never below Sol `high`, even for one file.
 3. Select the lowest capable model and effort, context mode, fact-only envelope, objective quality contract, and automatic-upgrade ceiling.
-4. Emit `PAIFA_ROUTE`. A/B routes use the fast receipt below. C/D, high-risk, and retry routes use the YAML contract in `references/routing-policy.md`.
-5. Validate deterministic rules before dispatch. Pass matching model, effort, and context fields explicitly; after a successful dispatch emit `PAIFA_DISPATCHED`. Its actual fields must match the route.
+4. Every reply after a trigger begins with `PAIFA_ROUTE`. The receipt is the decision, including when the user asks for only a decision or rationale. A/B routes use the fast receipt below; C/D, high-risk, and retry routes use the YAML contract in `references/routing-policy.md`.
+5. Start every route at `phase=planned`. Validate deterministic rules before dispatch and pass matching model, effort, and context fields explicitly. Change to `PAIFA_DISPATCHED` only after the real dispatch tool succeeds; its actual fields must match the route.
 
 Fast A/B receipt:
 
-`PAIFA_ROUTE v1 | create | B | gpt-5.6-terra/medium | compact | focused-tests | auto<=gpt-5.6-sol/high`
+`PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | focused-tests | auto<=gpt-5.6-sol/high`
 
 ## Diagnose before escalating
 
