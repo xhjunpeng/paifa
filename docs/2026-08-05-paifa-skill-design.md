@@ -288,13 +288,13 @@ Luna low
 
 ## 13. 固定输出
 
-A/B 类快速回执：
+所有普通派发决定使用单行紧凑回执，包括 C/D、高风险和重试路线：
 
 ```text
-PAIFA_ROUTE v1 | create | B | terra/medium | compact | focused-tests | auto<=sol/high
+PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | maker | checks=2 | auto<=gpt-5.6-sol/high
 ```
 
-C/D、风险或重试任务使用扩展 YAML，至少包含：
+完整结构化路线在内部生成并校验。只有用户明确要求审计详情或校验失败时才展示扩展 YAML，其中至少包含：
 
 - 版本和阶段。
 - 会话动作和派发类型。
@@ -303,6 +303,8 @@ C/D、风险或重试任务使用扩展 YAML，至少包含：
 - 模型、思考强度和上下文模式。
 - 质量合同。
 - 自动升级上限与原因。
+
+必须先核对任务状态，再在真实派发动作前输出一次最终路线。等待、轮询、监控和只读状态更新不得重复输出 `PAIFA_ROUTE`、`PAIFA_DISPATCHED` 或 `PAIFA_CONTEXT`。只有发生新的派发、重试或重新路由决定时，才能重新产生一组回执。
 
 真实派发后必须记录：
 

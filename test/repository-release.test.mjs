@@ -47,6 +47,18 @@ test('released repository installs one dispatch gate without replacing existing 
     assert.match(agents, /internal subagent.*?actual `forkTurns`/is);
     assert.match(agents, /context is not a tool receipt field/is);
     assert.match(agents, /`PAIFA_CONTEXT`.*?envelope identifier or hash/is);
+    assert.match(
+      agents,
+      /one validated compact `PAIFA_ROUTE` line immediately before each real dispatch decision/is,
+    );
+    assert.match(
+      agents,
+      /waiting, monitoring, and status-only updates must not repeat Paifa receipts/is,
+    );
+    assert.match(
+      agents,
+      /expanded route YAML is shown only for an explicit audit-detail request or validation failure/is,
+    );
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
