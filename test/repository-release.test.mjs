@@ -37,9 +37,13 @@ test('released repository installs one dispatch gate without replacing existing 
     assert.match(agents, /must invoke `paifa` before .*?(?:create|continue|retry|fork|spawn)/is);
     assert.match(agents, /only when the user explicitly requests .*?(?:delegate|split|subtask|parallel)/is);
     assert.match(agents, /must not expand .*?(?:goal|file|permission) scope/is);
-    assert.match(agents, /must not bypass .*?(?:high-risk|above Sol high|irreversible).*?confirmation/is);
-    assert.match(agents, /actual dispatch .*?(?:model|effort|context).*?match `PAIFA_ROUTE`/is);
-    assert.match(agents, /successful dispatch .*?emit `PAIFA_DISPATCHED`/is);
+    assert.match(agents, /high-risk work at its risk floor may be dispatched without additional user confirmation/is);
+    assert.match(
+      agents,
+      /explicit user confirmation is required only for .*?above Sol high.*?irreversible.*?changes? that increase high-risk consequences/is,
+    );
+    assert.match(agents, /`PAIFA_DISPATCHED` must record actual model, effort, and context values/is);
+    assert.match(agents, /each actual value must match its corresponding `PAIFA_ROUTE` value/is);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
