@@ -143,7 +143,7 @@ describe('validateRoute', () => {
   });
 
   test('accepts only none or a finite positive recent-turn count for an internal subagent', () => {
-    for (const forkTurns of ['none', 3]) {
+    for (const forkTurns of ['none', '3']) {
       const result = validateRoute(validRoute({
         session: { action: 'spawn-internal', context: 'compact', forkTurns },
       }), CAPABILITIES);
@@ -151,7 +151,7 @@ describe('validateRoute', () => {
       assert.equal(result.ok, true, `expected ${forkTurns} to be accepted`);
     }
 
-    for (const forkTurns of ['all', 0, -1, 1.5, Number.POSITIVE_INFINITY]) {
+    for (const forkTurns of ['all', 3, 0, -1, 1.5, Number.POSITIVE_INFINITY]) {
       const result = validateRoute(validRoute({
         session: { action: 'spawn-internal', context: 'compact', forkTurns },
       }), CAPABILITIES);

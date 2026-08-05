@@ -17,7 +17,7 @@ Use before creating, continuing, retrying, forking, or spawning a delegated task
 2. Apply the risk floor before cost scoring. Authentication, authorization, identity, tenant, billing, payment, migration, security, and production work are never below Sol `high`, even for one file.
 3. Select the lowest capable model and effort, context mode, fact-only envelope, objective quality contract, and automatic-upgrade ceiling.
 4. Every reply after a trigger begins with `PAIFA_ROUTE`. The receipt is the decision, including when the user asks for only a decision or rationale. A/B routes use the fast receipt below; C/D, high-risk, and retry routes use the YAML contract in `references/routing-policy.md`.
-5. Start every route at `phase=planned`. Validate before dispatch and pass matching model, effort, and context explicitly. Internal routes also carry `forkTurns` set to `none` or a finite positive recent-turn count in both planned and actual receipts. Change to `PAIFA_DISPATCHED` only after the real tool succeeds; its fields must match the route.
+5. Start every route at `phase=planned`. Validate before dispatch and pass matching model, effort, and context explicitly. Internal routes also carry `forkTurns` set to `none` or a quoted positive integer in both planned and actual receipts. Change to `PAIFA_DISPATCHED` only after the real tool succeeds; its fields must match the route.
 
 Fast A/B receipt:
 

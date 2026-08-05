@@ -6,7 +6,7 @@ Check the currently available dispatch tool and its accepted capabilities immedi
 | --- | --- | --- |
 | New user-visible task | model and thinking/reasoning effort | Record actual fields after the tool succeeds |
 | Continue an existing task | model and thinking/reasoning effort for the next turn when changing capability | Preserve the route and record the override actually applied |
-| Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Set `fork_turns` to `"none"` or a finite positive recent-turn count and provide a compact fact envelope |
+| Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Set `fork_turns` to `"none"` or a quoted positive integer such as `"3"`, and provide a compact fact envelope |
 | Fork | follow-up model and effort fields, if supported | Fork preserves history and is not a clean-room mechanism |
 
 Use the exact names exposed by the current tool. `PAIFA_ROUTE` is the recommendation and validation record; `PAIFA_DISPATCHED` is the successful tool receipt. Keep them separate and compare model, effort, context, and internal-route `forkTurns`.

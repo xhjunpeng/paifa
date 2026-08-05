@@ -58,7 +58,7 @@ function supportedEfforts(capabilities, model) {
 
 function validInternalForkTurns(forkTurns) {
   return forkTurns === 'none'
-    || (Number.isInteger(forkTurns) && forkTurns > 0);
+    || (typeof forkTurns === 'string' && /^[1-9]\d*$/.test(forkTurns));
 }
 
 export function validateRoute(route, capabilities = {}) {
@@ -94,7 +94,7 @@ export function validateRoute(route, capabilities = {}) {
     } else if (!validInternalForkTurns(route.session.forkTurns)) {
       errors.push(issue(
         'INTERNAL_FORK_TURNS_INVALID',
-        'Internal forkTurns must be "none" or a finite positive recent-turn count.',
+        'Internal forkTurns must be "none" or a quoted positive integer.',
       ));
     }
   }
