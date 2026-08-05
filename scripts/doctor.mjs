@@ -11,8 +11,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { readInstallState } from './lib/install-state.mjs';
-import { inspectManagedBlock } from './lib/managed-block.mjs';
+import { readInstallState, sha256 } from './lib/install-state.mjs';
+import { inspectManagedBlock, removeManagedBlock } from './lib/managed-block.mjs';
 
 function parseArgs(values) {
   const options = { json: false };
@@ -61,7 +61,10 @@ function runDoctor({ repoRoot, codexHome }) {
     'evals/routing-cases.json',
     'evals/trigger-cases.json',
   ];
-  const missing = required.filter((relativePath) => !existsSync(path.join(repoRoot, relativePath)));
+  const missing = required.filter((relativePath) => {
+    const target = path.join(repoRoot, relativePath);
+    return !existsSync(target) || !lstatSync(target).isFile();
+  });
   checks.push(missing.length === 0
     ? check('repository-files', 'pass', 'All required repository files exist.')
     : check('repository-files', 'fail', `Missing: ${missing.join(', ')}`));
@@ -90,6 +93,27 @@ function runDoctor({ repoRoot, codexHome }) {
   }
 
   const skillPath = path.join(codexHome, 'skills', 'paifa');
+  if (state) {
+    const hashPattern = /^[a-f0-9]{64}$/;
+    const schemaValid = typeof state.version === 'string'
+      && state.repoRoot === repoRoot
+      && state.skillPath === skillPath
+      && typeof state.backupPath === 'string'
+      && existsSync(state.backupPath)
+      && lstatSync(state.backupPath).isFile()
+      && hashPattern.test(state.agentsBeforeHash ?? '')
+      && hashPattern.test(state.agentsAfterHash ?? '')
+      && typeof state.agentsExisted === 'boolean'
+      && (state.agentsExisted
+        ? Number.isInteger(state.agentsOriginalMode)
+          && state.agentsOriginalMode >= 0
+          && state.agentsOriginalMode <= 0o777
+        : state.agentsOriginalMode === null)
+      && sha256(readFileSync(state.backupPath)) === state.agentsBeforeHash;
+    checks.push(schemaValid
+      ? check('install-state-contract', 'pass', 'Installation state paths and backup hash are valid.')
+      : check('install-state-contract', 'fail', 'Installation state contract is incomplete or inconsistent.'));
+  }
   try {
     const stat = lstatSync(skillPath);
     if (!stat.isSymbolicLink()) throw new Error('Skill path is not a symbolic link.');
@@ -109,6 +133,13 @@ function runDoctor({ repoRoot, codexHome }) {
     checks.push(managed.count === 1
       ? check('managed-block', 'pass', 'Exactly one managed block exists.')
       : check('managed-block', 'fail', 'Managed block is missing.'));
+    if (state?.agentsAfterHash) {
+      const restoreReady = sha256(agents) === state.agentsAfterHash
+        && sha256(removeManagedBlock(agents)) === state.agentsBeforeHash;
+      checks.push(restoreReady
+        ? check('restore-readiness', 'pass', 'Global rules still match the installed hash.')
+        : check('restore-readiness', 'warn', 'Global rules changed since initial install; full backup restore will be refused.'));
+    }
   } catch (error) {
     checks.push(check('managed-block', 'fail', error.message));
   }

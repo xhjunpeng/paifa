@@ -54,6 +54,10 @@ function timestamp(value) {
   return value.toISOString().replace(/[:.]/g, '-');
 }
 
+function fileMode(filePath, fallback = 0o600) {
+  return existsSync(filePath) ? lstatSync(filePath).mode & 0o777 : fallback;
+}
+
 function restoreLink(skillPath, before) {
   if (existsSync(skillPath) && lstatSync(skillPath).isSymbolicLink()) {
     unlinkSync(skillPath);
@@ -83,6 +87,7 @@ export function performInstall(options) {
   mkdirSync(skillDirectory, { recursive: true, mode: 0o700 });
   const agentsExisted = existsSync(agentsPath);
   const beforeAgents = agentsExisted ? readFileSync(agentsPath, 'utf8') : '';
+  const beforeAgentsMode = fileMode(agentsPath);
   const blockState = inspectManagedBlock(beforeAgents);
   const beforeSkill = inspectSkillPath(skillPath);
   const beforeStateText = existsSync(statePath) ? readFileSync(statePath, 'utf8') : null;
@@ -115,16 +120,31 @@ export function performInstall(options) {
     };
   }
 
+  if (previousState && !options.update) {
+    fail('UPDATE_REQUIRED', 'Existing installation changes require --update.');
+  }
+
   const beforeHash = sha256(beforeAgents);
   const backupDirectory = path.join(codexHome, 'backups', 'paifa');
-  const backupPath = path.join(
-    backupDirectory,
-    `AGENTS.md.${timestamp(now)}.${beforeHash.slice(0, 12)}.bak`,
-  );
-  atomicWriteFile(backupPath, beforeAgents, 0o600);
+  const backupPath = previousState?.backupPath ?? path.join(
+      backupDirectory,
+      `AGENTS.md.${timestamp(now)}.${beforeHash.slice(0, 12)}.bak`,
+    );
+  const originalBeforeHash = previousState?.agentsBeforeHash ?? beforeHash;
+  const originalAgentsExisted = previousState
+    ? (typeof previousState.agentsExisted === 'boolean' ? previousState.agentsExisted : true)
+    : agentsExisted;
+  const originalAgentsMode = previousState
+    ? (previousState.agentsExisted === false
+        ? null
+        : (Number.isInteger(previousState.agentsOriginalMode)
+            ? previousState.agentsOriginalMode
+            : beforeAgentsMode))
+    : (agentsExisted ? beforeAgentsMode : null);
+  if (!previousState) atomicWriteFile(backupPath, beforeAgents, 0o600);
 
   try {
-    atomicWriteFile(agentsPath, desiredAgents, 0o600);
+    atomicWriteFile(agentsPath, desiredAgents, beforeAgentsMode);
     options.hooks?.afterAgentsWrite?.();
 
     if (!linkAlreadyCorrect) {
@@ -137,8 +157,10 @@ export function performInstall(options) {
       repoRoot,
       skillPath,
       backupPath,
-      agentsBeforeHash: beforeHash,
+      agentsBeforeHash: originalBeforeHash,
       agentsAfterHash: sha256(desiredAgents),
+      agentsExisted: originalAgentsExisted,
+      agentsOriginalMode: originalAgentsMode,
       installedAt: now.toISOString(),
     };
     writeInstallState(statePath, state);
@@ -153,7 +175,7 @@ export function performInstall(options) {
     };
   } catch (error) {
     if (agentsExisted) {
-      atomicWriteFile(agentsPath, beforeAgents, 0o600);
+      atomicWriteFile(agentsPath, beforeAgents, beforeAgentsMode);
     } else {
       rmSync(agentsPath, { force: true });
     }
@@ -187,23 +209,42 @@ export function performUninstall(options) {
   }
 
   const beforeAgents = existsSync(agentsPath) ? readFileSync(agentsPath, 'utf8') : '';
+  const agentsExistedBeforeUninstall = existsSync(agentsPath);
+  const beforeAgentsMode = fileMode(agentsPath);
   let desiredAgents;
   if (options.restoreBackup) {
     if (sha256(beforeAgents) !== state.agentsAfterHash) {
       fail('RESTORE_HASH_MISMATCH', 'AGENTS.md changed after installation; refusing full restore.');
     }
-    desiredAgents = requiredFile(state.backupPath, 'BACKUP_MISSING');
+    const backupAgents = requiredFile(state.backupPath, 'BACKUP_MISSING');
+    if (sha256(removeManagedBlock(beforeAgents)) !== state.agentsBeforeHash) {
+      fail('RESTORE_BASE_MISMATCH', 'Unrelated global rules changed since initial installation; refusing full restore.');
+    }
+    desiredAgents = backupAgents;
   } else {
     desiredAgents = removeManagedBlock(beforeAgents);
   }
 
+  const shouldRemoveAgents = state.agentsExisted === false && desiredAgents === '';
+  const desiredMode = options.restoreBackup && Number.isInteger(state.agentsOriginalMode)
+    ? state.agentsOriginalMode
+    : beforeAgentsMode;
+
   try {
-    atomicWriteFile(agentsPath, desiredAgents, 0o600);
+    if (shouldRemoveAgents) {
+      rmSync(agentsPath, { force: true });
+    } else {
+      atomicWriteFile(agentsPath, desiredAgents, desiredMode);
+    }
     unlinkSync(skillPath);
     rmSync(statePath, { force: true });
     return { status: 'uninstalled', restoredBackup: Boolean(options.restoreBackup) };
   } catch (error) {
-    atomicWriteFile(agentsPath, beforeAgents, 0o600);
+    if (agentsExistedBeforeUninstall) {
+      atomicWriteFile(agentsPath, beforeAgents, beforeAgentsMode);
+    } else {
+      rmSync(agentsPath, { force: true });
+    }
     restoreLink(skillPath, beforeSkill);
     if (stateText !== null) atomicWriteFile(statePath, stateText, 0o600);
     throw error;

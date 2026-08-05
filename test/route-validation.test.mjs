@@ -18,8 +18,8 @@ const CAPABILITIES = {
 
 function validRoute(overrides = {}) {
   return {
-    version: 1,
-    taskClass: 'B',
+    version: 'v1',
+    routeClass: 'B',
     role: 'maker',
     independent: false,
     risk: [],
@@ -57,6 +57,28 @@ describe('validateRoute', () => {
 
     assert.equal(result.ok, false);
     assert.ok(errorCodes(result).includes('QUALITY_CONTRACT_REQUIRED'));
+  });
+
+  test('rejects incomplete or unknown route schema values', () => {
+    for (const route of [
+      validRoute({ version: 'v2' }),
+      validRoute({ routeClass: 'Z' }),
+      validRoute({ role: 'oracle' }),
+      validRoute({ session: { action: 'teleport', context: 'compact' } }),
+      validRoute({ session: { action: 'create', context: 'garbage' } }),
+      validRoute({ autoUpgradeCeiling: undefined }),
+    ]) assert.equal(validateRoute(route, CAPABILITIES).ok, false);
+  });
+
+  test('requires confirmation for irreversible or increased high-risk consequences', () => {
+    for (const field of ['irreversible', 'increasesHighRiskConsequences']) {
+      const rejected = validateRoute(validRoute({ [field]: true }), CAPABILITIES);
+      assert.ok(errorCodes(rejected).includes('HIGH_RISK_CONFIRMATION_REQUIRED'));
+      assert.equal(validateRoute(validRoute({
+        [field]: true,
+        userConfirmedHighRiskBoundary: true,
+      }), CAPABILITIES).ok, true);
+    }
   });
 
   test('rejects security work below sol high', () => {
@@ -185,12 +207,11 @@ describe('validateRoute', () => {
 });
 
 describe('validateDispatch', () => {
-  test('accepts dispatch parameters that match the route', () => {
+  test('accepts executable dispatch parameters that match the route', () => {
     const route = validRoute();
     const result = validateDispatch(route, {
       model: 'gpt-5.6-terra',
       effort: 'medium',
-      context: 'compact',
     });
 
     assert.equal(result.ok, true);
@@ -199,25 +220,31 @@ describe('validateDispatch', () => {
   test('rejects inherited or missing actual model parameters', () => {
     const result = validateDispatch(validRoute(), {
       effort: 'medium',
-      context: 'compact',
     });
 
     assert.equal(result.ok, false);
     assert.ok(errorCodes(result).includes('DISPATCH_MODEL_MISMATCH'));
   });
 
-  test('rejects actual effort and context that differ from the route', () => {
+  test('rejects actual effort without inventing a context tool field', () => {
     const result = validateDispatch(validRoute(), {
       model: 'gpt-5.6-terra',
       effort: 'low',
-      context: 'full-required',
     });
 
     assert.equal(result.ok, false);
-    assert.deepEqual(errorCodes(result), [
-      'DISPATCH_EFFORT_MISMATCH',
-      'DISPATCH_CONTEXT_MISMATCH',
-    ]);
+    assert.deepEqual(errorCodes(result), ['DISPATCH_EFFORT_MISMATCH']);
+  });
+
+  test('rejects semantic context when presented as an actual tool field', () => {
+    const result = validateDispatch(validRoute(), {
+      model: 'gpt-5.6-terra',
+      effort: 'medium',
+      context: 'compact',
+    });
+
+    assert.equal(result.ok, false);
+    assert.deepEqual(errorCodes(result), ['DISPATCH_FIELD_UNSUPPORTED']);
   });
 
   test('requires actual forkTurns to match an internal-subagent route', () => {
@@ -228,18 +255,15 @@ describe('validateDispatch', () => {
     const matching = validateDispatch(route, {
       model: 'gpt-5.6-terra',
       effort: 'medium',
-      context: 'compact',
       forkTurns: 'none',
     });
     const missing = validateDispatch(route, {
       model: 'gpt-5.6-terra',
       effort: 'medium',
-      context: 'compact',
     });
     const mismatched = validateDispatch(route, {
       model: 'gpt-5.6-terra',
       effort: 'medium',
-      context: 'compact',
       forkTurns: 3,
     });
 

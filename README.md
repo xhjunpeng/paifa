@@ -6,7 +6,8 @@ It does not execute business work or calculate live provider prices. It makes th
 
 ```text
 PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | focused-tests | auto<=gpt-5.6-sol/high
-PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=medium | context=compact
+PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=medium
+PAIFA_CONTEXT | mode=compact | delivery=envelope:sha256:<hash>
 ```
 
 ## Install
@@ -35,6 +36,8 @@ Split these independent checks into delegated tasks and use the lowest-cost reli
 Paifa applies hard floors before cost scoring. Authentication, authorization, identity, tenant isolation, security, billing, payment, migration, and production work cannot route below Sol `high`. Automatic escalation stops at Sol `high`; higher effort, irreversible operations, and increased high-risk consequences require explicit confirmation.
 
 Internal subagent overrides must pass `model`, `reasoning_effort`, and `fork_turns` explicitly. `fork_turns` is `"none"` or a quoted positive integer such as `"3"`; it is never `"all"` when overriding the model.
+
+`PAIFA_DISPATCHED` records only values the dispatch tool actually received: model, effort, and internal-route `forkTurns`. Context mode remains part of `PAIFA_ROUTE`; its fact-envelope delivery is recorded separately as `PAIFA_CONTEXT`, not claimed as a tool-returned field.
 
 ## Maintain
 

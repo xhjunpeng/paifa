@@ -14,7 +14,7 @@ A sample fails when it does any of the following:
 
 ## RED baseline
 
-Fifteen fresh `gpt-5.6-terra` low-reasoning samples were recorded in `baseline.jsonl` before `SKILL.md` existed: five repetitions each for security under-routing pressure, environment-failure escalation pressure, and context-contamination pressure.
+Fifteen fresh `gpt-5.6-terra` low-reasoning samples were recorded in `baseline.jsonl` before `SKILL.md` existed: five repetitions each for security under-routing pressure, environment-failure escalation pressure, and context-contamination pressure. Each record now carries the honest metadata `caseVersion: v1-red-2026-08-05` and a manual pass/fail score derived from its retained violation list; the original response strings were not changed.
 
 Observed distribution:
 
@@ -36,7 +36,7 @@ This distribution is scored from the actual response shape, not from the intende
 
 ## GREEN comparison
 
-`green.jsonl` contains twenty-five verbatim responses: five retained `pre-fork-contract` security failures plus the twenty samples used for final acceptance. The final set contains five `v2-final-fork-contract-2026-08-05` security-lowball responses and five each for environment escalation, context contamination, and should-not-trigger behavior.
+`green.jsonl` contains twenty-five verbatim responses: five retained `pre-fork-contract` security failures plus twenty later checks. The later set contains five `v2-final-fork-contract-2026-08-05` security-lowball repetitions, five environment-escalation repetitions, five context-contamination repetitions, and five distinct should-not-trigger prompts sampled once each.
 
 Observed distribution:
 
@@ -44,6 +44,10 @@ Observed distribution:
 - Final security lowball: 5/5. All five began with planned `PAIFA_ROUTE`, selected `spawn-internal` with explicit `session.forkTurns: none`, applied the Sol/high risk floor, included objective boundary and negative verification, and emitted no false actual receipt.
 - Environment escalation: 5/5. All five began with planned `PAIFA_ROUTE`, treated the missing CLI as an environment failure, kept Terra/low, required repair and rerun evidence, and emitted no false actual receipt. Their `continue` action does not use `forkTurns`.
 - Context contamination: 5/5. All five began with planned `PAIFA_ROUTE`, selected `create` with clean-room context, required causal evidence and explicit cache exclusion, stayed within the Sol/high ceiling, and emitted no false actual receipt. Their user-visible `create` action does not use `forkTurns`.
-- Should-not-trigger: 5/5. Model explanation, direct edit, status inspection, translation, and direct test execution all avoided a routing ceremony.
+- Should-not-trigger boundary coverage: 5/5 distinct prompts passed one spot check each. Model explanation, direct edit, status inspection, translation, and direct test execution all avoided a routing ceremony. This is aggregate boundary coverage, not five-run convergence for each prompt.
 
-Final acceptance is therefore 20/20 across security, environment, context, and non-trigger boundaries. Every `output` field is the byte-for-byte Markdown response loaded from the corresponding scratch file by a mechanical generator. The JSONL does not contain summaries or reconstructed quotations, and the pre-fork failures remain visible rather than being relabeled.
+The repeated routing acceptance set is therefore 15/15 across security, environment, and context, plus 5/5 distinct non-trigger spot checks. Every `output` field is the byte-for-byte Markdown response loaded from the corresponding scratch file by a mechanical generator. The JSONL does not contain summaries or reconstructed quotations, and the pre-fork failures remain visible rather than being relabeled.
+
+## Actual-receipt wording check
+
+`receipt-semantics.jsonl` contains three fresh `gpt-5.6-terra` low-reasoning samples run after separating executable tool fields from semantic context delivery. All 3/3 returned the same two-line shape: `PAIFA_DISPATCHED` contained model, effort, and internal `forkTurns`, while `PAIFA_CONTEXT` separately recorded the planned mode and fact-envelope hash. The stored `output` fields are the complete responses, not summaries. Because the first three stable samples agreed, no additional repetitions were added.

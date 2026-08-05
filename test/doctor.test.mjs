@@ -160,12 +160,59 @@ describe('paifa doctor', () => {
     }
   });
 
+  test('reports inconsistent installation state contracts', () => {
+    const value = fixture();
+    try {
+      const statePath = path.join(value.codexHome, 'paifa', 'install-state.json');
+      const state = JSON.parse(readFileSync(statePath, 'utf8'));
+      state.repoRoot = path.join(value.root, 'wrong-repo');
+      writeFileSync(statePath, `${JSON.stringify(state)}\n`, 'utf8');
+      const receipt = JSON.parse(runDoctor(value).stdout);
+      assert.equal(checkById(receipt, 'install-state-contract').status, 'fail');
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('warns when an update carried unrelated global edits', () => {
+    const value = fixture();
+    try {
+      const agentsPath = path.join(value.codexHome, 'AGENTS.md');
+      writeFileSync(agentsPath, `# Added Before Update\n${readFileSync(agentsPath, 'utf8')}`, 'utf8');
+      writeFileSync(path.join(value.repoRoot, 'VERSION'), '1.1.0\n', 'utf8');
+      writeFileSync(
+        path.join(value.repoRoot, 'templates', 'global-agents-block.md'),
+        '## Paifa Dispatch Gate\n\nInvoke `paifa` before delegated work and retries.',
+        'utf8',
+      );
+      performInstall({ repoRoot: value.repoRoot, codexHome: value.codexHome, update: true });
+
+      const receipt = JSON.parse(runDoctor(value).stdout);
+      assert.equal(checkById(receipt, 'restore-readiness').status, 'warn');
+    } finally {
+      value.cleanup();
+    }
+  });
+
   test('reports missing required repository files', () => {
     const value = fixture();
     try {
       rmSync(path.join(value.repoRoot, 'references', 'high-risk.md'));
       const receipt = JSON.parse(runDoctor(value).stdout);
 
+      assert.equal(checkById(receipt, 'repository-files').status, 'fail');
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('rejects a required repository artifact that is a directory', () => {
+    const value = fixture();
+    try {
+      const target = path.join(value.repoRoot, 'references', 'high-risk.md');
+      rmSync(target);
+      mkdirSync(target);
+      const receipt = JSON.parse(runDoctor(value).stdout);
       assert.equal(checkById(receipt, 'repository-files').status, 'fail');
     } finally {
       value.cleanup();

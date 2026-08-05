@@ -9,7 +9,7 @@ Check the currently available dispatch tool and its accepted capabilities immedi
 | Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Set `fork_turns` to `"none"` or a quoted positive integer such as `"3"`, and provide a compact fact envelope |
 | Fork | follow-up model and effort fields, if supported | Fork preserves history and is not a clean-room mechanism |
 
-Use the exact names exposed by the current tool. `PAIFA_ROUTE` is the recommendation and validation record; `PAIFA_DISPATCHED` is the successful tool receipt. Keep them separate and compare model, effort, context, and internal-route `forkTurns`.
+Use the exact names exposed by the current tool. `PAIFA_ROUTE` is the recommendation and validation record; `PAIFA_DISPATCHED` records only successful tool inputs: model, effort, and internal-route `forkTurns`. Compare those fields with the plan. Context is delivered in the task message or fact envelope, not through an independent tool field. Record it separately as `PAIFA_CONTEXT | mode=<planned-mode> | delivery=envelope:<id-or-sha256>`.
 
 ## Fallback
 

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import {
+  chmodSync,
   existsSync,
   lstatSync,
   mkdtempSync,
@@ -25,7 +26,7 @@ import { inspectManagedBlock } from '../scripts/lib/managed-block.mjs';
 const ORIGINAL_AGENTS = '# Global Rules\n\nKeep this rule.\n';
 const BLOCK_V1 = '## Paifa Dispatch Gate\n\nInvoke `paifa` before delegated work.';
 
-function fixture() {
+function fixture({ agentsExisted = true } = {}) {
   const root = mkdtempSync(path.join(os.tmpdir(), 'paifa-install-'));
   const repoRoot = path.join(root, 'repo');
   const codexHome = path.join(root, 'codex');
@@ -34,7 +35,9 @@ function fixture() {
   writeFileSync(path.join(repoRoot, 'SKILL.md'), '---\nname: paifa\ndescription: Use when delegating Codex work.\n---\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'VERSION'), '1.0.0\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'templates', 'global-agents-block.md'), BLOCK_V1, 'utf8');
-  writeFileSync(path.join(codexHome, 'AGENTS.md'), ORIGINAL_AGENTS, 'utf8');
+  if (agentsExisted) {
+    writeFileSync(path.join(codexHome, 'AGENTS.md'), ORIGINAL_AGENTS, 'utf8');
+  }
 
   return {
     root,
@@ -116,6 +119,64 @@ describe('install lifecycle', () => {
     }
   });
 
+  test('changed installation requires the explicit update flag', () => {
+    const value = fixture();
+    try {
+      performInstall(installOptions(value));
+      const agentsPath = path.join(value.codexHome, 'AGENTS.md');
+      const before = readFileSync(agentsPath, 'utf8');
+      writeFileSync(path.join(value.repoRoot, 'VERSION'), '1.1.0\n', 'utf8');
+      assert.throws(() => performInstall(installOptions(value)), /UPDATE_REQUIRED/);
+      assert.equal(readFileSync(agentsPath, 'utf8'), before);
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('restore-backup after an update restores the original global rules', () => {
+    const value = fixture();
+    try {
+      performInstall(installOptions(value));
+      writeFileSync(path.join(value.repoRoot, 'VERSION'), '1.1.0\n', 'utf8');
+      writeFileSync(path.join(value.repoRoot, 'templates', 'global-agents-block.md'),
+        '## Paifa Dispatch Gate\n\nInvoke `paifa` before delegated work and retries.', 'utf8');
+      performInstall(installOptions(value, { update: true }));
+      performUninstall({ repoRoot: value.repoRoot, codexHome: value.codexHome, restoreBackup: true });
+      const agents = readFileSync(path.join(value.codexHome, 'AGENTS.md'), 'utf8');
+      assert.equal(agents, ORIGINAL_AGENTS);
+      assert.equal(inspectManagedBlock(agents).count, 0);
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('restore-backup refuses when an update carried unrelated global edits', () => {
+    const value = fixture();
+    try {
+      performInstall(installOptions(value));
+      const agentsPath = path.join(value.codexHome, 'AGENTS.md');
+      writeFileSync(agentsPath, `# Added Before Update\n${readFileSync(agentsPath, 'utf8')}`, 'utf8');
+      writeFileSync(path.join(value.repoRoot, 'VERSION'), '1.1.0\n', 'utf8');
+      writeFileSync(path.join(value.repoRoot, 'templates', 'global-agents-block.md'),
+        '## Paifa Dispatch Gate\n\nInvoke `paifa` before delegated work and retries.', 'utf8');
+      performInstall(installOptions(value, { update: true }));
+
+      assert.throws(
+        () => performUninstall({
+          repoRoot: value.repoRoot,
+          codexHome: value.codexHome,
+          restoreBackup: true,
+        }),
+        /RESTORE_BASE_MISMATCH/,
+      );
+
+      performUninstall({ repoRoot: value.repoRoot, codexHome: value.codexHome });
+      assert.equal(readFileSync(agentsPath, 'utf8'), `# Added Before Update\n${ORIGINAL_AGENTS}`);
+    } finally {
+      value.cleanup();
+    }
+  });
+
   test('existing non-symlink skill path stops without changing AGENTS', () => {
     const value = fixture();
     try {
@@ -170,6 +231,29 @@ describe('install lifecycle', () => {
     }
   });
 
+  test('install failure preserves the original AGENTS mode', () => {
+    const value = fixture();
+    try {
+      const agentsPath = path.join(value.codexHome, 'AGENTS.md');
+      chmodSync(agentsPath, 0o640);
+
+      assert.throws(
+        () => performInstall(installOptions(value, {
+          hooks: {
+            afterAgentsWrite() {
+              throw new Error('injected failure');
+            },
+          },
+        })),
+        /injected failure/,
+      );
+
+      assert.equal(lstatSync(agentsPath).mode & 0o777, 0o640);
+    } finally {
+      value.cleanup();
+    }
+  });
+
   test('uninstall removes only managed artifacts and preserves outside edits', () => {
     const value = fixture();
     try {
@@ -187,6 +271,59 @@ describe('install lifecycle', () => {
       assert.equal(readFileSync(agentsPath, 'utf8'), `# Added Later\n${ORIGINAL_AGENTS}`);
       assert.equal(existsSync(path.join(value.codexHome, 'skills', 'paifa')), false);
       assert.equal(existsSync(path.join(value.codexHome, 'paifa', 'install-state.json')), false);
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('install and uninstall preserve an existing AGENTS mode', () => {
+    const value = fixture();
+    try {
+      const agentsPath = path.join(value.codexHome, 'AGENTS.md');
+      chmodSync(agentsPath, 0o640);
+
+      performInstall(installOptions(value));
+      assert.equal(lstatSync(agentsPath).mode & 0o777, 0o640);
+
+      performUninstall({ repoRoot: value.repoRoot, codexHome: value.codexHome });
+      assert.equal(lstatSync(agentsPath).mode & 0o777, 0o640);
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('uninstall restores the absence of an AGENTS file created by install', () => {
+    const value = fixture({ agentsExisted: false });
+    try {
+      const agentsPath = path.join(value.codexHome, 'AGENTS.md');
+
+      performInstall(installOptions(value));
+      assert.equal(existsSync(agentsPath), true);
+
+      performUninstall({ repoRoot: value.repoRoot, codexHome: value.codexHome });
+      assert.equal(existsSync(agentsPath), false);
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('update preserves metadata for an originally absent AGENTS file', () => {
+    const value = fixture({ agentsExisted: false });
+    try {
+      const agentsPath = path.join(value.codexHome, 'AGENTS.md');
+      performInstall(installOptions(value));
+      writeFileSync(path.join(value.repoRoot, 'VERSION'), '1.1.0\n', 'utf8');
+      performInstall(installOptions(value, { update: true }));
+
+      const state = JSON.parse(readFileSync(
+        path.join(value.codexHome, 'paifa', 'install-state.json'),
+        'utf8',
+      ));
+      assert.equal(state.agentsExisted, false);
+      assert.equal(state.agentsOriginalMode, null);
+
+      performUninstall({ repoRoot: value.repoRoot, codexHome: value.codexHome });
+      assert.equal(existsSync(agentsPath), false);
     } finally {
       value.cleanup();
     }

@@ -62,4 +62,4 @@ PAIFA_ROUTE:
   escalationReason: unknown-root-cause
 ```
 
-After successful tool execution, emit a separate actual receipt, for example: `PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=high | context=compact | forkTurns=none`. Validate the actual model, effort, context, and internal-route `forkTurns` against the planned route; do not merge planned and actual values into one claim.
+After successful tool execution, emit an actual tool receipt, for example: `PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=high | forkTurns=none`. Validate model, effort, and internal-route `forkTurns` against the planned route. Context mode is semantic policy, not a tool receipt field; record its delivery separately, for example: `PAIFA_CONTEXT | mode=compact | delivery=envelope:sha256:<hash>`. Do not merge planned, actual, and delivery evidence into one claim.

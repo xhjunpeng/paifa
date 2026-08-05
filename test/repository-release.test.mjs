@@ -43,8 +43,10 @@ test('released repository installs one dispatch gate without replacing existing 
       /explicit user confirmation is required only for .*?above Sol high.*?irreversible.*?changes? that increase high-risk consequences/is,
     );
     assert.match(agents, /every successful dispatch must emit `PAIFA_DISPATCHED`/is);
-    assert.match(agents, /`PAIFA_DISPATCHED` must record actual model, effort, and context values/is);
-    assert.match(agents, /each actual value must match its corresponding `PAIFA_ROUTE` value/is);
+    assert.match(agents, /`PAIFA_DISPATCHED` must record actual model and effort/is);
+    assert.match(agents, /internal subagent.*?actual `forkTurns`/is);
+    assert.match(agents, /context is not a tool receipt field/is);
+    assert.match(agents, /`PAIFA_CONTEXT`.*?envelope identifier or hash/is);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

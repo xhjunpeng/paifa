@@ -20,6 +20,10 @@ const HIGH_RISK = new Set([
   'migration',
   'production',
 ]);
+const ROUTE_CLASSES = new Set(['A', 'B', 'C', 'D']);
+const ROLES = new Set(['maker', 'checker', 'investigator']);
+const SESSION_ACTIONS = new Set(['create', 'continue', 'spawn-internal', 'fork']);
+const CONTEXT_MODES = new Set(['minimal', 'compact', 'recent', 'full-required', 'clean-room']);
 
 function issue(code, message) {
   return { code, message };
@@ -78,11 +82,23 @@ export function validateRoute(route, capabilities = {}) {
     ));
   }
 
+  if (route.version !== 'v1' || !ROUTE_CLASSES.has(route.routeClass) || !ROLES.has(route.role)) {
+    errors.push(issue('ROUTE_SCHEMA_INVALID', 'Route version, routeClass, or role is invalid.'));
+  }
+
   if (!route.session?.action || !route.session?.context) {
     errors.push(issue(
       'SESSION_REQUIRED',
       'Route must set both session action and context mode.',
     ));
+  }
+  if (route.session && (!SESSION_ACTIONS.has(route.session.action)
+    || !CONTEXT_MODES.has(route.session.context))) {
+    errors.push(issue('SESSION_INVALID', 'Session action or context mode is unsupported.'));
+  }
+
+  if (!route.autoUpgradeCeiling?.model || !route.autoUpgradeCeiling?.effort) {
+    errors.push(issue('AUTO_UPGRADE_CEILING_REQUIRED', 'Route must set an automatic upgrade ceiling.'));
   }
 
   if (route.session?.action === 'spawn-internal') {
@@ -132,6 +148,14 @@ export function validateRoute(route, capabilities = {}) {
     ));
   }
 
+  if ((route.irreversible === true || route.increasesHighRiskConsequences === true)
+    && route.userConfirmedHighRiskBoundary !== true) {
+    errors.push(issue(
+      'HIGH_RISK_CONFIRMATION_REQUIRED',
+      'Irreversible or increased high-risk consequences require explicit confirmation.',
+    ));
+  }
+
   if (ceilingAboveSolHigh(route.autoUpgradeCeiling)) {
     errors.push(issue(
       'AUTO_UPGRADE_CEILING',
@@ -161,6 +185,16 @@ export function validateRoute(route, capabilities = {}) {
 export function validateDispatch(route, dispatch) {
   const errors = [];
   const actual = dispatch && typeof dispatch === 'object' ? dispatch : {};
+  const allowedFields = new Set(['model', 'effort']);
+  if (route?.session?.action === 'spawn-internal') allowedFields.add('forkTurns');
+  const unsupportedFields = Object.keys(actual).filter((field) => !allowedFields.has(field));
+
+  if (unsupportedFields.length > 0) {
+    errors.push(issue(
+      'DISPATCH_FIELD_UNSUPPORTED',
+      `Actual receipt contains unsupported tool fields: ${unsupportedFields.join(', ')}.`,
+    ));
+  }
 
   if (actual.model !== route?.model) {
     errors.push(issue(
@@ -173,13 +207,6 @@ export function validateDispatch(route, dispatch) {
     errors.push(issue(
       'DISPATCH_EFFORT_MISMATCH',
       `Actual effort ${actual.effort ?? '<missing>'} does not match route ${route?.effort ?? '<missing>'}.`,
-    ));
-  }
-
-  if (actual.context !== route?.session?.context) {
-    errors.push(issue(
-      'DISPATCH_CONTEXT_MISMATCH',
-      `Actual context ${actual.context ?? '<missing>'} does not match route ${route?.session?.context ?? '<missing>'}.`,
     ));
   }
 

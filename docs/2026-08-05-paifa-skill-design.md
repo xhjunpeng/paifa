@@ -46,9 +46,11 @@ paifa Skill
         ↓ 生成路由和质量合同
 validate-route 校验
         ↓
-Codex 派发工具显式传参
+Codex 派发工具显式传入可执行参数
         ↓
 PAIFA_DISPATCHED 记录真实参数
+        ↓
+PAIFA_CONTEXT 记录上下文交付证据
         ↓
 子任务结果验证与升级判断
 ```
@@ -305,10 +307,11 @@ C/D、风险或重试任务使用扩展 YAML，至少包含：
 真实派发后必须记录：
 
 ```text
-PAIFA_DISPATCHED | model=gpt-5.6-terra | thinking=medium | context=compact
+PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=medium
+PAIFA_CONTEXT | mode=compact | delivery=envelope:sha256:<hash>
 ```
 
-`PAIFA_ROUTE` 表示计划；`PAIFA_DISPATCHED` 表示实际参数。两者必须一致。
+`PAIFA_ROUTE` 表示计划；`PAIFA_DISPATCHED` 只记录工具实际接收的模型、思考强度和内部子代理 `forkTurns`。这些可执行字段必须与计划一致。上下文模式不是独立工具字段，使用 `PAIFA_CONTEXT` 另记事实信封的标识或哈希，不能伪装成工具返回值。
 
 ## 14. 工具映射
 
@@ -337,7 +340,8 @@ PAIFA_DISPATCHED | model=gpt-5.6-terra | thinking=medium | context=compact
 - 模型覆盖时是否错误携带完整历史。
 - Fork 是否被错误用于上下文清理。
 - 是否存在质量合同。
-- 真实派发参数是否与计划一致。
+- 真实模型、思考强度和内部子代理 `forkTurns` 是否与计划一致。
+- 实际回执是否错误包含不存在的上下文工具字段。
 
 校验失败时禁止派发，并返回具体修复建议。
 

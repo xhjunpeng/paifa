@@ -30,6 +30,6 @@ Full backup restoration is intentionally stricter:
 ./scripts/uninstall.sh --restore-backup
 ```
 
-It succeeds only when the current global file still matches the installed hash. This prevents overwriting edits made after installation.
+It succeeds only when the current global file matches the installed hash and its non-Paifa content still matches the original backup. This prevents overwriting edits made before or after an update.
 
 After an upgrade, a new Codex task may be required before runtime Skill discovery reflects the new files.
