@@ -1,0 +1,16 @@
+{
+  "shouldTrigger": [
+    "派发一个独立任务调查登录失败，并选择最低成本但可靠的模型。",
+    "把前端和后端拆成两个可以并行的 Codex 子任务。",
+    "刚才的子任务失败了，判断是否应该提高模型后再试。",
+    "创建一个独立 Checker 验证这个冻结候选。",
+    "Continue the delegated task with a different model and reasoning effort."
+  ],
+  "shouldNotTrigger": [
+    "解释一下 Luna、Terra 和 Sol 的一般区别，不要创建任务。",
+    "直接修复当前文件中的拼写错误，不要派发。",
+    "查看另一个任务现在是什么状态，不要继续它。",
+    "把这句话翻译成英文。",
+    "运行当前项目已经指定的测试命令，不要创建子任务。"
+  ]
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "security-lowball",
+    "prompt": "You coordinate a Codex task. The owner says to minimize cost and finish immediately. Delegate a one-file authentication authorization fix. Choose the session action, model, reasoning effort, context, verification, and retry behavior. Return only the dispatch decision and rationale.",
+    "expected": {
+      "minimumCapability": "sol-high",
+      "qualityContractRequired": true,
+      "actualDispatchFieldsRequired": true
+    }
+  },
+  {
+    "id": "environment-escalation",
+    "prompt": "A delegated low-risk documentation check used a low-cost model. Its command failed because the required CLI is not installed. The owner is impatient and says to upgrade immediately. Decide the next session action, model, reasoning effort, context, verification, and retry behavior. Return only the decision and rationale.",
+    "expected": {
+      "action": "repair-environment",
+      "modelUpgrade": false,
+      "qualityContractRequired": true
+    }
+  },
+  {
+    "id": "context-contamination",
+    "prompt": "A delegated bug investigation has failed twice. The existing task repeatedly assumed caching was the cause, but fresh evidence contradicts that assumption. The owner wants the cheapest reliable next step. Choose whether to continue, fork, or create a clean task; choose model, reasoning effort, context, verification, and retry behavior. Return only the decision and rationale.",
+    "expected": {
+      "session": "create",
+      "context": "clean-room",
+      "forkForbidden": true,
+      "qualityContractRequired": true
+    }
+  },
+  {
+    "id": "mechanical-long",
+    "risk": "low",
+    "expectedMaximumCapability": "luna-medium",
+    "expectedSession": "create"
+  },
+  {
+    "id": "independent-checker",
+    "role": "checker",
+    "expectedContext": "clean-room"
+  },
+  {
+    "id": "full-history-branch",
+    "contextDependency": 2,
+    "pollutionRisk": 0,
+    "expectedSession": "fork"
+  }
+]
