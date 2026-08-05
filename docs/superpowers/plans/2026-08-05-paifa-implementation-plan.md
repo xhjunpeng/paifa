@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Source root: `/Users/jumper/Downloads/66mw/skills/功能/paifa`.
+- Source root: `<repo-root>`.
 - Public repository content must not contain private project data, credentials, or hard-coded user home paths.
 - `SKILL.md` must remain below 500 English-word-equivalent content and put heavy policy in conditional references.
 - No third-party runtime dependencies in v1.
@@ -82,7 +82,7 @@
 Run:
 
 ```bash
-cd /Users/jumper/Downloads/66mw/skills/功能/paifa
+cd <repo-root>
 git init -b feat/paifa-v1
 git status --short --branch
 ```
@@ -554,7 +554,7 @@ git commit -m "docs: prepare paifa for public release"
 - [ ] **Step 1: Run the full verification suite before touching the real Codex home**
 
 ```bash
-cd /Users/jumper/Downloads/66mw/skills/功能/paifa
+cd <repo-root>
 npm test
 node scripts/doctor.mjs --repo-root "$PWD" --codex-home "$(mktemp -d)" --json
 git diff --check
@@ -566,9 +566,9 @@ The temporary doctor may report “not installed”; it must do so cleanly and w
 - [ ] **Step 2: Verify exact real targets and absence of conflicts**
 
 ```bash
-test ! -e /Users/jumper/.codex/skills/paifa
-rg -n 'PAIFA_MANAGED_BLOCK' /Users/jumper/.codex/AGENTS.md || true
-shasum -a 256 /Users/jumper/.codex/AGENTS.md
+test ! -e <codex-home>/skills/paifa
+rg -n 'PAIFA_MANAGED_BLOCK' <codex-home>/AGENTS.md || true
+shasum -a 256 <codex-home>/AGENTS.md
 ```
 
 Stop if an unmanaged existing Skill or managed block appears unexpectedly.
@@ -577,19 +577,19 @@ Stop if an unmanaged existing Skill or managed block appears unexpectedly.
 
 ```bash
 ./scripts/install.sh \
-  --repo-root /Users/jumper/Downloads/66mw/skills/功能/paifa \
-  --codex-home /Users/jumper/.codex
+  --repo-root <repo-root> \
+  --codex-home <codex-home>
 ```
 
 - [ ] **Step 4: Verify install receipts and global-file preservation**
 
 ```bash
 node scripts/doctor.mjs \
-  --repo-root /Users/jumper/Downloads/66mw/skills/功能/paifa \
-  --codex-home /Users/jumper/.codex \
+  --repo-root <repo-root> \
+  --codex-home <codex-home> \
   --json
-ls -ld /Users/jumper/.codex/skills/paifa
-rg -n 'PAIFA_MANAGED_BLOCK' /Users/jumper/.codex/AGENTS.md
+ls -ld <codex-home>/skills/paifa
+rg -n 'PAIFA_MANAGED_BLOCK' <codex-home>/AGENTS.md
 ```
 
 Confirm exactly one managed block, a symlink to the repository, a recorded backup, and no modifications outside the managed block.
