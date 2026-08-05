@@ -67,3 +67,7 @@ PAIFA_ROUTE:
 After successful tool execution, emit an actual tool receipt, for example: `PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=high | forkTurns=none`. Validate model, effort, and internal-route `forkTurns` against the planned route. Context mode is semantic policy, not a tool receipt field; record its delivery separately, for example: `PAIFA_CONTEXT | mode=compact | delivery=envelope:sha256:<hash>`. Do not merge planned, actual, and delivery evidence into one claim.
 
 Waiting, monitoring, polling, and status-only updates after dispatch emit no Paifa receipt. Emit another planned receipt only when a new retry, reroute, fork, continuation, or delegated task will actually be dispatched.
+
+## Main-task lifecycle
+
+The main task owns completion after every dispatch. Continue all safe independent work while delegated work runs. If the next required step depends on its result, wait for it, integrate it, and verify the combined outcome before the final answer. The main task must not end its turn merely because delegated work has started.

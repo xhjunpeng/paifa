@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.0.2 - 2026-08-05
+
+- Clarified that Paifa never authorizes or requires delegation for ordinary main-task work.
+- Made the main task retain completion ownership after dispatch: continue independent work, then wait for and integrate required delegated results before the final answer.
+- Added deterministic lifecycle contracts and three fresh Terra/low semantic samples for the premature-stop regression.
+
 ## 1.0.1 - 2026-08-05
 
 - Changed every normal route class to one validator-generated compact `PAIFA_ROUTE` line.

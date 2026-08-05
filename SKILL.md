@@ -9,23 +9,27 @@ Route a real delegation to the lowest-cost capability that can meet its quality 
 
 ## Trigger boundary
 
-Use before creating, continuing, retrying, forking, or spawning a delegated task or internal subagent, including a request for lowest-cost routing. Do not use for one ordinary task, a model explanation with no dispatch, or status-only inspection. Waiting or monitoring already-dispatched work stays status-only until a new retry or reroute decision is required.
+Use before creating, continuing, retrying, forking, or spawning delegated work. Paifa does not authorize, require, or recommend delegation by itself. Do not use for an ordinary task, a model explanation without dispatch, or status-only inspection.
 
 ## Route contract
 
-1. Confirm delegation and safe split boundaries; select `create`, `continue`, `spawn-internal`, or `fork`.
+1. Confirm safe split boundaries; select `create`, `continue`, `spawn-internal`, or `fork`.
 2. Apply the risk floor before cost scoring. Authentication, authorization, identity, tenant, billing, payment, migration, security, and production work are never below Sol `high`, even for one file.
-3. Select the lowest capable model and effort, context mode, fact-only envelope, objective quality contract, and automatic-upgrade ceiling.
-4. Inspect task state first. Build the structured route internally at `phase=planned` and validate it. Immediately before the real dispatch decision, emit exactly the validator's one-line `PAIFA_ROUTE` receipt plus at most one short explanation. Use this compact shape for A/B/C/D, high-risk, and retry routes. Show raw route YAML only when the user explicitly requests audit details or validation fails.
-5. Do not repeat Paifa receipts during waiting, monitoring, polling, or status updates. A materially new dispatch, retry, or reroute repeats step 4 once. Pass matching model and effort explicitly; internal routes also pass `forkTurns` as `none` or a quoted positive integer. After tool success, emit one `PAIFA_DISPATCHED` and one `PAIFA_CONTEXT`.
+3. Select the lowest capable model and effort, context, fact envelope, quality contract, and upgrade ceiling.
+4. Inspect state, build and validate the internal `phase=planned` route, then emit its single-line `PAIFA_ROUTE` plus at most one sentence. Show YAML only for explicit audit details or validation failure.
+5. Pass explicit model and effort; internal routes also pass `forkTurns` as `none` or a positive string. After success, emit one `PAIFA_DISPATCHED` and `PAIFA_CONTEXT`. Waiting, polling, and status updates emit no receipts; retry or reroute starts a new route.
 
 Fast A/B receipt:
 
 `PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | maker | checks=2 | auto<=gpt-5.6-sol/high`
 
+## Main-task lifecycle
+
+The main task owns completion. Continue all safe independent work while delegated work runs. If a required step depends on its result, wait, integrate it, and verify the combined outcome before the final answer. The main task must not end its turn merely because delegated work started.
+
 ## Diagnose before escalating
 
-Repair missing tools, permissions, services, or dependencies; do not blame the model. Add a fact envelope when requirements or context are insufficient. Re-route when scope changes. Escalate one step only for evidenced capability failure; automatic escalation stops at Sol `high`. Ask the user before a higher effort, an irreversible action, or changed high-risk consequences.
+Repair missing tools, permissions, services, or dependencies without blaming the model. Add missing facts, and re-route scope changes. Escalate one step only for evidenced capability failure, stopping automatically at Sol `high`. Ask before higher effort, irreversible action, or increased high-risk consequences.
 
 ## Load details only when needed
 

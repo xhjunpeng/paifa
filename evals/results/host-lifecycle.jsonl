@@ -1,0 +1,3 @@
+{"caseId":"required-delegated-result","caseVersion":"v1-main-task-lifecycle-2026-08-05","rep":1,"model":"gpt-5.6-terra","reasoning":"low","output":"ACTION=WAIT-AND-INTEGRATE","manualScore":"pass","violations":[]}
+{"caseId":"required-delegated-result","caseVersion":"v1-main-task-lifecycle-2026-08-05","rep":2,"model":"gpt-5.6-terra","reasoning":"low","output":"ACTION=WAIT-AND-INTEGRATE","manualScore":"pass","violations":[]}
+{"caseId":"required-delegated-result","caseVersion":"v1-main-task-lifecycle-2026-08-05","rep":3,"model":"gpt-5.6-terra","reasoning":"low","output":"ACTION=WAIT-AND-INTEGRATE","manualScore":"pass","violations":[]}

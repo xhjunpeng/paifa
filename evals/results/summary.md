@@ -57,3 +57,7 @@ The repeated routing acceptance set is therefore 15/15 across security, environm
 The owner's two reported screenshots are the observed RED behavior: Paifa 1.0.0 exposed a full route object and repeatedly emitted `PAIFA_ROUTE` during unchanged `wait_threads` monitoring. Those screenshots contain private task identifiers and are not copied into this public repository or represented as verbatim JSONL evidence.
 
 `compact-output-semantics.jsonl` contains three complete fresh `gpt-5.6-terra` low-reasoning responses produced with the 1.0.1 Skill. All 3/3 returned one short status sentence and emitted no `PAIFA_ROUTE`, `PAIFA_DISPATCHED`, or `PAIFA_CONTEXT`. Because the first three stable samples agreed, no additional repetitions were added.
+
+## Main-task lifecycle
+
+The owner's screenshot of the main task returning control immediately after reporting that a delegated worker had started is the observed RED behavior. `host-lifecycle.jsonl` contains three complete fresh `gpt-5.6-terra` low-reasoning responses produced with the 1.0.2 Skill. All 3/3 returned exactly `ACTION=WAIT-AND-INTEGRATE` when the delegated result was required and no independent local work remained. Because the first three stable samples agreed, no additional repetitions were added.

@@ -23,6 +23,8 @@ The installer creates a symlink at the current Codex Home's `skills/paifa` path 
 
 The managed block makes Paifa run before a requested delegation, split, retry, fork, or subagent spawn. You can also invoke `paifa` explicitly when choosing the lowest-cost reliable route.
 
+Paifa does not create a reason to delegate. Ordinary main-task work proceeds directly without Paifa or waiting when no real dispatch is needed. After a dispatch, the main task remains responsible for completion: it continues safe independent work and, when the result is required, waits for it, integrates it, and verifies the combined outcome before answering.
+
 Filesystem installation and Doctor checks do not prove that an already-running Codex task dynamically discovered the Skill. Start a new Codex task when runtime discovery is not dynamic.
 
 ## Use
@@ -36,6 +38,8 @@ Split these independent checks into delegated tasks and use the lowest-cost reli
 Paifa applies hard floors before cost scoring. Authentication, authorization, identity, tenant isolation, security, billing, payment, migration, and production work cannot route below Sol `high`. Automatic escalation stops at Sol `high`; higher effort, irreversible operations, and increased high-risk consequences require explicit confirmation.
 
 Normal output is compact for every route class: Paifa inspects state, validates the full route internally, then emits one `PAIFA_ROUTE` line immediately before dispatch. Waiting, monitoring, polling, and status-only updates do not repeat receipts. Expanded YAML is available only when audit details are explicitly requested or validation fails.
+
+Starting delegated work is not completion. The main task must not end its turn merely because a delegated task or subagent has started.
 
 Internal subagent overrides must pass `model`, `reasoning_effort`, and `fork_turns` explicitly. `fork_turns` is `"none"` or a quoted positive integer such as `"3"`; it is never `"all"` when overriding the model.
 
