@@ -40,6 +40,7 @@
 - `scripts/lib/route-validation.mjs` — pure deterministic route and dispatch validation.
 - `scripts/lib/managed-block.mjs` — pure insertion, replacement, removal, and marker validation.
 - `scripts/lib/install-state.mjs` — hashes, backup metadata, atomic file writes, and install-state serialization.
+- `scripts/lib/installer.mjs` — filesystem installation and uninstall transaction boundary.
 - `scripts/validate-route.mjs` — JSON CLI over route validation.
 - `scripts/install.mjs` — safe installation and update CLI.
 - `scripts/uninstall.mjs` — safe uninstall and optional guarded restore CLI.
