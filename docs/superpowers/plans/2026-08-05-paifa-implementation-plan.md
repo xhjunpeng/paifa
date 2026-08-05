@@ -525,7 +525,7 @@ Require RED baseline evidence for behavioral changes, deterministic tests for sc
 - [ ] **Step 4: Run documentation and privacy checks**
 
 ```bash
-rg -n 'TBD|TODO|PLACEHOLDER|/Users/jumper|66mw|API[_ -]?KEY|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY' . --glob '!evals/results/*.jsonl' --glob '!.git/**'
+rg -n 'TBD|TODO|PLACEHOLDER|/Users/|/home/|API[_ -]?KEY|BEGIN (RSA|OPENSSH|EC) PRIVATE KEY' . --glob '!evals/results/*.jsonl' --glob '!.git/**'
 git diff --check
 npm test
 ```
