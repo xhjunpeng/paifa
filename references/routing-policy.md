@@ -47,7 +47,7 @@ The automatic ceiling is `gpt-5.6-sol` / `high`; confirmation rules are in `high
 PAIFA_ROUTE:
   version: v1
   phase: planned
-  session: { action: create, context: compact }
+  session: { action: spawn-internal, context: compact, forkTurns: none }
   dispatchType: task
   role: maker
   routeClass: C
@@ -62,4 +62,4 @@ PAIFA_ROUTE:
   escalationReason: unknown-root-cause
 ```
 
-After successful tool execution, emit a separate actual receipt, for example: `PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=high | context=compact`. Validate the actual model, effort, and context against the planned route; do not merge planned and actual values into one claim.
+After successful tool execution, emit a separate actual receipt, for example: `PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=high | context=compact | forkTurns=none`. Validate the actual model, effort, context, and internal-route `forkTurns` against the planned route; do not merge planned and actual values into one claim.

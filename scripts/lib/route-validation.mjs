@@ -56,6 +56,11 @@ function supportedEfforts(capabilities, model) {
   return null;
 }
 
+function validInternalForkTurns(forkTurns) {
+  return forkTurns === 'none'
+    || (Number.isInteger(forkTurns) && forkTurns > 0);
+}
+
 export function validateRoute(route, capabilities = {}) {
   const errors = [];
 
@@ -78,6 +83,20 @@ export function validateRoute(route, capabilities = {}) {
       'SESSION_REQUIRED',
       'Route must set both session action and context mode.',
     ));
+  }
+
+  if (route.session?.action === 'spawn-internal') {
+    if (route.session.forkTurns === undefined) {
+      errors.push(issue(
+        'INTERNAL_FORK_TURNS_REQUIRED',
+        'An internal-subagent route must explicitly plan forkTurns.',
+      ));
+    } else if (!validInternalForkTurns(route.session.forkTurns)) {
+      errors.push(issue(
+        'INTERNAL_FORK_TURNS_INVALID',
+        'Internal forkTurns must be "none" or a finite positive recent-turn count.',
+      ));
+    }
   }
 
   if (!Array.isArray(route.qualityContract) || route.qualityContract.length === 0) {
@@ -161,6 +180,14 @@ export function validateDispatch(route, dispatch) {
     errors.push(issue(
       'DISPATCH_CONTEXT_MISMATCH',
       `Actual context ${actual.context ?? '<missing>'} does not match route ${route?.session?.context ?? '<missing>'}.`,
+    ));
+  }
+
+  if (route?.session?.action === 'spawn-internal'
+    && actual.forkTurns !== route.session.forkTurns) {
+    errors.push(issue(
+      'DISPATCH_FORK_TURNS_MISMATCH',
+      `Actual forkTurns ${actual.forkTurns ?? '<missing>'} does not match route ${route.session.forkTurns ?? '<missing>'}.`,
     ));
   }
 

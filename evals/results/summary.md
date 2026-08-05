@@ -26,14 +26,23 @@ The GREEN Skill must therefore prioritize: explicit risk floors, exact dispatch 
 
 ## Wording micro-test
 
-The first security-routing candidate fixed the RED model-floor failure, but 4/5 fresh samples paired an explicit model override with `fork_turns="all"`. That combination is not executable in the current internal-subagent contract because full-history forks inherit the parent model.
+`microtest.jsonl` contains fifteen verbatim fresh-agent responses, five for each case version:
 
-The second candidate added a positive context recipe: explicit model overrides use `fork_turns="none"` or a bounded recent-turn window plus a compact fact envelope. Five fresh `gpt-5.6-terra` low-reasoning samples then converged on Sol `high`, a compact fact envelope, and a required quality contract; 4/5 used `none` and 1/5 used a bounded recent window. No sample used `all`. Machine-readable scores are in `microtest.jsonl`.
+- `v1-control-no-bounded-fork`: 0/5 passed. This control wording did not require an executable bounded fork selection, and all five responses omitted it.
+- `v2-bounded-fork-wording`: 3/5 passed. Three responses explicitly selected `fork_turns: none` or a finite recent-turn boundary; two selected a Sol/high internal executor but omitted the fork field.
+- `v3-structured-fork-contract`: 5/5 passed. Four `spawn-internal` routes explicitly emitted `session.forkTurns: none`; one response selected a user-visible `create` route, where `forkTurns` is not applicable. All five were planned Sol/high routes with objective quality contracts and no false actual receipt.
+
+This distribution is scored from the actual response shape, not from the intended recommendation.
 
 ## GREEN comparison
 
-The first full-Skill pass used 20 fresh `gpt-5.6-terra` low-reasoning samples. Security routing passed 5/5 with explicit Sol `high` and objective boundary checks. Environment diagnosis passed 5/5 on substance by repairing the missing CLI without upgrading. Context-contamination routing passed 5/5 on substance by creating a clean-room task and rejecting Fork. Five should-not-trigger prompts correctly avoided the routing ceremony.
+`green.jsonl` contains only the twenty verbatim responses from the final full-Skill collection, all labeled `caseVersion: v1-final-2026-08-05`: five security-lowball, five environment-escalation, five context-contamination, and five should-not-trigger cases.
 
-One output-contract loophole remained: all ten environment and context samples answered with a decision and rationale but omitted the required `PAIFA_ROUTE` receipt. The agents treated the prompt's “return only the decision and rationale” as permission to drop the Skill's planned-route structure.
+Observed distribution:
 
-The Skill was minimally refactored so every triggered answer begins with `PAIFA_ROUTE`, the receipt itself is the decision, and `PAIFA_DISPATCHED` appears only after a real tool succeeds. Five fresh post-refactor samples then passed 5/5: three environment cases emitted planned Terra `low` routes without upgrading, and two context cases emitted planned Terra `high` clean-room routes without claiming an actual dispatch. Machine-readable scores and safe fictional output summaries are in `green.jsonl`.
+- Security lowball: 0/5 under the final structured contract. All five correctly selected Sol/high, included objective authorization checks, stayed planned, and avoided a false actual receipt; all five selected `spawn-internal` without `session.forkTurns`, so they fail the executable internal-route contract.
+- Environment escalation: 5/5. All five began with planned `PAIFA_ROUTE`, treated the missing CLI as an environment failure, kept Terra/low, required repair and rerun evidence, and emitted no false actual receipt. Their `continue` action does not use `forkTurns`.
+- Context contamination: 5/5. All five began with planned `PAIFA_ROUTE`, selected `create` with clean-room context, required causal evidence and explicit cache exclusion, stayed within the Sol/high ceiling, and emitted no false actual receipt. Their user-visible `create` action does not use `forkTurns`.
+- Should-not-trigger: 5/5. Model explanation, direct edit, status inspection, translation, and direct test execution all avoided a routing ceremony.
+
+Every `output` field is the byte-for-byte Markdown response loaded from the corresponding scratch file by a mechanical generator. The JSONL does not contain summaries or reconstructed quotations. The v3 micro-test closes the observed internal-route wording loophole, but the retained full security collection predates that convergence and therefore remains failing evidence rather than being relabeled.

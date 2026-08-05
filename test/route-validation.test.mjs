@@ -133,6 +133,34 @@ describe('validateRoute', () => {
     assert.equal(result.ok, true);
   });
 
+  test('requires an explicit forkTurns plan for an internal subagent', () => {
+    const result = validateRoute(validRoute({
+      session: { action: 'spawn-internal', context: 'compact' },
+    }), CAPABILITIES);
+
+    assert.equal(result.ok, false);
+    assert.ok(errorCodes(result).includes('INTERNAL_FORK_TURNS_REQUIRED'));
+  });
+
+  test('accepts only none or a finite positive recent-turn count for an internal subagent', () => {
+    for (const forkTurns of ['none', 3]) {
+      const result = validateRoute(validRoute({
+        session: { action: 'spawn-internal', context: 'compact', forkTurns },
+      }), CAPABILITIES);
+
+      assert.equal(result.ok, true, `expected ${forkTurns} to be accepted`);
+    }
+
+    for (const forkTurns of ['all', 0, -1, 1.5, Number.POSITIVE_INFINITY]) {
+      const result = validateRoute(validRoute({
+        session: { action: 'spawn-internal', context: 'compact', forkTurns },
+      }), CAPABILITIES);
+
+      assert.equal(result.ok, false, `expected ${forkTurns} to be rejected`);
+      assert.ok(errorCodes(result).includes('INTERNAL_FORK_TURNS_INVALID'));
+    }
+  });
+
   test('rejects fork as a pollution cleanup strategy', () => {
     const result = validateRoute(validRoute({
       pollutionRisk: 2,
@@ -190,6 +218,34 @@ describe('validateDispatch', () => {
       'DISPATCH_EFFORT_MISMATCH',
       'DISPATCH_CONTEXT_MISMATCH',
     ]);
+  });
+
+  test('requires actual forkTurns to match an internal-subagent route', () => {
+    const route = validRoute({
+      session: { action: 'spawn-internal', context: 'compact', forkTurns: 'none' },
+    });
+
+    const matching = validateDispatch(route, {
+      model: 'gpt-5.6-terra',
+      effort: 'medium',
+      context: 'compact',
+      forkTurns: 'none',
+    });
+    const missing = validateDispatch(route, {
+      model: 'gpt-5.6-terra',
+      effort: 'medium',
+      context: 'compact',
+    });
+    const mismatched = validateDispatch(route, {
+      model: 'gpt-5.6-terra',
+      effort: 'medium',
+      context: 'compact',
+      forkTurns: 3,
+    });
+
+    assert.equal(matching.ok, true);
+    assert.ok(errorCodes(missing).includes('DISPATCH_FORK_TURNS_MISMATCH'));
+    assert.ok(errorCodes(mismatched).includes('DISPATCH_FORK_TURNS_MISMATCH'));
   });
 });
 

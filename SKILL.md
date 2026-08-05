@@ -17,7 +17,7 @@ Use before creating, continuing, retrying, forking, or spawning a delegated task
 2. Apply the risk floor before cost scoring. Authentication, authorization, identity, tenant, billing, payment, migration, security, and production work are never below Sol `high`, even for one file.
 3. Select the lowest capable model and effort, context mode, fact-only envelope, objective quality contract, and automatic-upgrade ceiling.
 4. Every reply after a trigger begins with `PAIFA_ROUTE`. The receipt is the decision, including when the user asks for only a decision or rationale. A/B routes use the fast receipt below; C/D, high-risk, and retry routes use the YAML contract in `references/routing-policy.md`.
-5. Start every route at `phase=planned`. Validate deterministic rules before dispatch and pass matching model, effort, and context fields explicitly. Change to `PAIFA_DISPATCHED` only after the real dispatch tool succeeds; its actual fields must match the route.
+5. Start every route at `phase=planned`. Validate before dispatch and pass matching model, effort, and context explicitly. Internal routes also carry `forkTurns` set to `none` or a finite positive recent-turn count in both planned and actual receipts. Change to `PAIFA_DISPATCHED` only after the real tool succeeds; its fields must match the route.
 
 Fast A/B receipt:
 
@@ -36,4 +36,4 @@ Repair missing tools, permissions, services, or dependencies; do not blame the m
 
 ## Red flags
 
-Do not rationalize a lower floor because work is small, cheap, urgent, or directly owned. Do not dispatch without an objective quality contract. Do not use Fork to clean polluted context. An explicit internal-subagent model override uses `fork_turns: "none"` or a bounded recent window with a compact fact envelope, never `"all"`. Never rely on inherited defaults or report a recommendation as if it ran.
+Do not rationalize a lower floor because work is small, cheap, urgent, or directly owned. Do not dispatch without an objective quality contract. Do not use Fork to clean polluted context. Never rely on inherited defaults or report a recommendation as if it ran.
