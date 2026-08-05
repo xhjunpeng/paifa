@@ -118,8 +118,8 @@ Copy each complete response into the new JSONL file. Stop at three if all agree;
 ### Task 4: Full verification and local update
 
 **Files:**
-- Local installation: `/Users/jumper/.codex/skills/paifa`
-- Global managed block: `/Users/jumper/.codex/AGENTS.md`
+- Local installation: `~/.codex/skills/paifa`
+- Global managed block: `~/.codex/AGENTS.md`
 
 - [ ] **Step 1: Run repository verification**
 

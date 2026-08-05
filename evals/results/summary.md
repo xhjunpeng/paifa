@@ -51,3 +51,9 @@ The repeated routing acceptance set is therefore 15/15 across security, environm
 ## Actual-receipt wording check
 
 `receipt-semantics.jsonl` contains three fresh `gpt-5.6-terra` low-reasoning samples run after separating executable tool fields from semantic context delivery. All 3/3 returned the same two-line shape: `PAIFA_DISPATCHED` contained model, effort, and internal `forkTurns`, while `PAIFA_CONTEXT` separately recorded the planned mode and fact-envelope hash. The stored `output` fields are the complete responses, not summaries. Because the first three stable samples agreed, no additional repetitions were added.
+
+## Compact monitoring output
+
+The owner's two reported screenshots are the observed RED behavior: Paifa 1.0.0 exposed a full route object and repeatedly emitted `PAIFA_ROUTE` during unchanged `wait_threads` monitoring. Those screenshots contain private task identifiers and are not copied into this public repository or represented as verbatim JSONL evidence.
+
+`compact-output-semantics.jsonl` contains three complete fresh `gpt-5.6-terra` low-reasoning responses produced with the 1.0.1 Skill. All 3/3 returned one short status sentence and emitted no `PAIFA_ROUTE`, `PAIFA_DISPATCHED`, or `PAIFA_CONTEXT`. Because the first three stable samples agreed, no additional repetitions were added.

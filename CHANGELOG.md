@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.0.1 - 2026-08-05
+
+- Changed every normal route class to one validator-generated compact `PAIFA_ROUTE` line.
+- Stopped waiting, monitoring, polling, and status-only updates from repeating Paifa receipts.
+- Kept expanded route YAML available only for explicit audit details or validation failures.
+
 ## 1.0.0 - 2026-08-05
 
 - Added evidence-based model, reasoning, session, context, and escalation routing.
