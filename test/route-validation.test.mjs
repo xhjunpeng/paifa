@@ -50,6 +50,30 @@ describe('validateRoute', () => {
 
     assert.equal(result.ok, true);
     assert.deepEqual(result.errors, []);
+    assert.equal(
+      result.receipt,
+      'PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | maker | checks=1 | auto<=gpt-5.6-sol/high',
+    );
+    assert.equal(result.receipt.includes('\n'), false);
+  });
+
+  test('renders a high-risk D route as one compact line', () => {
+    const result = validateRoute(validRoute({
+      routeClass: 'D',
+      role: 'checker',
+      independent: true,
+      risk: ['security'],
+      model: 'gpt-5.6-sol',
+      effort: 'high',
+      session: { action: 'create', context: 'clean-room' },
+      qualityContract: ['boundary tests', 'negative tests', 'exact diff', 'doctor'],
+    }), CAPABILITIES);
+
+    assert.equal(result.ok, true);
+    assert.equal(
+      result.receipt,
+      'PAIFA_ROUTE v1 | planned | create | D | gpt-5.6-sol/high | clean-room | checker | checks=4 | auto<=gpt-5.6-sol/high',
+    );
   });
 
   test('requires a quality contract', () => {
@@ -57,6 +81,7 @@ describe('validateRoute', () => {
 
     assert.equal(result.ok, false);
     assert.ok(errorCodes(result).includes('QUALITY_CONTRACT_REQUIRED'));
+    assert.equal(result.receipt, undefined);
   });
 
   test('rejects incomplete or unknown route schema values', () => {
@@ -183,6 +208,18 @@ describe('validateRoute', () => {
     }
   });
 
+  test('includes forkTurns only in an internal compact receipt', () => {
+    const result = validateRoute(validRoute({
+      session: { action: 'spawn-internal', context: 'compact', forkTurns: 'none' },
+    }), CAPABILITIES);
+
+    assert.equal(result.ok, true);
+    assert.equal(
+      result.receipt,
+      'PAIFA_ROUTE v1 | planned | spawn-internal | B | gpt-5.6-terra/medium | compact | maker | forkTurns=none | checks=1 | auto<=gpt-5.6-sol/high',
+    );
+  });
+
   test('rejects fork as a pollution cleanup strategy', () => {
     const result = validateRoute(validRoute({
       pollutionRisk: 2,
@@ -291,9 +328,14 @@ describe('validate-route CLI', () => {
 
   test('exits zero and prints JSON for a valid route', () => {
     const result = runCli(JSON.stringify(validRoute()));
+    const receipt = JSON.parse(result.stdout);
 
     assert.equal(result.status, 0, result.stderr);
-    assert.equal(JSON.parse(result.stdout).ok, true);
+    assert.equal(receipt.ok, true);
+    assert.equal(
+      receipt.receipt,
+      'PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | maker | checks=1 | auto<=gpt-5.6-sol/high',
+    );
   });
 
   test('exits one and prints violations for an invalid route', () => {

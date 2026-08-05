@@ -65,6 +65,26 @@ function validInternalForkTurns(forkTurns) {
     || (typeof forkTurns === 'string' && /^[1-9]\d*$/.test(forkTurns));
 }
 
+export function compactRouteReceipt(route) {
+  const parts = [
+    `PAIFA_ROUTE ${route.version}`,
+    'planned',
+    route.session.action,
+    route.routeClass,
+    `${route.model}/${route.effort}`,
+    route.session.context,
+    route.role,
+  ];
+  if (route.session.action === 'spawn-internal') {
+    parts.push(`forkTurns=${route.session.forkTurns}`);
+  }
+  parts.push(
+    `checks=${route.qualityContract.length}`,
+    `auto<=${route.autoUpgradeCeiling.model}/${route.autoUpgradeCeiling.effort}`,
+  );
+  return parts.join(' | ');
+}
+
 export function validateRoute(route, capabilities = {}) {
   const errors = [];
 
@@ -179,7 +199,12 @@ export function validateRoute(route, capabilities = {}) {
     ));
   }
 
-  return { ok: errors.length === 0, errors };
+  const ok = errors.length === 0;
+  return {
+    ok,
+    errors,
+    ...(ok ? { receipt: compactRouteReceipt(route) } : {}),
+  };
 }
 
 export function validateDispatch(route, dispatch) {
