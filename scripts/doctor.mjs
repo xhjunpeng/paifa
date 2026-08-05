@@ -1,0 +1,169 @@
+#!/usr/bin/env node
+
+import {
+  existsSync,
+  lstatSync,
+  readFileSync,
+  readlinkSync,
+  realpathSync,
+} from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { readInstallState } from './lib/install-state.mjs';
+import { inspectManagedBlock } from './lib/managed-block.mjs';
+
+function parseArgs(values) {
+  const options = { json: false };
+  for (let index = 0; index < values.length; index += 1) {
+    const value = values[index];
+    if (value === '--repo-root' || value === '--codex-home') {
+      const next = values[index + 1];
+      if (!next) throw new Error(`ARGUMENT_REQUIRED: ${value} needs a path.`);
+      options[value === '--repo-root' ? 'repoRoot' : 'codexHome'] = next;
+      index += 1;
+    } else if (value === '--json') {
+      options.json = true;
+    } else {
+      throw new Error(`UNKNOWN_ARGUMENT: ${value}`);
+    }
+  }
+  return options;
+}
+
+function check(id, status, message) {
+  return { id, status, message };
+}
+
+function linkTarget(linkPath) {
+  const target = readlinkSync(linkPath);
+  return path.resolve(path.dirname(linkPath), target);
+}
+
+function renderHuman(receipt) {
+  const lines = receipt.checks.map((entry) => (
+    `${entry.status.toUpperCase().padEnd(4)} ${entry.id}: ${entry.message}`
+  ));
+  lines.push(receipt.ok ? 'Paifa doctor: healthy' : 'Paifa doctor: attention required');
+  return `${lines.join('\n')}\n`;
+}
+
+function runDoctor({ repoRoot, codexHome }) {
+  const checks = [];
+  const required = [
+    'SKILL.md',
+    'VERSION',
+    'templates/global-agents-block.md',
+    'references/routing-policy.md',
+    'references/high-risk.md',
+    'references/tool-mapping.md',
+    'evals/routing-cases.json',
+    'evals/trigger-cases.json',
+  ];
+  const missing = required.filter((relativePath) => !existsSync(path.join(repoRoot, relativePath)));
+  checks.push(missing.length === 0
+    ? check('repository-files', 'pass', 'All required repository files exist.')
+    : check('repository-files', 'fail', `Missing: ${missing.join(', ')}`));
+
+  let version = null;
+  try {
+    version = readFileSync(path.join(repoRoot, 'VERSION'), 'utf8').trim();
+    const skill = readFileSync(path.join(repoRoot, 'SKILL.md'), 'utf8');
+    const validFrontmatter = /^---\nname: paifa\ndescription: Use when[^\n]*\n---\n/.test(skill);
+    checks.push(validFrontmatter
+      ? check('skill-frontmatter', 'pass', 'Skill frontmatter is discoverable.')
+      : check('skill-frontmatter', 'fail', 'Skill frontmatter is missing or invalid.'));
+  } catch (error) {
+    checks.push(check('skill-frontmatter', 'fail', error.message));
+  }
+
+  const statePath = path.join(codexHome, 'paifa', 'install-state.json');
+  let state = null;
+  try {
+    state = readInstallState(statePath);
+    checks.push(state
+      ? check('install-state', 'pass', 'Installation state is valid JSON.')
+      : check('install-state', 'fail', 'Installation state is missing.'));
+  } catch (error) {
+    checks.push(check('install-state', 'fail', error.message));
+  }
+
+  const skillPath = path.join(codexHome, 'skills', 'paifa');
+  try {
+    const stat = lstatSync(skillPath);
+    if (!stat.isSymbolicLink()) throw new Error('Skill path is not a symbolic link.');
+    const target = realpathSync(linkTarget(skillPath));
+    checks.push(target === repoRoot
+      ? check('skill-link', 'pass', 'Skill link points to this repository.')
+      : check('skill-link', 'fail', `Skill link points to ${target}.`));
+  } catch (error) {
+    checks.push(check('skill-link', 'fail', error.message));
+  }
+
+  const agentsPath = path.join(codexHome, 'AGENTS.md');
+  let managed = null;
+  try {
+    const agents = readFileSync(agentsPath, 'utf8');
+    managed = inspectManagedBlock(agents);
+    checks.push(managed.count === 1
+      ? check('managed-block', 'pass', 'Exactly one managed block exists.')
+      : check('managed-block', 'fail', 'Managed block is missing.'));
+  } catch (error) {
+    checks.push(check('managed-block', 'fail', error.message));
+  }
+
+  const versionsMatch = Boolean(version && state && managed?.count === 1
+    && version === state.version
+    && version === managed.version);
+  checks.push(versionsMatch
+    ? check('version-match', 'pass', `Repository and installation are ${version}.`)
+    : check('version-match', 'fail', 'Repository, state, and managed-block versions differ.'));
+
+  try {
+    const routing = JSON.parse(readFileSync(path.join(repoRoot, 'evals', 'routing-cases.json'), 'utf8'));
+    const triggers = JSON.parse(readFileSync(path.join(repoRoot, 'evals', 'trigger-cases.json'), 'utf8'));
+    const valid = Array.isArray(routing)
+      && Array.isArray(triggers.shouldTrigger)
+      && Array.isArray(triggers.shouldNotTrigger);
+    checks.push(valid
+      ? check('eval-fixtures', 'pass', 'Evaluation fixtures have valid top-level shapes.')
+      : check('eval-fixtures', 'fail', 'Evaluation fixtures have invalid top-level shapes.'));
+  } catch (error) {
+    checks.push(check('eval-fixtures', 'fail', error.message));
+  }
+
+  return {
+    ok: checks.every((entry) => entry.status !== 'fail'),
+    version,
+    checks,
+    limits: {
+      semanticRoutingVerified: false,
+      automaticDiscoveryVerified: false,
+    },
+  };
+}
+
+try {
+  const parsed = parseArgs(process.argv.slice(2));
+  const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
+  const repoRoot = realpathSync(parsed.repoRoot ?? path.resolve(scriptDirectory, '..'));
+  const codexHome = path.resolve(
+    parsed.codexHome ?? process.env.CODEX_HOME ?? path.join(os.homedir(), '.codex'),
+  );
+  const receipt = runDoctor({ repoRoot, codexHome });
+  process.stdout.write(parsed.json
+    ? `${JSON.stringify(receipt, null, 2)}\n`
+    : renderHuman(receipt));
+  process.exitCode = receipt.ok ? 0 : 1;
+} catch (error) {
+  const receipt = {
+    ok: false,
+    error: {
+      code: error.code ?? String(error.message).split(':', 1)[0],
+      message: error.message,
+    },
+  };
+  process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);
+  process.exitCode = 2;
+}
