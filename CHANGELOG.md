@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.1.1 - 2026-08-06
+
+- Added a two-way execution choice: independent task for isolated or durable work, internal subagent for bounded shared-directory work.
+- Added the dispatch kind to the same single user-visible line and validated that the actual tool kind matches.
+- Prevented internal subagents from claiming an independent Worktree they do not provide.
+
 ## 1.1.0 - 2026-08-06
 
 - Reduced routing to one plain ladder covering 5.6 Luna, Terra, Sol and `low` through `ultra` reasoning.

@@ -1,12 +1,14 @@
 # Paifa
 
-Paifa is a small Codex dispatch helper. Immediately before delegated work starts, it chooses the lowest capable model and reasoning effort, explains the choice in one short line, and uses the same values in the dispatch tool.
+Paifa is a small Codex dispatch helper. Immediately before delegated work starts, it chooses the execution kind, lowest capable model, and reasoning effort, explains the choice in one short line, and uses the same values in the dispatch tool.
 
 Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 
 ```text
-派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。
+派发方式：独立任务｜派发模型：5.6 Sol｜思考强度：高｜原因：需要干净 Worktree 和独立审计。
 ```
+
+Use an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review. Use an internal subagent only for bounded work that can share the current directory and return its result to the main task.
 
 ## Routing
 

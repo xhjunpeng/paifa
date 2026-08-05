@@ -2,6 +2,8 @@
 
 Choose one observable task profile. Do not calculate scores.
 
+First choose the dispatch kind: an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review; otherwise an internal subagent for bounded work that may share the current directory.
+
 | Profile | Task shape | Preferred route |
 | --- | --- | --- |
 | `simple` | Mechanical or read-only | Luna / `low` |
@@ -17,6 +19,6 @@ If the preferred combination is unavailable, use the first supported combination
 
 Before dispatch show only:
 
-`派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。`
+`派发方式：独立任务｜派发模型：5.6 Sol｜思考强度：高｜原因：需要干净 Worktree 和独立审计。`
 
 The main task owns completion: continue safe independent work and integrate required results.

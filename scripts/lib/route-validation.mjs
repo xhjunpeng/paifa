@@ -69,6 +69,18 @@ const EFFORT_LABELS = {
   ultra: '极高（更快消耗使用额度）',
 };
 
+const DISPATCH_KIND_LABELS = {
+  task: '独立任务',
+  subagent: '内部子智能体',
+};
+
+const INDEPENDENT_TASK_REQUIREMENTS = [
+  'independentWorktree',
+  'durable',
+  'userFollowUp',
+  'independentReview',
+];
+
 function issue(code, message) {
   return { code, message };
 }
@@ -92,11 +104,18 @@ export function selectRoute(category, capabilities = {}) {
   return null;
 }
 
-export function formatDispatchNotice({ model, effort, reason }) {
+export function selectDispatchKind(requirements = {}) {
+  return INDEPENDENT_TASK_REQUIREMENTS.some((field) => requirements[field] === true)
+    ? 'task'
+    : 'subagent';
+}
+
+export function formatDispatchNotice({ dispatchKind, model, effort, reason }) {
   const shortReason = String(reason ?? '').replace(/\s+/g, ' ').trim();
+  const dispatchKindLabel = DISPATCH_KIND_LABELS[dispatchKind] ?? dispatchKind;
   const modelLabel = MODEL_LABELS[model] ?? model;
   const effortLabel = EFFORT_LABELS[effort] ?? effort;
-  return `派发模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}`;
+  return `派发方式：${dispatchKindLabel}｜派发模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}`;
 }
 
 export function validateRoute(route, capabilities = {}) {
@@ -110,6 +129,18 @@ export function validateRoute(route, capabilities = {}) {
 
   if (!Object.hasOwn(CATEGORY_CANDIDATES, route.category)) {
     errors.push(issue('CATEGORY_INVALID', 'Category is not part of the supported routing ladder.'));
+  }
+
+  if (!Object.hasOwn(DISPATCH_KIND_LABELS, route.dispatchKind)) {
+    errors.push(issue('DISPATCH_KIND_INVALID', 'Dispatch kind must be task or subagent.'));
+  } else {
+    const expectedDispatchKind = selectDispatchKind(route.dispatchRequirements);
+    if (route.dispatchKind !== expectedDispatchKind) {
+      errors.push(issue(
+        'DISPATCH_KIND_MISMATCH',
+        `Use ${expectedDispatchKind}; the selected dispatch kind cannot satisfy the task requirements.`,
+      ));
+    }
   }
 
   const reason = typeof route.reason === 'string' ? route.reason.replace(/\s+/g, ' ').trim() : '';
@@ -163,6 +194,7 @@ export function validateRoute(route, capabilities = {}) {
     errors,
     ...(ok ? {
       notice: formatDispatchNotice({
+        dispatchKind: route.dispatchKind,
         model: route.model,
         effort: route.effort,
         reason,
@@ -174,6 +206,13 @@ export function validateRoute(route, capabilities = {}) {
 export function validateDispatch(route, dispatch) {
   const errors = [];
   const actual = dispatch && typeof dispatch === 'object' ? dispatch : {};
+
+  if (actual.dispatchKind !== route?.dispatchKind) {
+    errors.push(issue(
+      'DISPATCH_KIND_MISMATCH',
+      `Actual dispatch kind ${actual.dispatchKind ?? '<missing>'} does not match route ${route?.dispatchKind ?? '<missing>'}.`,
+    ));
+  }
 
   if (actual.model !== route?.model) {
     errors.push(issue(

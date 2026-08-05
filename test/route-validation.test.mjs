@@ -19,6 +19,8 @@ const CAPABILITIES = {
 
 function validRoute(overrides = {}) {
   return {
+    dispatchKind: 'subagent',
+    dispatchRequirements: {},
     category: 'ordinary',
     model: 'gpt-5.6-terra',
     effort: 'medium',
@@ -77,7 +79,7 @@ describe('validateRoute', () => {
     assert.deepEqual(result.errors, []);
     assert.equal(
       result.notice,
-      '派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。',
+      '派发方式：内部子智能体｜派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。',
     );
     assert.equal(result.notice.includes('\n'), false);
     assert.equal(result.receipt, undefined);
@@ -137,16 +139,21 @@ describe('validateRoute', () => {
 });
 
 describe('validateDispatch', () => {
-  test('accepts matching model and effort', () => {
+  test('accepts matching dispatch kind, model, and effort', () => {
     assert.equal(validateDispatch(validRoute(), {
+      dispatchKind: 'subagent',
       model: 'gpt-5.6-terra',
       effort: 'medium',
     }).ok, true);
   });
 
-  test('rejects inherited, missing, or mismatched dispatch settings', () => {
-    const missing = validateDispatch(validRoute(), { effort: 'medium' });
+  test('rejects missing or mismatched dispatch settings', () => {
+    const missing = validateDispatch(validRoute(), {
+      dispatchKind: 'subagent',
+      effort: 'medium',
+    });
     const mismatched = validateDispatch(validRoute(), {
+      dispatchKind: 'subagent',
       model: 'gpt-5.6-terra',
       effort: 'low',
     });
@@ -175,7 +182,7 @@ describe('validate-route CLI', () => {
 
     assert.equal(result.status, 0, result.stderr);
     assert.equal(output.ok, true);
-    assert.match(output.notice, /^派发模型：/);
+    assert.match(output.notice, /^派发方式：内部子智能体｜派发模型：/);
     assert.equal(output.receipt, undefined);
   });
 

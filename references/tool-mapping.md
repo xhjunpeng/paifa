@@ -4,12 +4,12 @@ Check the currently available dispatch tool and its accepted capabilities immedi
 
 | Dispatch action | Explicit fields | Execution rule |
 | --- | --- | --- |
-| New user-visible task | model and thinking/reasoning effort | Pass both fields explicitly |
+| New user-visible task | model and thinking/reasoning effort | Use when independent Worktree, durability, direct follow-up, or independent review is required |
 | Continue an existing task | model and thinking/reasoning effort for the next turn when changing capability | Pass the selected override explicitly |
-| Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Set `fork_turns` to `"none"` or a quoted positive integer such as `"3"`, and provide a compact fact envelope |
+| Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Use only when sharing the current directory is acceptable; provide a compact fact envelope |
 | Fork | follow-up model and effort fields, if supported | Fork preserves history and is not a clean-room mechanism |
 
-Use the exact names exposed by the current tool. Immediately before dispatch, tell the user the selected model, effort, and one-sentence reason. Then pass the same model and effort to the tool. Internal tool mechanics such as `fork_turns` stay internal and are not added to the user-facing line.
+Use the exact names exposed by the current tool. Immediately before dispatch, tell the user the selected dispatch kind, model, effort, and one-sentence reason. Then use the matching tool and parameters. An internal subagent cannot by itself provide a new independent Worktree.
 
 ## Fallback
 

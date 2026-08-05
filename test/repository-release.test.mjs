@@ -35,13 +35,15 @@ test('released repository installs one dispatch gate without replacing existing 
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
     assert.match(agents, /invoke `paifa` immediately before .*?(?:creat|continu|retry|fork|spawn)/is);
-    assert.match(agents, /only chooses .*?model and reasoning effort/is);
+    assert.match(agents, /chooses the dispatch kind, model, and reasoning effort/is);
     assert.match(agents, /does not authorize delegation.*?expand the requested scope/is);
+    assert.match(agents, /independent task.*?independent Worktree.*?direct user follow-up.*?independent review/is);
+    assert.match(agents, /internal subagent only for bounded work.*?share the current directory/is);
     assert.match(
       agents,
-      /派发模型：5\.6 Terra｜思考强度：中｜原因：任务边界清晰/is,
+      /派发方式：独立任务｜派发模型：5\.6 Sol｜思考强度：高｜原因：需要干净 Worktree/is,
     );
-    assert.match(agents, /same model and effort in the actual tool call/is);
+    assert.match(agents, /same dispatch kind, model, and effort in the actual tool call/is);
     assert.match(agents, /waiting, monitoring, and status updates do not repeat the line/is);
     assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
   } finally {

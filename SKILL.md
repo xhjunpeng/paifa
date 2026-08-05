@@ -1,15 +1,20 @@
 ---
 name: paifa
-description: Use when choosing the model and reasoning effort immediately before real delegated Codex work.
+description: Use when immediately before real delegated Codex work.
 ---
 
 # Paifa
 
-For real dispatch only. Paifa does not decide whether to delegate or start extra work. Choose the lowest capable combination.
+For real dispatch only; never authorize or create work.
 
 ## Choose
 
-Match the task once:
+Dispatch kind:
+
+- Independent task: independent Worktree, durable/sidebar task, user follow-up, or independent review.
+- Internal subagent: bounded work sharing the current directory and returning to the main task.
+
+Model and effort:
 
 - Mechanical/read-only -> 5.6 Luna / `low`.
 - Small, explicit, verifiable -> 5.6 Luna / `medium`.
@@ -24,10 +29,10 @@ UI: `low=轻度`, `medium=中`, `high=高`, `xhigh=极高`, `max=最高`, `ultra
 
 ## Tell and dispatch
 
-Before the tool call, show one user-language line:
+Before dispatch, show one user-language line:
 
-`派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。`
+`派发方式：独立任务｜派发模型：5.6 Sol｜思考强度：高｜原因：需要干净 Worktree 和独立审计。`
 
-Pass matching internal values. Show nothing else; never repeat during waits/status.
+Use matching tool/model/effort. Show nothing else; never repeat during waits/status.
 
 No dispatch: skip Paifa/waiting. The main task continues independent work, integrates required results, and owns completion.

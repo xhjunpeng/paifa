@@ -15,7 +15,7 @@ test('paifa leaves ordinary main-thread work alone', () => {
 
   assert.match(
     skill,
-    /does not decide whether to delegate/is,
+    /never authorize or create work/is,
   );
   assert.match(
     gate,
