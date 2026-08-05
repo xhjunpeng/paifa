@@ -1,43 +1,33 @@
 ---
 name: paifa
-description: Use when preparing to create, continue, retry, fork, or spawn delegated Codex tasks or subagents, especially when model cost, reasoning effort, session isolation, context pollution, verification quality, or escalation must be decided.
+description: Use when choosing the model and reasoning effort immediately before real delegated Codex work.
 ---
 
 # Paifa
 
-Route a real delegation to the lowest-cost capability that can meet its quality and risk floor. Build the full route internally, validate it, show one compact decision, dispatch with explicit fields, then record what actually ran.
+For real dispatch only. Paifa does not decide whether to delegate or start extra work. Choose the lowest capable combination.
 
-## Trigger boundary
+## Choose
 
-Use before creating, continuing, retrying, forking, or spawning delegated work. Paifa does not authorize, require, or recommend delegation by itself. Do not use for an ordinary task, a model explanation without dispatch, or status-only inspection.
+Match the task once:
 
-## Route contract
+- Mechanical/read-only -> 5.6 Luna / `low`.
+- Small, explicit, verifiable -> 5.6 Luna / `medium`.
+- Normal implementation/bug/investigation/review -> 5.6 Terra / `medium`.
+- Unknown root cause/cross-module reasoning -> 5.6 Terra / `high`.
+- Security/identity/tenant/billing/migration/production/final acceptance -> 5.6 Sol / `high`.
+- Unusually complex/high-consequence -> 5.6 Sol / `xhigh`.
+- Repeated non-convergence or major architecture -> 5.6 Sol / `max`.
+- Hardest exceptional case after lower levels fail -> 5.6 Sol / `ultra`.
 
-1. Confirm safe split boundaries; select `create`, `continue`, `spawn-internal`, or `fork`.
-2. Apply the risk floor before cost scoring. Authentication, authorization, identity, tenant, billing, payment, migration, security, and production work are never below Sol `high`, even for one file.
-3. Select the lowest capable model and effort, context, fact envelope, quality contract, and upgrade ceiling.
-4. Inspect state, build and validate the internal `phase=planned` route, then emit its single-line `PAIFA_ROUTE` plus at most one sentence. Show YAML only for explicit audit details or validation failure.
-5. Pass explicit model and effort; internal routes also pass `forkTurns` as `none` or a positive string. After success, emit one `PAIFA_DISPATCHED` and `PAIFA_CONTEXT`. Waiting, polling, and status updates emit no receipts; retry or reroute starts a new route.
+UI: `low=轻度`, `medium=中`, `high=高`, `xhigh=极高`, `max=最高`, `ultra=极高（更快消耗使用额度）`. If unavailable, use the next supported route at or above the task floor. Missing tools/facts/services never upgrade.
 
-Fast A/B receipt:
+## Tell and dispatch
 
-`PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | maker | checks=2 | auto<=gpt-5.6-sol/high`
+Before the tool call, show one user-language line:
 
-## Main-task lifecycle
+`派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。`
 
-The main task owns completion. Continue all safe independent work while delegated work runs. If a required step depends on its result, wait, integrate it, and verify the combined outcome before the final answer. The main task must not end its turn merely because delegated work started.
+Pass matching internal values. Show nothing else; never repeat during waits/status.
 
-## Diagnose before escalating
-
-Repair missing tools, permissions, services, or dependencies without blaming the model. Add missing facts, and re-route scope changes. Escalate one step only for evidenced capability failure, stopping automatically at Sol `high`. Ask before higher effort, irreversible action, or increased high-risk consequences.
-
-## Load details only when needed
-
-- Load `references/high-risk.md` for risk, irreversible, security, or production work.
-- Load `references/routing-policy.md` for C/D scoring, retries, session/context choice, quality evidence, or audit-only YAML.
-- Load `references/tool-mapping.md` before a real dispatch, capability fallback, or internal-subagent model override.
-- Use `templates/task-envelope.md` whenever handing facts to a new or isolated session.
-
-## Red flags
-
-Do not rationalize a lower floor because work is small, cheap, urgent, or directly owned. Do not dispatch without an objective quality contract. Do not use Fork to clean polluted context. Never rely on inherited defaults, report a recommendation as if it ran, or invent `verifying`, `dispatched`, or `monitoring` route phases.
+No dispatch: skip Paifa/waiting. The main task continues independent work, integrates required results, and owns completion.

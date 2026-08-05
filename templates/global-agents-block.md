@@ -1,13 +1,13 @@
 ## Paifa Dispatch Gate
 
-You must invoke `paifa` before you create, continue, retry, fork, or spawn a delegated Codex task or subagent.
+Invoke `paifa` immediately before creating, continuing, retrying, forking, or spawning real delegated Codex work. If no real dispatch is happening, the main task proceeds normally without Paifa or waiting.
 
-Paifa does not authorize or require delegation. If no real dispatch is needed, the main task proceeds normally without Paifa or waiting.
+Paifa only chooses the delegated task's model and reasoning effort. It does not authorize delegation, create extra tasks, or expand the requested scope.
 
-Only when the user explicitly requests delegation, splitting work, a subtask, or parallel work, that request grants continuing authorization within its stated scope to choose a route, pass the model and reasoning effort explicitly, and deliver the session/context policy through the task envelope. You must not expand the goal, files, or permission scope.
+Immediately before each dispatch tool call, show exactly one short line in the user's language:
 
-High-risk work at its risk floor may be dispatched without additional user confirmation. Explicit user confirmation is required only for work above Sol high, irreversible operations, or changes that increase high-risk consequences. Every successful dispatch must emit `PAIFA_DISPATCHED`. `PAIFA_DISPATCHED` must record actual model and effort; an internal subagent receipt must also record actual `forkTurns`. Context is not a tool receipt field: record its delivery separately as `PAIFA_CONTEXT` with the planned mode and an envelope identifier or hash.
+`派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。`
 
-After inspecting task state and validating the full route internally, emit one validated compact `PAIFA_ROUTE` line immediately before each real dispatch decision. Waiting, monitoring, and status-only updates must not repeat Paifa receipts. Expanded route YAML is shown only for an explicit audit-detail request or validation failure.
+Use the same model and effort in the actual tool call. Do not show scores, YAML, JSON, route objects, context hashes, or coded receipts. Waiting, monitoring, and status updates do not repeat the line.
 
-The main task owns completion after every dispatch. Continue all safe independent work while delegated work runs. If the next required step depends on its result, wait for it, integrate it, and verify the combined outcome before the final answer. The main task must not end its turn merely because delegated work has started.
+After dispatch, the main task continues safe independent work and remains responsible for integrating required results and completing the user's goal.

@@ -1,14 +1,27 @@
 # Paifa
 
-Paifa is a Codex delegation-routing Skill. It chooses the lowest-cost model, reasoning effort, session strategy, context envelope, and verification contract that still meets a task's quality and risk floor.
+Paifa is a small Codex dispatch helper. Immediately before delegated work starts, it chooses the lowest capable model and reasoning effort, explains the choice in one short line, and uses the same values in the dispatch tool.
 
-It does not execute business work or calculate live provider prices. It makes the dispatch decision auditable through separate planned and actual receipts:
+Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 
 ```text
-PAIFA_ROUTE v1 | planned | create | B | gpt-5.6-terra/medium | compact | maker | checks=2 | auto<=gpt-5.6-sol/high
-PAIFA_DISPATCHED | model=gpt-5.6-terra | effort=medium
-PAIFA_CONTEXT | mode=compact | delivery=envelope:sha256:<hash>
+派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。
 ```
+
+## Routing
+
+Paifa uses a short capability ladder across the three 5.6 models and six reasoning levels:
+
+- Mechanical or read-only: Luna / `low`.
+- Small, explicit, easy to verify: Luna / `medium`.
+- Ordinary implementation, bug fixing, investigation, or review: Terra / `medium`.
+- Cross-module or unclear-root-cause work: Terra / `high`.
+- Security-sensitive, production-impacting, or final acceptance: Sol / `high`.
+- Unusually complex or high-consequence reasoning: Sol / `xhigh`.
+- Repeated non-convergence or major architecture: Sol / `max`.
+- Exceptional hardest cases after lower levels prove insufficient: Sol / `ultra`.
+
+Missing tools, missing facts, permissions, and environment failures do not cause a model upgrade. Paifa does nothing when no real dispatch is happening, and it never starts another task merely to choose a model.
 
 ## Install
 
@@ -19,31 +32,7 @@ Clone this repository, enter its root, then run:
 node scripts/doctor.mjs
 ```
 
-The installer creates a symlink at the current Codex Home's `skills/paifa` path and adds one versioned managed block to the global `AGENTS.md`. It backs up that file, writes atomically, preserves unrelated content, and records install state. Existing unmanaged Skill paths or conflicting managed state stop the installation.
-
-The managed block makes Paifa run before a requested delegation, split, retry, fork, or subagent spawn. You can also invoke `paifa` explicitly when choosing the lowest-cost reliable route.
-
-Paifa does not create a reason to delegate. Ordinary main-task work proceeds directly without Paifa or waiting when no real dispatch is needed. After a dispatch, the main task remains responsible for completion: it continues safe independent work and, when the result is required, waits for it, integrates it, and verifies the combined outcome before answering.
-
-Filesystem installation and Doctor checks do not prove that an already-running Codex task dynamically discovered the Skill. Start a new Codex task when runtime discovery is not dynamic.
-
-## Use
-
-Ask Codex to delegate normally, for example:
-
-```text
-Split these independent checks into delegated tasks and use the lowest-cost reliable models.
-```
-
-Paifa applies hard floors before cost scoring. Authentication, authorization, identity, tenant isolation, security, billing, payment, migration, and production work cannot route below Sol `high`. Automatic escalation stops at Sol `high`; higher effort, irreversible operations, and increased high-risk consequences require explicit confirmation.
-
-Normal output is compact for every route class: Paifa inspects state, validates the full route internally, then emits one `PAIFA_ROUTE` line immediately before dispatch. Waiting, monitoring, polling, and status-only updates do not repeat receipts. Expanded YAML is available only when audit details are explicitly requested or validation fails.
-
-Starting delegated work is not completion. The main task must not end its turn merely because a delegated task or subagent has started.
-
-Internal subagent overrides must pass `model`, `reasoning_effort`, and `fork_turns` explicitly. `fork_turns` is `"none"` or a quoted positive integer such as `"3"`; it is never `"all"` when overriding the model.
-
-`PAIFA_DISPATCHED` records only values the dispatch tool actually received: model, effort, and internal-route `forkTurns`. Context mode remains part of `PAIFA_ROUTE`; its fact-envelope delivery is recorded separately as `PAIFA_CONTEXT`, not claimed as a tool-returned field.
+The installer links the Skill into Codex and adds one versioned managed block to the global `AGENTS.md`. It preserves unrelated global rules, keeps a backup, and supports safe updates and removal.
 
 ## Maintain
 
@@ -54,12 +43,8 @@ node scripts/doctor.mjs
 ./scripts/uninstall.sh
 ```
 
-Use `./scripts/uninstall.sh --restore-backup` only when global `AGENTS.md` has not changed since installation; the hash guard refuses an unsafe restore. See [upgrade guidance](docs/upgrade.md) and [contribution rules](docs/contributing.md).
+After dispatch, the main task remains responsible for continuing independent work, integrating required delegated results, and completing the user's goal. Waiting and status messages do not repeat the model line.
 
-## Support and security
-
-Version 1 supports macOS and common Linux POSIX shell environments with Node.js 24. Windows installation is not supported in v1. Paifa has no third-party runtime dependencies and never performs automatic network updates.
-
-Doctor verifies deterministic repository and installation contracts. Semantic routing and trigger behavior are evaluated separately with recorded fresh-agent pressure cases; Doctor does not claim those behaviors are universally guaranteed.
+Version 1 supports macOS and common Linux POSIX shell environments with Node.js 24. Windows installation is not supported. Paifa has no third-party runtime dependencies and performs no automatic network updates.
 
 MIT licensed. See [LICENSE](LICENSE).

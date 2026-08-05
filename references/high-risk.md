@@ -1,6 +1,6 @@
 # High-risk floors and confirmation
 
-Apply this reference before scoring cost whenever work touches an item below. These are hard floors, not a preference that file size, urgency, a user request for low cost, or direct ownership can lower.
+Apply this reference whenever work touches an item below. These are hard floors that file size, urgency, or a request for low cost cannot lower.
 
 | Work domain | Minimum route | Additional completion evidence |
 | --- | --- | --- |
@@ -11,8 +11,8 @@ Apply this reference before scoring cost whenever work touches an item below. Th
 
 Use the strongest applicable row. An independent Checker must be a new clean-room task; it cannot inherit the Maker's assumptions.
 
-## Confirmation boundary
+## Stronger reasoning and confirmation
 
-Automatic escalation may not pass `gpt-5.6-sol` / `high`. Require explicit user confirmation before Sol `xhigh`, `max`, or `ultra`, any irreversible operation, or a change that increases high-risk consequences. Record the confirmation in the expanded route before dispatch.
+Use Sol `xhigh`, `max`, or `ultra` only when the task matches the `deep`, `maximum`, or `ultra` profile and state the practical reason in the one-line dispatch notice. Irreversible operations or changes that increase high-risk consequences still require explicit user confirmation.
 
 If the user specifies a model below a floor, explain the minimum and route at that floor. If no model combination can meet the floor, stop and request direction rather than silently downgrade.

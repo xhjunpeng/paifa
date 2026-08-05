@@ -1,14 +1,3 @@
-const EFFORT_ORDER = new Map([
-  ['none', 0],
-  ['minimal', 1],
-  ['low', 2],
-  ['medium', 3],
-  ['high', 4],
-  ['xhigh', 5],
-  ['max', 6],
-  ['ultra', 7],
-]);
-
 const HIGH_RISK = new Set([
   'authentication',
   'authorization',
@@ -20,37 +9,68 @@ const HIGH_RISK = new Set([
   'migration',
   'production',
 ]);
-const ROUTE_CLASSES = new Set(['A', 'B', 'C', 'D']);
-const ROLES = new Set(['maker', 'checker', 'investigator']);
-const SESSION_ACTIONS = new Set(['create', 'continue', 'spawn-internal', 'fork']);
-const CONTEXT_MODES = new Set(['minimal', 'compact', 'recent', 'full-required', 'clean-room']);
+
+const CATEGORY_CANDIDATES = {
+  simple: [
+    ['gpt-5.6-luna', 'low'],
+    ['gpt-5.6-luna', 'medium'],
+    ['gpt-5.6-terra', 'low'],
+    ['gpt-5.6-terra', 'medium'],
+    ['gpt-5.6-terra', 'high'],
+    ['gpt-5.6-sol', 'low'],
+    ['gpt-5.6-sol', 'medium'],
+    ['gpt-5.6-sol', 'high'],
+  ],
+  clear: [
+    ['gpt-5.6-luna', 'medium'],
+    ['gpt-5.6-terra', 'low'],
+    ['gpt-5.6-terra', 'medium'],
+    ['gpt-5.6-sol', 'low'],
+    ['gpt-5.6-sol', 'medium'],
+  ],
+  ordinary: [
+    ['gpt-5.6-terra', 'medium'],
+    ['gpt-5.6-terra', 'high'],
+    ['gpt-5.6-sol', 'medium'],
+    ['gpt-5.6-sol', 'high'],
+  ],
+  complex: [
+    ['gpt-5.6-terra', 'high'],
+    ['gpt-5.6-sol', 'high'],
+  ],
+  'high-risk': [
+    ['gpt-5.6-sol', 'high'],
+  ],
+  deep: [
+    ['gpt-5.6-sol', 'xhigh'],
+  ],
+  maximum: [
+    ['gpt-5.6-sol', 'max'],
+  ],
+  ultra: [
+    ['gpt-5.6-sol', 'ultra'],
+  ],
+};
+
+const HIGH_RISK_CATEGORIES = new Set(['high-risk', 'deep', 'maximum', 'ultra']);
+
+const MODEL_LABELS = {
+  'gpt-5.6-luna': '5.6 Luna',
+  'gpt-5.6-terra': '5.6 Terra',
+  'gpt-5.6-sol': '5.6 Sol',
+};
+
+const EFFORT_LABELS = {
+  low: '轻度',
+  medium: '中',
+  high: '高',
+  xhigh: '极高',
+  max: '最高',
+  ultra: '极高（更快消耗使用额度）',
+};
 
 function issue(code, message) {
   return { code, message };
-}
-
-function modelTier(model) {
-  if (typeof model !== 'string') return 0;
-  if (model.includes('sol')) return 3;
-  if (model.includes('terra')) return 2;
-  if (model.includes('luna')) return 1;
-  return 0;
-}
-
-function effortRank(effort) {
-  return EFFORT_ORDER.get(effort) ?? -1;
-}
-
-function aboveSolHigh(model, effort) {
-  return modelTier(model) > 3
-    || (modelTier(model) === 3 && effortRank(effort) > effortRank('high'));
-}
-
-function ceilingAboveSolHigh(ceiling) {
-  if (!ceiling || typeof ceiling !== 'object') return false;
-  const tier = modelTier(ceiling.model);
-  return tier > 3
-    || (tier === 3 && effortRank(ceiling.effort) > effortRank('high'));
 }
 
 function supportedEfforts(capabilities, model) {
@@ -60,34 +80,27 @@ function supportedEfforts(capabilities, model) {
   return null;
 }
 
-function validInternalForkTurns(forkTurns) {
-  return forkTurns === 'none'
-    || (typeof forkTurns === 'string' && /^[1-9]\d*$/.test(forkTurns));
+export function selectRoute(category, capabilities = {}) {
+  const candidates = CATEGORY_CANDIDATES[category];
+  if (!candidates) return null;
+
+  for (const [model, effort] of candidates) {
+    if (supportedEfforts(capabilities, model)?.includes(effort)) {
+      return { model, effort };
+    }
+  }
+  return null;
 }
 
-export function compactRouteReceipt(route) {
-  const parts = [
-    `PAIFA_ROUTE ${route.version}`,
-    'planned',
-    route.session.action,
-    route.routeClass,
-    `${route.model}/${route.effort}`,
-    route.session.context,
-    route.role,
-  ];
-  if (route.session.action === 'spawn-internal') {
-    parts.push(`forkTurns=${route.session.forkTurns}`);
-  }
-  parts.push(
-    `checks=${route.qualityContract.length}`,
-    `auto<=${route.autoUpgradeCeiling.model}/${route.autoUpgradeCeiling.effort}`,
-  );
-  return parts.join(' | ');
+export function formatDispatchNotice({ model, effort, reason }) {
+  const shortReason = String(reason ?? '').replace(/\s+/g, ' ').trim();
+  const modelLabel = MODEL_LABELS[model] ?? model;
+  const effortLabel = EFFORT_LABELS[effort] ?? effort;
+  return `派发模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}`;
 }
 
 export function validateRoute(route, capabilities = {}) {
   const errors = [];
-
   if (!route || typeof route !== 'object' || Array.isArray(route)) {
     return {
       ok: false,
@@ -95,77 +108,45 @@ export function validateRoute(route, capabilities = {}) {
     };
   }
 
+  if (!Object.hasOwn(CATEGORY_CANDIDATES, route.category)) {
+    errors.push(issue('CATEGORY_INVALID', 'Category is not part of the supported routing ladder.'));
+  }
+
+  const reason = typeof route.reason === 'string' ? route.reason.replace(/\s+/g, ' ').trim() : '';
+  if (!reason || reason.length > 120) {
+    errors.push(issue('REASON_INVALID', 'Reason must be one short sentence of 1 to 120 characters.'));
+  }
+
   if (!route.model || !route.effort) {
-    errors.push(issue(
-      'EXPLICIT_MODEL_REQUIRED',
-      'Route must set an explicit model and effort; inheritance is not auditable.',
-    ));
-  }
-
-  if (route.version !== 'v1' || !ROUTE_CLASSES.has(route.routeClass) || !ROLES.has(route.role)) {
-    errors.push(issue('ROUTE_SCHEMA_INVALID', 'Route version, routeClass, or role is invalid.'));
-  }
-
-  if (!route.session?.action || !route.session?.context) {
-    errors.push(issue(
-      'SESSION_REQUIRED',
-      'Route must set both session action and context mode.',
-    ));
-  }
-  if (route.session && (!SESSION_ACTIONS.has(route.session.action)
-    || !CONTEXT_MODES.has(route.session.context))) {
-    errors.push(issue('SESSION_INVALID', 'Session action or context mode is unsupported.'));
-  }
-
-  if (!route.autoUpgradeCeiling?.model || !route.autoUpgradeCeiling?.effort) {
-    errors.push(issue('AUTO_UPGRADE_CEILING_REQUIRED', 'Route must set an automatic upgrade ceiling.'));
-  }
-
-  if (route.session?.action === 'spawn-internal') {
-    if (route.session.forkTurns === undefined) {
-      errors.push(issue(
-        'INTERNAL_FORK_TURNS_REQUIRED',
-        'An internal-subagent route must explicitly plan forkTurns.',
-      ));
-    } else if (!validInternalForkTurns(route.session.forkTurns)) {
-      errors.push(issue(
-        'INTERNAL_FORK_TURNS_INVALID',
-        'Internal forkTurns must be "none" or a quoted positive integer.',
-      ));
-    }
-  }
-
-  if (!Array.isArray(route.qualityContract) || route.qualityContract.length === 0) {
-    errors.push(issue(
-      'QUALITY_CONTRACT_REQUIRED',
-      'Route must include at least one objective completion check.',
-    ));
-  }
-
-  const efforts = supportedEfforts(capabilities, route.model);
-  if (route.model && route.effort && (!efforts || !efforts.includes(route.effort))) {
-    errors.push(issue(
-      'UNSUPPORTED_MODEL_EFFORT',
-      `Model ${route.model} does not support effort ${route.effort}.`,
-    ));
+    errors.push(issue('EXPLICIT_MODEL_REQUIRED', 'Route must set an explicit model and effort.'));
   }
 
   const risk = Array.isArray(route.risk) ? route.risk : [];
   const hasHighRisk = risk.some((value) => HIGH_RISK.has(value));
-  if (hasHighRisk
-    && (modelTier(route.model) < modelTier('gpt-5.6-sol')
-      || effortRank(route.effort) < effortRank('high'))) {
-    errors.push(issue(
-      'RISK_FLOOR',
-      'High-risk work requires Sol high or stronger with explicit parameters.',
-    ));
+  if (hasHighRisk && !HIGH_RISK_CATEGORIES.has(route.category)) {
+    errors.push(issue('HIGH_RISK_CATEGORY_REQUIRED', 'High-risk work requires Sol high or stronger.'));
   }
 
-  if (aboveSolHigh(route.model, route.effort) && !route.userConfirmedAboveCeiling) {
-    errors.push(issue(
-      'USER_CONFIRMATION_REQUIRED',
-      'Effort above Sol high requires explicit user confirmation.',
-    ));
+  const effectiveCategory = route.category;
+  const expected = selectRoute(effectiveCategory, capabilities);
+  if (!expected && Object.hasOwn(CATEGORY_CANDIDATES, effectiveCategory)) {
+    errors.push(issue('NO_CAPABLE_ROUTE', 'No supported model and effort meet this category.'));
+  }
+
+  if (route.model && route.effort) {
+    const efforts = supportedEfforts(capabilities, route.model);
+    if (!efforts?.includes(route.effort)) {
+      errors.push(issue(
+        'UNSUPPORTED_MODEL_EFFORT',
+        `Model ${route.model} does not support effort ${route.effort}.`,
+      ));
+    } else if (expected
+      && (route.model !== expected.model || route.effort !== expected.effort)) {
+      errors.push(issue(
+        'NOT_LOWEST_CAPABLE',
+        `Use ${expected.model}/${expected.effort}, the lowest supported route for ${effectiveCategory}.`,
+      ));
+    }
   }
 
   if ((route.irreversible === true || route.increasesHighRiskConsequences === true)
@@ -176,50 +157,23 @@ export function validateRoute(route, capabilities = {}) {
     ));
   }
 
-  if (ceilingAboveSolHigh(route.autoUpgradeCeiling)) {
-    errors.push(issue(
-      'AUTO_UPGRADE_CEILING',
-      'Automatic escalation cannot exceed Sol high.',
-    ));
-  }
-
-  if (route.role === 'checker'
-    && route.independent === true
-    && (route.session?.action !== 'create' || route.session?.context !== 'clean-room')) {
-    errors.push(issue(
-      'CHECKER_ISOLATION',
-      'An independent checker requires a clean new task.',
-    ));
-  }
-
-  if (Number(route.pollutionRisk) >= 2 && route.session?.action === 'fork') {
-    errors.push(issue(
-      'FORK_PRESERVES_POLLUTION',
-      'Fork preserves completed history and cannot clean polluted context.',
-    ));
-  }
-
   const ok = errors.length === 0;
   return {
     ok,
     errors,
-    ...(ok ? { receipt: compactRouteReceipt(route) } : {}),
+    ...(ok ? {
+      notice: formatDispatchNotice({
+        model: route.model,
+        effort: route.effort,
+        reason,
+      }),
+    } : {}),
   };
 }
 
 export function validateDispatch(route, dispatch) {
   const errors = [];
   const actual = dispatch && typeof dispatch === 'object' ? dispatch : {};
-  const allowedFields = new Set(['model', 'effort']);
-  if (route?.session?.action === 'spawn-internal') allowedFields.add('forkTurns');
-  const unsupportedFields = Object.keys(actual).filter((field) => !allowedFields.has(field));
-
-  if (unsupportedFields.length > 0) {
-    errors.push(issue(
-      'DISPATCH_FIELD_UNSUPPORTED',
-      `Actual receipt contains unsupported tool fields: ${unsupportedFields.join(', ')}.`,
-    ));
-  }
 
   if (actual.model !== route?.model) {
     errors.push(issue(
@@ -232,14 +186,6 @@ export function validateDispatch(route, dispatch) {
     errors.push(issue(
       'DISPATCH_EFFORT_MISMATCH',
       `Actual effort ${actual.effort ?? '<missing>'} does not match route ${route?.effort ?? '<missing>'}.`,
-    ));
-  }
-
-  if (route?.session?.action === 'spawn-internal'
-    && actual.forkTurns !== route.session.forkTurns) {
-    errors.push(issue(
-      'DISPATCH_FORK_TURNS_MISMATCH',
-      `Actual forkTurns ${actual.forkTurns ?? '<missing>'} does not match route ${route.session.forkTurns ?? '<missing>'}.`,
     ));
   }
 

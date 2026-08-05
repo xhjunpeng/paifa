@@ -2,6 +2,14 @@
 
 All notable changes follow semantic versioning.
 
+## 1.1.0 - 2026-08-06
+
+- Reduced routing to one plain ladder covering 5.6 Luna, Terra, Sol and `low` through `ultra` reasoning.
+- Replaced all user-visible route objects and coded receipts with one human-readable model, effort, and reason line.
+- Matched the user-visible model and reasoning labels to the Codex UI while keeping tool parameters internal.
+- Removed scoring, YAML, context hashes, and repeated waiting/status output from the runtime contract.
+- Kept the Sol `high` floor for security-sensitive and production-impacting work.
+
 ## 1.0.2 - 2026-08-05
 
 - Clarified that Paifa never authorizes or requires delegation for ordinary main-task work.

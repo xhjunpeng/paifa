@@ -34,31 +34,16 @@ test('released repository installs one dispatch gate without replacing existing 
 
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
-    assert.match(agents, /must invoke `paifa` before .*?(?:create|continue|retry|fork|spawn)/is);
-    assert.match(agents, /only when the user explicitly requests .*?(?:delegate|split|subtask|parallel)/is);
-    assert.match(agents, /must not expand .*?(?:goal|file|permission) scope/is);
-    assert.match(agents, /high-risk work at its risk floor may be dispatched without additional user confirmation/is);
+    assert.match(agents, /invoke `paifa` immediately before .*?(?:creat|continu|retry|fork|spawn)/is);
+    assert.match(agents, /only chooses .*?model and reasoning effort/is);
+    assert.match(agents, /does not authorize delegation.*?expand the requested scope/is);
     assert.match(
       agents,
-      /explicit user confirmation is required only for .*?above Sol high.*?irreversible.*?changes? that increase high-risk consequences/is,
+      /派发模型：5\.6 Terra｜思考强度：中｜原因：任务边界清晰/is,
     );
-    assert.match(agents, /every successful dispatch must emit `PAIFA_DISPATCHED`/is);
-    assert.match(agents, /`PAIFA_DISPATCHED` must record actual model and effort/is);
-    assert.match(agents, /internal subagent.*?actual `forkTurns`/is);
-    assert.match(agents, /context is not a tool receipt field/is);
-    assert.match(agents, /`PAIFA_CONTEXT`.*?envelope identifier or hash/is);
-    assert.match(
-      agents,
-      /one validated compact `PAIFA_ROUTE` line immediately before each real dispatch decision/is,
-    );
-    assert.match(
-      agents,
-      /waiting, monitoring, and status-only updates must not repeat Paifa receipts/is,
-    );
-    assert.match(
-      agents,
-      /expanded route YAML is shown only for an explicit audit-detail request or validation failure/is,
-    );
+    assert.match(agents, /same model and effort in the actual tool call/is);
+    assert.match(agents, /waiting, monitoring, and status updates do not repeat the line/is);
+    assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
