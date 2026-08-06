@@ -16,7 +16,7 @@ import { inspectManagedBlock } from '../scripts/lib/managed-block.mjs';
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, '..');
 const ORIGINAL_AGENTS = '# Existing global rule\n\nPreserve this content exactly.\n';
 
-test('released repository installs the execution gate without replacing existing AGENTS rules', () => {
+test('released repository installs a narrow Paifa trigger without replacing existing AGENTS rules', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'paifa-release-'));
   const codexHome = path.join(root, 'codex');
   try {
@@ -34,27 +34,16 @@ test('released repository installs the execution gate without replacing existing
 
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
-    assert.match(agents, /before material execution.*?choose the lowest capable model and effort/is);
-    assert.match(agents, /for real dispatch.*?invoke `paifa` immediately before the tool call/is);
-    assert.match(agents, /independent task.*?independent Worktree.*?user follow-up.*?independent review/is);
-    assert.match(agents, /otherwise an internal subagent/is);
-    assert.match(agents, /ordinary work uses Terra medium.*?cross-module.*?Terra high/is);
-    assert.match(
-      agents,
-      /Sol.*?both high consequence and high uncertainty.*?Terra high failure/is,
-    );
-    assert.match(agents, /risk keywords alone.*?do not justify Sol/is);
-    assert.match(agents, /方式：当前任务｜模型：5\.6 Terra 中｜原因：范围明确的普通实现/is);
-    assert.match(agents, /准备执行：回复 1 批准/is);
-    assert.match(agents, /approved dispatch kind, model, and effort in the actual tool call/is);
-    assert.match(agents, /do not repeat the two lines while waiting or reporting status/is);
+    assert.match(agents, /Invoke `paifa` only when the next action will change state/is);
+    assert.match(agents, /questions, explanations, planning, source reading, or read-only inspection/is);
+    assert.match(agents, /SKILL\.md is the source of truth for model routing, approval, delegation, and completion rules/is);
     assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
 });
 
-test('global execution gate uses a compact task-level approval contract', () => {
+test('global execution gate is a compact trigger while the Skill owns the policy', () => {
   const block = readFileSync(
     path.join(REPOSITORY_ROOT, 'templates', 'global-agents-block.md'),
     'utf8',
@@ -62,20 +51,14 @@ test('global execution gate uses a compact task-level approval contract', () => 
   const skill = readFileSync(path.join(REPOSITORY_ROOT, 'SKILL.md'), 'utf8');
 
   const notice = '方式：当前任务｜模型：5.6 Terra 中｜原因：范围明确的普通实现\n准备执行：回复 1 批准';
-  assert.match(block, /material execution/i);
-  assert.match(block, /questions, analysis, planning, source reading, and read-only checks.*?do not require approval/is);
-  assert.match(block, new RegExp(notice));
-  assert.match(block, /clear execution intent.*?执行.*?开始.*?继续.*?按建议执行.*?确认.*?`1`/is);
-  assert.match(block, /开始执行：已获授权/);
-  assert.match(block, /准备执行：回复 1 批准/);
-  assert.match(block, /一次任务级授权.*?依赖安装.*?测试.*?修复.*?重试.*?验证/is);
-  assert.match(block, /更贵.*?模型.*?思考强度.*?跨项目.*?生产.*?不可逆.*?发布.*?推送.*?部署/is);
-  assert.match(block, /direct work.*?actual UI-selected model/i);
-  assert.match(skill, /material execution/i);
+  assert.match(block, /next action will change state/i);
+  assert.match(block, /questions, explanations, planning, source reading, or read-only inspection/i);
+  assert.doesNotMatch(block, /方式：|准备执行：|开始执行：|Sol|Terra|Luna/);
+  assert.match(skill, /description: Use when the next action will change state/is);
   assert.match(skill, new RegExp(notice));
   assert.match(skill, /clear execution intent/is);
   assert.match(skill, /一次任务级授权.*?依赖安装.*?测试.*?修复.*?重试.*?验证/is);
-  assert.doesNotMatch(block, /范围：|实际模型：|思考强度：/);
+  assert.match(skill, /当前任务.*?only when.*?exact model and effort.*?visible/is);
 });
 
 test('repository allows noncommercial use and reserves commercial licensing', () => {

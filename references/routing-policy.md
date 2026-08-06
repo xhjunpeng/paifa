@@ -1,5 +1,7 @@
 # Simple routing ladder
 
+Use this policy only after the next action is state-changing. A route's model and effort must be the settings of the worker that actually executes it; never substitute an unknown current session for a route.
+
 Choose one observable task profile. Do not calculate scores.
 
 First choose the dispatch kind: an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review; otherwise an internal subagent for bounded work that may share the current directory.
