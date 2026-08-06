@@ -21,4 +21,10 @@ Before dispatch show only:
 `方式：独立任务｜模型：5.6 Terra 高｜原因：跨模块任务，但边界明确且可验证。`
 `准备执行：回复 1 批准`
 
+明确执行意图（`执行`、`开始`、`继续`、`按建议执行`、`确认` 或 `1`）已授权时，第二行改为：
+
+`开始执行：已获授权`
+
+一次任务级授权覆盖依赖安装、测试/构建、小修复、重试与验证。仅在成本、项目/工作区、生产或不可逆外部影响，或任务目标实质升级时重新确认。
+
 The main task owns completion: continue safe independent work and integrate required results.
