@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.3.3 - 2026-08-06
+
+- Separated every user-visible route into explicit `模型` and `思考强度` fields.
+- Forbid `GPT-5`, `当前会话`, and `强度未暴露` as a routing substitute.
+- Require Paifa before creating or modifying an executable plan document, while leaving plan discussion uninterrupted.
+
 ## 1.3.2 - 2026-08-06
 
 - Narrowed discovery to the next state-changing action so ordinary conversation does not load Paifa.
