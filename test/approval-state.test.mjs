@@ -63,29 +63,33 @@ describe('approval state', () => {
     });
   });
 
-  test('approves exactly 1 or 确认 and consumes the pending route', () => {
+  test('approves 1 or 确认 after trimming only leading and trailing whitespace', () => {
     withStateDir((stateDir) => {
-      propose('workspace-a', validRoute(), { stateDir });
-      const approved = approve('workspace-a', '确认', { stateDir });
+      for (const reply of ['1', ' 1 ', '\n1\n', '\u30001\u3000', '确认', ' 确认 ', '\n确认\n', '\u3000确认\u3000']) {
+        propose('workspace-a', validRoute(), { stateDir });
+        const approved = approve('workspace-a', reply, { stateDir });
 
-      assert.equal(approved.ok, true);
-      assert.equal(approved.route.executionApproved, true);
-      assert.equal(
-        approved.notice,
-        '方式：内部子智能体｜模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。\n开始执行：已获授权',
-      );
-      assert.equal(approve('workspace-a', '1', { stateDir }).error.code, 'NO_PENDING_APPROVAL');
+        assert.equal(approved.ok, true, `expected ${JSON.stringify(reply)} to approve`);
+        assert.equal(approved.route.executionApproved, true);
+        assert.equal(
+          approved.notice,
+          '方式：内部子智能体｜模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。\n开始执行：已获授权',
+        );
+        assert.equal(approve('workspace-a', '1', { stateDir }).error.code, 'NO_PENDING_APPROVAL');
+      }
     });
   });
 
-  test('accepts no other confirmation wording', () => {
+  test('rejects confirmation text with added content without consuming the pending route', () => {
     withStateDir((stateDir) => {
-      propose('workspace-a', validRoute(), { stateDir });
-      const result = approve('workspace-a', ' 1', { stateDir });
+      for (const reply of ['1, 按照最新 Paifa 标准', '1 说明', '确认，请继续', '', '   ', '\n\t']) {
+        propose('workspace-a', validRoute(), { stateDir });
+        const result = approve('workspace-a', reply, { stateDir });
 
-      assert.equal(result.ok, false);
-      assert.equal(result.error.code, 'APPROVAL_REPLY_INVALID');
-      assert.equal(approve('workspace-a', '1', { stateDir }).ok, true);
+        assert.equal(result.ok, false, `expected ${JSON.stringify(reply)} to be rejected`);
+        assert.equal(result.error.code, 'APPROVAL_REPLY_INVALID');
+        assert.equal(approve('workspace-a', '1', { stateDir }).ok, true);
+      }
     });
   });
 
