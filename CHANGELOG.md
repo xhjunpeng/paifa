@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.3.2 - 2026-08-06
+
+- Narrowed discovery to the next state-changing action so ordinary conversation does not load Paifa.
+- Made a current-task route invalid when its exact model or effort is unavailable; cost-controlled work must use a worker with an exact route.
+- Reduced the installed global rule to one trigger sentence and kept routing policy in the Skill.
+
 ## 1.3.1 - 2026-08-06
 
 - Treat clear execution intent as task-level approval and start without requiring a second standalone reply.

@@ -1,11 +1,11 @@
 ---
 name: paifa
-description: Use when immediately before material Codex execution, including edits, state-changing commands, publishing, or delegated work.
+description: Use when the next action will change state: edit/delete files, install dependencies, commit, push, publish/deploy, or create/retry real delegated work. Do not use for questions, explanations, planning, source reading, or read-only inspection.
 ---
 
 # Paifa
 
-Questions, analysis, planning, source reading, and read-only checks do not require approval.
+This is not a conversational preflight. Load it only after the next action meets the description's state-changing trigger; questions, explanations, planning, source reading, and read-only inspection do not use Paifa.
 
 Before material execution, choose the lowest capable model and effort, then show exactly two user-language lines. If the user has not yet authorized execution, wait:
 
@@ -14,7 +14,7 @@ Before material execution, choose the lowest capable model and effort, then show
 准备执行：回复 1 批准
 ```
 
-For current-task work, report the actual UI-selected model and effort; never present a cheaper recommendation as if it is active. A clear execution intent—`执行`, `开始`, `继续`, `按建议执行`, `确认`, or `1`—approves the stated task. Show the same first line, then `开始执行：已获授权`, and start immediately.
+`当前任务` is valid only when the exact model and effort are visible and will actually execute the work; never substitute an unknown current session or an unexposed effort for a model choice. If either is unavailable and model selection matters, must use `内部子智能体` or `独立任务` with an exact route. A clear execution intent—`执行`, `开始`, `继续`, `按建议执行`, `确认`, or `1`—approves the stated task. Show the same first line, then `开始执行：已获授权`, and start immediately.
 
 一次任务级授权 covers the normal closed loop: project-local 依赖安装, 测试/build, 小修复, 重试, and 验证. Do not interrupt for those steps. Ask again only for a 更贵模型 or 思考强度, 跨项目 or another workspace, 生产/凭据/付费服务, 不可逆 deletion or data migration, an unapproved 发布/推送/部署, or a material change to the task goal.
 
