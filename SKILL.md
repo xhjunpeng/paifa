@@ -18,20 +18,20 @@ Model and effort:
 
 - Mechanical/read-only -> 5.6 Luna / `low`.
 - Small, explicit, verifiable -> 5.6 Luna / `medium`.
-- Normal implementation/bug/investigation/review -> 5.6 Terra / `medium`.
-- Unknown root cause/cross-module reasoning -> 5.6 Terra / `high`.
-- Security/identity/tenant/billing/migration/production/final acceptance -> 5.6 Sol / `high`.
-- Unusually complex/high-consequence -> 5.6 Sol / `xhigh`.
-- Repeated non-convergence or major architecture -> 5.6 Sol / `max`.
-- Hardest exceptional case after lower levels fail -> 5.6 Sol / `ultra`.
+- Default implementation/bug/review/ordinary planning -> 5.6 Terra / `medium`.
+- Cross-module/unknown root cause/complex planning/high-risk but verifiable -> 5.6 Terra / `high`.
+- 5.6 Sol / `high`: only both high consequence and high uncertainty, or evidenced Terra/high failure.
+- `xhigh/max/ultra`: only after Sol/high is insufficient and the user confirms.
 
-UI: `low=轻度`, `medium=中`, `high=高`, `xhigh=极高`, `max=最高`, `ultra=极高（更快消耗使用额度）`. If unavailable, use the next supported route at or above the task floor. Missing tools/facts/services never upgrade.
+Risk keywords, file count, duration, missing tools/facts/services, or a generic quality request never justify Sol. If unavailable, never lower the task floor.
+
+UI: `low=轻度`, `medium=中`, `high=高`, `xhigh=极高`, `max=最高`, `ultra=极高（更快消耗使用额度）`.
 
 ## Tell and dispatch
 
 Before dispatch, show one user-language line:
 
-`派发方式：独立任务｜派发模型：5.6 Sol｜思考强度：高｜原因：需要干净 Worktree 和独立审计。`
+`派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。`
 
 Use matching tool/model/effort. Show nothing else; never repeat during waits/status.
 

@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.2.0 - 2026-08-06
+
+- Made Terra the default for implementation, review, planning, and high-risk work with clear boundaries and verification.
+- Added a strict Sol gate: both high consequence and high uncertainty, or evidenced Terra/high failure.
+- Required explicit confirmation for `xhigh`, `max`, and `ultra`, and blocked keyword-, duration-, file-count-, environment-, and generic-quality-based Sol upgrades.
+
 ## 1.1.1 - 2026-08-06
 
 - Added a two-way execution choice: independent task for isolated or durable work, internal subagent for bounded shared-directory work.

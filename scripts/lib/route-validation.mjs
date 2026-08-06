@@ -39,7 +39,7 @@ const CATEGORY_CANDIDATES = {
     ['gpt-5.6-sol', 'high'],
   ],
   'high-risk': [
-    ['gpt-5.6-sol', 'high'],
+    ['gpt-5.6-terra', 'high'],
   ],
   deep: [
     ['gpt-5.6-sol', 'xhigh'],
@@ -53,6 +53,8 @@ const CATEGORY_CANDIDATES = {
 };
 
 const HIGH_RISK_CATEGORIES = new Set(['high-risk', 'deep', 'maximum', 'ultra']);
+const STRONG_REASONING_CATEGORIES = new Set(['deep', 'maximum', 'ultra']);
+const STRONG_REASONING_EFFORTS = new Set(['xhigh', 'max', 'ultra']);
 
 const MODEL_LABELS = {
   'gpt-5.6-luna': '5.6 Luna',
@@ -92,11 +94,23 @@ function supportedEfforts(capabilities, model) {
   return null;
 }
 
-export function selectRoute(category, capabilities = {}) {
-  const candidates = CATEGORY_CANDIDATES[category];
+export function solGateMet(solGate = {}) {
+  return solGate.terraHighFailed === true
+    || (solGate.highConsequence === true && solGate.highUncertainty === true);
+}
+
+export function selectRoute(category, capabilities = {}, solGate = {}) {
+  let candidates = CATEGORY_CANDIDATES[category];
   if (!candidates) return null;
 
+  const allowSol = solGateMet(solGate);
+  if (STRONG_REASONING_CATEGORIES.has(category) && !allowSol) return null;
+  if (allowSol && !STRONG_REASONING_CATEGORIES.has(category)) {
+    candidates = [['gpt-5.6-sol', 'high']];
+  }
+
   for (const [model, effort] of candidates) {
+    if (model === 'gpt-5.6-sol' && !allowSol) continue;
     if (supportedEfforts(capabilities, model)?.includes(effort)) {
       return { model, effort };
     }
@@ -155,11 +169,27 @@ export function validateRoute(route, capabilities = {}) {
   const risk = Array.isArray(route.risk) ? route.risk : [];
   const hasHighRisk = risk.some((value) => HIGH_RISK.has(value));
   if (hasHighRisk && !HIGH_RISK_CATEGORIES.has(route.category)) {
-    errors.push(issue('HIGH_RISK_CATEGORY_REQUIRED', 'High-risk work requires Sol high or stronger.'));
+    errors.push(issue('HIGH_RISK_CATEGORY_REQUIRED', 'High-risk work requires the high-risk category.'));
+  }
+
+  const allowSol = solGateMet(route.solGate);
+  if (route.model === 'gpt-5.6-sol' && !allowSol) {
+    errors.push(issue(
+      'SOL_GATE_REQUIRED',
+      'Sol requires both high consequence and high uncertainty, or evidenced Terra high failure.',
+    ));
+  }
+
+  if (STRONG_REASONING_EFFORTS.has(route.effort)
+    && route.userConfirmedAboveHigh !== true) {
+    errors.push(issue(
+      'STRONG_REASONING_CONFIRMATION_REQUIRED',
+      'xhigh, max, and ultra require explicit user confirmation.',
+    ));
   }
 
   const effectiveCategory = route.category;
-  const expected = selectRoute(effectiveCategory, capabilities);
+  const expected = selectRoute(effectiveCategory, capabilities, route.solGate);
   if (!expected && Object.hasOwn(CATEGORY_CANDIDATES, effectiveCategory)) {
     errors.push(issue('NO_CAPABLE_ROUTE', 'No supported model and effort meet this category.'));
   }

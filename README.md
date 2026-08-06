@@ -5,7 +5,7 @@ Paifa is a small Codex dispatch helper. Immediately before delegated work starts
 Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 
 ```text
-派发方式：独立任务｜派发模型：5.6 Sol｜思考强度：高｜原因：需要干净 Worktree 和独立审计。
+派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。
 ```
 
 Use an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review. Use an internal subagent only for bounded work that can share the current directory and return its result to the main task.
@@ -16,14 +16,12 @@ Paifa uses a short capability ladder across the three 5.6 models and six reasoni
 
 - Mechanical or read-only: Luna / `low`.
 - Small, explicit, easy to verify: Luna / `medium`.
-- Ordinary implementation, bug fixing, investigation, or review: Terra / `medium`.
-- Cross-module or unclear-root-cause work: Terra / `high`.
-- Security-sensitive, production-impacting, or final acceptance: Sol / `high`.
-- Unusually complex or high-consequence reasoning: Sol / `xhigh`.
-- Repeated non-convergence or major architecture: Sol / `max`.
-- Exceptional hardest cases after lower levels prove insufficient: Sol / `ultra`.
+- Ordinary implementation, review, or planning: Terra / `medium`.
+- Cross-module, unclear-root-cause, complex planning, or high-risk but verifiable work: Terra / `high`.
+- Sol / `high`: only both high consequence and high uncertainty, or evidenced Terra/high failure.
+- Sol above `high`: only after lower effort is insufficient and the user explicitly confirms.
 
-Missing tools, missing facts, permissions, and environment failures do not cause a model upgrade. Paifa does nothing when no real dispatch is happening, and it never starts another task merely to choose a model.
+Risk keywords, file count, duration, missing tools or facts, environment failures, and generic quality requests do not justify Sol. Paifa does nothing when no real dispatch is happening, and it never starts another task merely to choose a model.
 
 ## Install
 

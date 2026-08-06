@@ -39,9 +39,15 @@ test('released repository installs one dispatch gate without replacing existing 
     assert.match(agents, /does not authorize delegation.*?expand the requested scope/is);
     assert.match(agents, /independent task.*?independent Worktree.*?direct user follow-up.*?independent review/is);
     assert.match(agents, /internal subagent only for bounded work.*?share the current directory/is);
+    assert.match(agents, /ordinary planning.*?Terra.*?cross-module planning.*?Terra high/is);
     assert.match(
       agents,
-      /派发方式：独立任务｜派发模型：5\.6 Sol｜思考强度：高｜原因：需要干净 Worktree/is,
+      /Sol.*?both high consequence and high uncertainty.*?Terra high failure/is,
+    );
+    assert.match(agents, /risk keywords alone.*?do not justify Sol/is);
+    assert.match(
+      agents,
+      /派发方式：独立任务｜派发模型：5\.6 Terra｜思考强度：高｜原因：跨模块任务/is,
     );
     assert.match(agents, /same dispatch kind, model, and effort in the actual tool call/is);
     assert.match(agents, /waiting, monitoring, and status updates do not repeat the line/is);

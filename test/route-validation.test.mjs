@@ -49,25 +49,28 @@ describe('selectRoute', () => {
       model: 'gpt-5.6-terra', effort: 'high',
     });
     assert.deepEqual(selectRoute('high-risk', CAPABILITIES), {
-      model: 'gpt-5.6-sol', effort: 'high',
+      model: 'gpt-5.6-terra', effort: 'high',
     });
-    assert.deepEqual(selectRoute('deep', CAPABILITIES), {
+    assert.deepEqual(selectRoute('deep', CAPABILITIES, { terraHighFailed: true }), {
       model: 'gpt-5.6-sol', effort: 'xhigh',
     });
-    assert.deepEqual(selectRoute('maximum', CAPABILITIES), {
+    assert.deepEqual(selectRoute('maximum', CAPABILITIES, { terraHighFailed: true }), {
       model: 'gpt-5.6-sol', effort: 'max',
     });
-    assert.deepEqual(selectRoute('ultra', CAPABILITIES), {
+    assert.deepEqual(selectRoute('ultra', CAPABILITIES, { terraHighFailed: true }), {
       model: 'gpt-5.6-sol', effort: 'ultra',
     });
   });
 
   test('falls forward without dropping below the category floor', () => {
     const onlySol = { 'gpt-5.6-sol': ['high'] };
-    assert.deepEqual(selectRoute('ordinary', onlySol), {
+    assert.equal(selectRoute('ordinary', onlySol), null);
+    assert.deepEqual(selectRoute('ordinary', onlySol, { terraHighFailed: true }), {
       model: 'gpt-5.6-sol', effort: 'high',
     });
-    assert.equal(selectRoute('high-risk', { 'gpt-5.6-terra': ['high'] }), null);
+    assert.deepEqual(selectRoute('high-risk', { 'gpt-5.6-terra': ['high'] }), {
+      model: 'gpt-5.6-terra', effort: 'high',
+    });
   });
 });
 
@@ -95,7 +98,7 @@ describe('validateRoute', () => {
     assert.ok(errorCodes(result).includes('NOT_LOWEST_CAPABLE'));
   });
 
-  test('requires high-risk work to use Sol high', () => {
+  test('requires the high-risk category without upgrading on the keyword alone', () => {
     const rejected = validateRoute(validRoute({
       category: 'ordinary',
       risk: ['security'],
@@ -104,7 +107,7 @@ describe('validateRoute', () => {
 
     const accepted = validateRoute(validRoute({
       category: 'high-risk',
-      model: 'gpt-5.6-sol',
+      model: 'gpt-5.6-terra',
       effort: 'high',
       risk: ['security'],
     }), CAPABILITIES);
@@ -115,6 +118,8 @@ describe('validateRoute', () => {
       model: 'gpt-5.6-sol',
       effort: 'xhigh',
       risk: ['security'],
+      solGate: { terraHighFailed: true },
+      userConfirmedAboveHigh: true,
     }), CAPABILITIES);
     assert.equal(deeper.ok, true);
   });

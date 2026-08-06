@@ -23,11 +23,11 @@ test('the one-line notice includes the selected dispatch kind', () => {
   assert.equal(
     routing.formatDispatchNotice({
       dispatchKind: 'task',
-      model: 'gpt-5.6-sol',
+      model: 'gpt-5.6-terra',
       effort: 'high',
-      reason: '需要干净 Worktree 和独立审计。',
+      reason: '需要独立 Worktree，但边界明确可验证。',
     }),
-    '派发方式：独立任务｜派发模型：5.6 Sol｜思考强度：高｜原因：需要干净 Worktree 和独立审计。',
+    '派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：需要独立 Worktree，但边界明确可验证。',
   );
 });
 

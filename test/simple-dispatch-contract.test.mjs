@@ -29,18 +29,18 @@ test('chooses the lowest capable model from the full model and effort ladder', (
     effort: 'high',
   });
   assert.deepEqual(routing.selectRoute('high-risk', CAPABILITIES), {
-    model: 'gpt-5.6-sol',
+    model: 'gpt-5.6-terra',
     effort: 'high',
   });
-  assert.deepEqual(routing.selectRoute('deep', CAPABILITIES), {
+  assert.deepEqual(routing.selectRoute('deep', CAPABILITIES, { terraHighFailed: true }), {
     model: 'gpt-5.6-sol',
     effort: 'xhigh',
   });
-  assert.deepEqual(routing.selectRoute('maximum', CAPABILITIES), {
+  assert.deepEqual(routing.selectRoute('maximum', CAPABILITIES, { terraHighFailed: true }), {
     model: 'gpt-5.6-sol',
     effort: 'max',
   });
-  assert.deepEqual(routing.selectRoute('ultra', CAPABILITIES), {
+  assert.deepEqual(routing.selectRoute('ultra', CAPABILITIES, { terraHighFailed: true }), {
     model: 'gpt-5.6-sol',
     effort: 'ultra',
   });
