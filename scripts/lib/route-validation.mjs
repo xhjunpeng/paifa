@@ -124,12 +124,21 @@ export function selectDispatchKind(requirements = {}) {
     : 'subagent';
 }
 
-export function formatDispatchNotice({ dispatchKind, model, effort, reason }) {
+export function formatDispatchNotice({
+  dispatchKind,
+  model,
+  effort,
+  reason,
+  executionApproved = false,
+}) {
   const shortReason = String(reason ?? '').replace(/\s+/g, ' ').trim();
   const dispatchKindLabel = DISPATCH_KIND_LABELS[dispatchKind] ?? dispatchKind;
   const modelLabel = MODEL_LABELS[model] ?? model;
   const effortLabel = EFFORT_LABELS[effort] ?? effort;
-  return `方式：${dispatchKindLabel}｜模型：${modelLabel} ${effortLabel}｜原因：${shortReason}\n准备执行：回复 1 批准`;
+  const actionLine = executionApproved
+    ? '开始执行：已获授权'
+    : '准备执行：回复 1 批准';
+  return `方式：${dispatchKindLabel}｜模型：${modelLabel} ${effortLabel}｜原因：${shortReason}\n${actionLine}`;
 }
 
 export function validateRoute(route, capabilities = {}) {
@@ -228,6 +237,7 @@ export function validateRoute(route, capabilities = {}) {
         model: route.model,
         effort: route.effort,
         reason,
+        executionApproved: route.executionApproved === true,
       }),
     } : {}),
   };

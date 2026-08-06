@@ -1,6 +1,6 @@
 # Paifa
 
-Paifa is a small Codex execution gate. Immediately before a real change or delegated task, it chooses the lowest capable model and reasoning effort, then waits for explicit approval.
+Paifa is a small Codex execution gate. Immediately before a real change or delegated task, it chooses the lowest capable model and reasoning effort.
 
 Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 
@@ -9,7 +9,9 @@ Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 准备执行：回复 1 批准
 ```
 
-Questions, analysis, planning, source reading, and read-only checks are uninterrupted. A standalone `1` approves only the displayed execution; a scope or model change needs a fresh approval. Current-task model labels always reflect the UI selection, never a cheaper recommendation.
+Questions, analysis, planning, source reading, and read-only checks are uninterrupted. `执行`、`开始`、`继续`、`按建议执行`、`确认` 或 `1` 都是对已说明任务的执行授权；此时第二行显示 `开始执行：已获授权`，并直接开始。未授权时才显示 `准备执行：回复 1 批准`。当前任务的模型标签始终反映 UI 所选模型，绝不把更便宜的建议伪装为当前实际模型。
+
+一次任务级授权覆盖正常闭环：项目内依赖安装、测试/构建、小修复、重试和验证，不会因这些步骤反复打断。仅在模型或思考强度变贵、跨项目/工作区、生产/凭据/付费服务、不可逆删除/数据迁移、原先未授权的发布/推送/部署，或任务目标实质变化时重新确认。
 
 Use an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review. Use an internal subagent only for bounded work that can share the current directory and return its result to the main task.
 

@@ -54,7 +54,7 @@ test('released repository installs the execution gate without replacing existing
   }
 });
 
-test('global execution gate uses the compact two-line approval contract', () => {
+test('global execution gate uses a compact task-level approval contract', () => {
   const block = readFileSync(
     path.join(REPOSITORY_ROOT, 'templates', 'global-agents-block.md'),
     'utf8',
@@ -65,10 +65,16 @@ test('global execution gate uses the compact two-line approval contract', () => 
   assert.match(block, /material execution/i);
   assert.match(block, /questions, analysis, planning, source reading, and read-only checks.*?do not require approval/is);
   assert.match(block, new RegExp(notice));
-  assert.match(block, /only a standalone `1` approves/i);
+  assert.match(block, /clear execution intent.*?执行.*?开始.*?继续.*?按建议执行.*?确认.*?`1`/is);
+  assert.match(block, /开始执行：已获授权/);
+  assert.match(block, /准备执行：回复 1 批准/);
+  assert.match(block, /一次任务级授权.*?依赖安装.*?测试.*?修复.*?重试.*?验证/is);
+  assert.match(block, /更贵.*?模型.*?思考强度.*?跨项目.*?生产.*?不可逆.*?发布.*?推送.*?部署/is);
   assert.match(block, /direct work.*?actual UI-selected model/i);
   assert.match(skill, /material execution/i);
   assert.match(skill, new RegExp(notice));
+  assert.match(skill, /clear execution intent/is);
+  assert.match(skill, /一次任务级授权.*?依赖安装.*?测试.*?修复.*?重试.*?验证/is);
   assert.doesNotMatch(block, /范围：|实际模型：|思考强度：/);
 });
 

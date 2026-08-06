@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.3.1 - 2026-08-06
+
+- Treat clear execution intent as task-level approval and start without requiring a second standalone reply.
+- Keep the two-line notice while covering normal dependency, test, repair, retry, and verification work under one approval.
+- Require a new approval only when cost, workspace, high-impact external effects, or the task goal materially changes.
+
 ## 1.3.0 - 2026-08-06
 
 - Added a two-line, user-approved execution gate for direct changes and delegated work; only a standalone `1` permits the stated action.

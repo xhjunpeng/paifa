@@ -88,6 +88,13 @@ describe('validateRoute', () => {
     assert.equal(result.receipt, undefined);
   });
 
+  test('returns the immediate-start notice when task-level execution is already approved', () => {
+    const result = validateRoute(validRoute({ executionApproved: true }), CAPABILITIES);
+
+    assert.equal(result.ok, true);
+    assert.match(result.notice, /\n开始执行：已获授权$/);
+  });
+
   test('rejects a route that is stronger and more expensive than necessary', () => {
     const result = validateRoute(validRoute({
       model: 'gpt-5.6-sol',
