@@ -58,6 +58,8 @@ function runDoctor({ repoRoot, codexHome }) {
     'references/routing-policy.md',
     'references/high-risk.md',
     'references/tool-mapping.md',
+    'scripts/approval.mjs',
+    'scripts/lib/approval-state.mjs',
     'evals/routing-cases.json',
     'evals/trigger-cases.json',
   ];

@@ -9,7 +9,7 @@ Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 准备执行：回复 1 批准
 ```
 
-`执行`、`开始`、`继续`、`按建议执行`、`确认` 或 `1` 都是对已说明任务的执行授权；此时第二行显示 `开始执行：已获授权`，并直接开始。未授权时才显示 `准备执行：回复 1 批准`。用户可见通知固定包含独立的 `模型` 与 `思考强度` 字段；模型仅可为 `5.6 Luna`、`5.6 Terra` 或 `5.6 Sol`，不得输出 `GPT-5`，也不得以“当前会话”或“强度未暴露”代替任一字段。`当前任务` 仅在模型与思考强度均可见且实际用于执行时使用；否则必须选择可指定精确路由的子智能体或独立任务。
+每项实际执行都先生成待确认方案，再等待用户紧接着单独回复 `1` 或 `确认`。本地审批器只会批准上一条仍待确认的方案；没有待确认方案、重复确认或其他文字都不能启动执行。批准后第二行显示 `开始执行：已获授权`，并开始工作。用户可见通知固定包含独立的 `模型` 与 `思考强度` 字段；模型仅可为 `5.6 Luna`、`5.6 Terra` 或 `5.6 Sol`，不得输出 `GPT-5`，也不得以“当前会话”或“强度未暴露”代替任一字段。`当前任务` 仅在模型与思考强度均可见且实际用于执行时使用；否则必须选择可指定精确路由的子智能体或独立任务。
 
 一次任务级授权覆盖正常闭环：项目内依赖安装、测试/构建、小修复、重试和验证，不会因这些步骤反复打断。仅在模型或思考强度变贵、跨项目/工作区、生产/凭据/付费服务、不可逆删除/数据迁移、原先未授权的发布/推送/部署，或任务目标实质变化时重新确认。
 
@@ -49,6 +49,17 @@ node scripts/doctor.mjs
 ```
 
 After dispatch, the main task remains responsible for continuing independent work, integrating required delegated results, and completing the user's goal. Waiting and status messages do not repeat the model line.
+
+## Approval executor
+
+The dependency-free local executor prevents confirmation order from drifting. It stores only the pending route in Codex's private state directory; users see the two-line notice, never the state file or its internals.
+
+```bash
+node scripts/approval.mjs propose route.json --scope task-123
+node scripts/approval.mjs approve 1 --scope task-123
+```
+
+The commands return JSON for automation. A successful approval consumes the route, so it cannot be approved twice. Use `--state-dir` only for isolated testing or an explicitly managed private state location.
 
 Version 1 supports macOS and common Linux POSIX shell environments with Node.js 24. Windows installation is not supported. Paifa has no third-party runtime dependencies and performs no automatic network updates.
 

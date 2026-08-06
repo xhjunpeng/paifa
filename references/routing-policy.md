@@ -23,10 +23,8 @@ Before dispatch show only:
 `方式：独立任务｜模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。`
 `准备执行：回复 1 批准`
 
-明确执行意图（`执行`、`开始`、`继续`、`按建议执行`、`确认` 或 `1`）已授权时，第二行改为：
+Store the route as pending with `node scripts/approval.mjs propose <route-file> --scope <task-scope>`, then show only those two lines. Only the immediately following reply exactly `1` or `确认` can be approved with `node scripts/approval.mjs approve <reply> --scope <task-scope>`. It consumes the pending route and returns the second line as `开始执行：已获授权`. No pending route, repeated confirmation, or any other reply must not start execution. Re-proposing replaces the prior pending route.
 
-`开始执行：已获授权`
-
-一次任务级授权覆盖依赖安装、测试/构建、小修复、重试与验证。仅在成本、项目/工作区、生产或不可逆外部影响，或任务目标实质升级时重新确认。
+一次任务级授权覆盖依赖安装、测试/构建、小修复、重试与验证。已批准且边界不变时不重复确认；仅在成本、项目/工作区、生产或不可逆外部影响，或任务目标实质升级时重新确认。
 
 The main task owns completion: continue safe independent work and integrate required results.
