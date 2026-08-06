@@ -129,7 +129,7 @@ export function formatDispatchNotice({ dispatchKind, model, effort, reason }) {
   const dispatchKindLabel = DISPATCH_KIND_LABELS[dispatchKind] ?? dispatchKind;
   const modelLabel = MODEL_LABELS[model] ?? model;
   const effortLabel = EFFORT_LABELS[effort] ?? effort;
-  return `派发方式：${dispatchKindLabel}｜派发模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}`;
+  return `方式：${dispatchKindLabel}｜模型：${modelLabel} ${effortLabel}｜原因：${shortReason}\n准备执行：回复 1 批准`;
 }
 
 export function validateRoute(route, capabilities = {}) {

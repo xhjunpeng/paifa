@@ -46,7 +46,7 @@ test('chooses the lowest capable model from the full model and effort ladder', (
   });
 });
 
-test('shows dispatch kind, model, effort, and a short reason in one human-readable line', () => {
+test('shows dispatch kind, model, effort, and a short reason in two compact approval lines', () => {
   assert.equal(typeof routing.formatDispatchNotice, 'function');
 
   const notice = routing.formatDispatchNotice({
@@ -58,9 +58,9 @@ test('shows dispatch kind, model, effort, and a short reason in one human-readab
 
   assert.equal(
     notice,
-    '派发方式：内部子智能体｜派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。',
+    '方式：内部子智能体｜模型：5.6 Terra 中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
   );
-  assert.equal(notice.includes('\n'), false);
+  assert.equal(notice.split('\n').length, 2);
   assert.equal(notice.includes('PAIFA_'), false);
   assert.equal(notice.includes('{'), false);
 });
@@ -83,7 +83,7 @@ test('uses the six reasoning labels shown in the Codex UI', () => {
         effort,
         reason: '匹配当前任务。',
       }),
-      new RegExp(`^派发方式：内部子智能体｜派发模型：5\\.6 Sol｜思考强度：${label}`),
+      new RegExp(`^方式：内部子智能体｜模型：5\\.6 Sol ${label}｜原因：`),
     );
   }
 });
@@ -123,7 +123,7 @@ test('a valid route returns the plain dispatch notice and no machine receipt', (
   assert.equal(result.ok, true);
   assert.equal(
     result.notice,
-    '派发方式：内部子智能体｜派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。',
+    '方式：内部子智能体｜模型：5.6 Terra 中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
   );
   assert.equal(result.receipt, undefined);
 });

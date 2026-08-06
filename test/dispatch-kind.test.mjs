@@ -19,7 +19,7 @@ test('uses an internal subagent only for bounded work that can share the current
   assert.equal(routing.selectDispatchKind({}), 'subagent');
 });
 
-test('the one-line notice includes the selected dispatch kind', () => {
+test('the approval notice includes the selected dispatch kind', () => {
   assert.equal(
     routing.formatDispatchNotice({
       dispatchKind: 'task',
@@ -27,7 +27,7 @@ test('the one-line notice includes the selected dispatch kind', () => {
       effort: 'high',
       reason: '需要独立 Worktree，但边界明确可验证。',
     }),
-    '派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：需要独立 Worktree，但边界明确可验证。',
+    '方式：独立任务｜模型：5.6 Terra 高｜原因：需要独立 Worktree，但边界明确可验证。\n准备执行：回复 1 批准',
   );
 });
 

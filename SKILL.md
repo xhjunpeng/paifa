@@ -1,38 +1,21 @@
 ---
 name: paifa
-description: Use when immediately before real delegated Codex work.
+description: Use when immediately before material Codex execution, including edits, state-changing commands, publishing, or delegated work.
 ---
 
 # Paifa
 
-For real dispatch only; never authorize or create work.
+Questions, analysis, planning, source reading, and read-only checks do not require approval.
 
-## Choose
+Before material execution, choose the lowest capable model and effort, then show exactly two user-language lines:
 
-Dispatch kind:
+```text
+方式：当前任务｜模型：5.6 Terra 中｜原因：范围明确的普通实现
+准备执行：回复 1 批准
+```
 
-- Independent task: independent Worktree, durable/sidebar task, user follow-up, or independent review.
-- Internal subagent: bounded work sharing the current directory and returning to the main task.
+For current-task work, report the actual UI-selected model and effort; never present a cheaper recommendation as if it is active. Only a standalone `1` approves the stated action. Until then, do not edit, delete, install, commit, push, publish, or dispatch. A scope, execution-kind, model, effort, or external-effect change needs a new two-line approval.
 
-Model and effort:
+For real dispatch, choose `独立任务` for an independent Worktree, durable/sidebar work, user follow-up, or independent review; otherwise use `内部子智能体`. Mechanical/read-only -> Luna/low; small explicit -> Luna/medium; ordinary -> Terra/medium; cross-module or high-risk but verifiable -> Terra/high. Sol/high requires both high consequence and high uncertainty, or an evidenced Terra/high failure. `xhigh/max/ultra` also require explicit user confirmation. Risk keywords, file count, duration, missing facts, tools, or generic quality never justify Sol.
 
-- Mechanical/read-only -> 5.6 Luna / `low`.
-- Small, explicit, verifiable -> 5.6 Luna / `medium`.
-- Default implementation/bug/review/ordinary planning -> 5.6 Terra / `medium`.
-- Cross-module/unknown root cause/complex planning/high-risk but verifiable -> 5.6 Terra / `high`.
-- 5.6 Sol / `high`: only both high consequence and high uncertainty, or evidenced Terra/high failure.
-- `xhigh/max/ultra`: only after Sol/high is insufficient and the user confirms.
-
-Risk keywords, file count, duration, missing tools/facts/services, or a generic quality request never justify Sol. If unavailable, never lower the task floor.
-
-UI: `low=轻度`, `medium=中`, `high=高`, `xhigh=极高`, `max=最高`, `ultra=极高（更快消耗使用额度）`.
-
-## Tell and dispatch
-
-Before dispatch, show one user-language line:
-
-`派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。`
-
-Use matching tool/model/effort. Show nothing else; never repeat during waits/status.
-
-No dispatch: skip Paifa/waiting. The main task continues independent work, integrates required results, and owns completion.
+Use the approved dispatch kind/model/effort in the actual tool call. The main task continues safe work, integrates delegated results, and owns completion. Do not repeat the two lines while waiting or reporting status.

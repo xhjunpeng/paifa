@@ -1,17 +1,16 @@
-## Paifa Dispatch Gate
+## Paifa Execution Gate
 
-Invoke `paifa` immediately before creating, continuing, retrying, forking, or spawning real delegated Codex work. If no real dispatch is happening, the main task proceeds normally without Paifa or waiting.
+Before material execution—editing or deleting files, a state-changing command, installation, commit, push, publishing, or real delegated work—choose the lowest capable model and effort, then stop. Questions, analysis, planning, source reading, and read-only checks do not require approval.
 
-Paifa chooses the dispatch kind, model, and reasoning effort. It does not authorize delegation, create extra work, or expand the requested scope.
+Show exactly these two lines in the user's language:
 
-Use an independent task when the work needs an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review. Use an internal subagent only for bounded work that may share the current directory and returns to the main task.
+```text
+方式：当前任务｜模型：5.6 Terra 中｜原因：范围明确的普通实现
+准备执行：回复 1 批准
+```
 
-Ordinary planning uses Terra medium; cross-module planning uses Terra high. Use Sol only when both high consequence and high uncertainty are present, or there is evidenced Terra high failure. Risk keywords alone do not justify Sol. `xhigh`, `max`, and `ultra` require explicit user confirmation.
+For direct work, replace the example with the actual UI-selected model and effort; never call a cheaper recommendation the active current-task model. For delegated work, use `内部子智能体` or `独立任务` as the first value. Only a standalone `1` approves the stated action. Until then, do not make a material change. A scope, execution-kind, model, effort, or external-effect change requires a fresh two-line approval.
 
-Immediately before each dispatch tool call, show exactly one short line in the user's language:
+For real dispatch, invoke `paifa` immediately before the tool call. It selects an independent task for an independent Worktree, durable/sidebar work, user follow-up, or independent review; otherwise an internal subagent. Ordinary work uses Terra medium; cross-module or high-risk-but-verifiable work uses Terra high. Sol requires both high consequence and high uncertainty, or evidenced Terra high failure. Risk keywords alone do not justify Sol. `xhigh`, `max`, and `ultra` require explicit confirmation.
 
-`派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。`
-
-Use the same dispatch kind, model, and effort in the actual tool call. Do not show scores, YAML, JSON, route objects, context hashes, or coded receipts. Waiting, monitoring, and status updates do not repeat the line.
-
-After dispatch, the main task continues safe independent work and remains responsible for integrating required results and completing the user's goal.
+Use the approved dispatch kind, model, and effort in the actual tool call. Do not show scores, YAML, JSON, route objects, context hashes, or receipts. Do not repeat the two lines while waiting or reporting status. After dispatch, the main task continues safe independent work, integrates required delegated results, and owns completion.

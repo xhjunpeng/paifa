@@ -16,7 +16,7 @@ import { inspectManagedBlock } from '../scripts/lib/managed-block.mjs';
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, '..');
 const ORIGINAL_AGENTS = '# Existing global rule\n\nPreserve this content exactly.\n';
 
-test('released repository installs one dispatch gate without replacing existing AGENTS rules', () => {
+test('released repository installs the execution gate without replacing existing AGENTS rules', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'paifa-release-'));
   const codexHome = path.join(root, 'codex');
   try {
@@ -34,27 +34,42 @@ test('released repository installs one dispatch gate without replacing existing 
 
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
-    assert.match(agents, /invoke `paifa` immediately before .*?(?:creat|continu|retry|fork|spawn)/is);
-    assert.match(agents, /chooses the dispatch kind, model, and reasoning effort/is);
-    assert.match(agents, /does not authorize delegation.*?expand the requested scope/is);
-    assert.match(agents, /independent task.*?independent Worktree.*?direct user follow-up.*?independent review/is);
-    assert.match(agents, /internal subagent only for bounded work.*?share the current directory/is);
-    assert.match(agents, /ordinary planning.*?Terra.*?cross-module planning.*?Terra high/is);
+    assert.match(agents, /before material execution.*?choose the lowest capable model and effort/is);
+    assert.match(agents, /for real dispatch.*?invoke `paifa` immediately before the tool call/is);
+    assert.match(agents, /independent task.*?independent Worktree.*?user follow-up.*?independent review/is);
+    assert.match(agents, /otherwise an internal subagent/is);
+    assert.match(agents, /ordinary work uses Terra medium.*?cross-module.*?Terra high/is);
     assert.match(
       agents,
       /Sol.*?both high consequence and high uncertainty.*?Terra high failure/is,
     );
     assert.match(agents, /risk keywords alone.*?do not justify Sol/is);
-    assert.match(
-      agents,
-      /派发方式：独立任务｜派发模型：5\.6 Terra｜思考强度：高｜原因：跨模块任务/is,
-    );
-    assert.match(agents, /same dispatch kind, model, and effort in the actual tool call/is);
-    assert.match(agents, /waiting, monitoring, and status updates do not repeat the line/is);
+    assert.match(agents, /方式：当前任务｜模型：5\.6 Terra 中｜原因：范围明确的普通实现/is);
+    assert.match(agents, /准备执行：回复 1 批准/is);
+    assert.match(agents, /approved dispatch kind, model, and effort in the actual tool call/is);
+    assert.match(agents, /do not repeat the two lines while waiting or reporting status/is);
     assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('global execution gate uses the compact two-line approval contract', () => {
+  const block = readFileSync(
+    path.join(REPOSITORY_ROOT, 'templates', 'global-agents-block.md'),
+    'utf8',
+  );
+  const skill = readFileSync(path.join(REPOSITORY_ROOT, 'SKILL.md'), 'utf8');
+
+  const notice = '方式：当前任务｜模型：5.6 Terra 中｜原因：范围明确的普通实现\n准备执行：回复 1 批准';
+  assert.match(block, /material execution/i);
+  assert.match(block, /questions, analysis, planning, source reading, and read-only checks.*?do not require approval/is);
+  assert.match(block, new RegExp(notice));
+  assert.match(block, /only a standalone `1` approves/i);
+  assert.match(block, /direct work.*?actual UI-selected model/i);
+  assert.match(skill, /material execution/i);
+  assert.match(skill, new RegExp(notice));
+  assert.doesNotMatch(block, /范围：|实际模型：|思考强度：/);
 });
 
 test('repository allows noncommercial use and reserves commercial licensing', () => {

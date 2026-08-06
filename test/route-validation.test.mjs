@@ -75,16 +75,16 @@ describe('selectRoute', () => {
 });
 
 describe('validateRoute', () => {
-  test('returns one plain user-facing line for a valid route', () => {
+  test('returns the compact two-line approval notice for a valid route', () => {
     const result = validateRoute(validRoute(), CAPABILITIES);
 
     assert.equal(result.ok, true);
     assert.deepEqual(result.errors, []);
     assert.equal(
       result.notice,
-      '派发方式：内部子智能体｜派发模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。',
+      '方式：内部子智能体｜模型：5.6 Terra 中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
     );
-    assert.equal(result.notice.includes('\n'), false);
+    assert.equal(result.notice.split('\n').length, 2);
     assert.equal(result.receipt, undefined);
   });
 
@@ -187,7 +187,8 @@ describe('validate-route CLI', () => {
 
     assert.equal(result.status, 0, result.stderr);
     assert.equal(output.ok, true);
-    assert.match(output.notice, /^派发方式：内部子智能体｜派发模型：/);
+    assert.match(output.notice, /^方式：内部子智能体｜模型：/);
+    assert.match(output.notice, /\n准备执行：回复 1 批准$/);
     assert.equal(output.receipt, undefined);
   });
 

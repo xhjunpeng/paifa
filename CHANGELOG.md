@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.3.0 - 2026-08-06
+
+- Added a two-line, user-approved execution gate for direct changes and delegated work; only a standalone `1` permits the stated action.
+- Kept questions, analysis, planning, source reading, and read-only checks free of approval prompts.
+
 ## Unreleased
 
 - Replaced the MIT license with PolyForm Noncommercial 1.0.0 and reserved commercial use for separately agreed written licenses.

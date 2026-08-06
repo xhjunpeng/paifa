@@ -9,17 +9,17 @@ function read(relativePath) {
   return readFileSync(path.join(ROOT, relativePath), 'utf8');
 }
 
-test('paifa leaves ordinary main-thread work alone', () => {
+test('paifa does not gate ordinary conversation', () => {
   const skill = read('SKILL.md');
   const gate = read('templates/global-agents-block.md');
 
   assert.match(
     skill,
-    /never authorize or create work/is,
+    /questions, analysis, planning, source reading, and read-only checks.*?do not require approval/is,
   );
   assert.match(
     gate,
-    /if no real dispatch is happening, the main task proceeds normally without Paifa or waiting/is,
+    /questions, analysis, planning, source reading, and read-only checks.*?do not require approval/is,
   );
 });
 
@@ -29,7 +29,7 @@ test('the main task owns completion after a dispatch', () => {
   const routing = read('references/routing-policy.md');
 
   assert.match(skill, /main task.*?owns completion/is);
-  assert.match(skill, /continues independent work.*?integrates required results/is);
-  assert.match(gate, /main task.*?responsible for integrating required results.*?completing/is);
+  assert.match(skill, /continues safe work.*?integrates delegated results/is);
+  assert.match(gate, /main task.*?continues safe independent work.*?integrates required delegated results.*?owns completion/is);
   assert.match(routing, /main task owns completion.*?continue safe independent work.*?integrate/is);
 });

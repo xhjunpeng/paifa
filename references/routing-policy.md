@@ -18,6 +18,7 @@ Risk keywords alone do not justify Sol. File count, duration, missing tools, fac
 
 Before dispatch show only:
 
-`派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。`
+`方式：独立任务｜模型：5.6 Terra 高｜原因：跨模块任务，但边界明确且可验证。`
+`准备执行：回复 1 批准`
 
 The main task owns completion: continue safe independent work and integrate required results.

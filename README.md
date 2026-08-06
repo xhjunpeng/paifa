@@ -1,12 +1,15 @@
 # Paifa
 
-Paifa is a small Codex dispatch helper. Immediately before delegated work starts, it chooses the execution kind, lowest capable model, and reasoning effort, explains the choice in one short line, and uses the same values in the dispatch tool.
+Paifa is a small Codex execution gate. Immediately before a real change or delegated task, it chooses the lowest capable model and reasoning effort, then waits for explicit approval.
 
 Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 
 ```text
-派发方式：独立任务｜派发模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。
+方式：当前任务｜模型：5.6 Terra 中｜原因：范围明确的普通实现
+准备执行：回复 1 批准
 ```
+
+Questions, analysis, planning, source reading, and read-only checks are uninterrupted. A standalone `1` approves only the displayed execution; a scope or model change needs a fresh approval. Current-task model labels always reflect the UI selection, never a cheaper recommendation.
 
 Use an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review. Use an internal subagent only for bounded work that can share the current directory and return its result to the main task.
 
