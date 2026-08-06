@@ -9,7 +9,7 @@ Check the currently available dispatch tool and its accepted capabilities immedi
 | Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Use only when sharing the current directory is acceptable; provide a compact fact envelope |
 | Fork | follow-up model and effort fields, if supported | Fork preserves history and is not a clean-room mechanism |
 
-Use the exact names exposed by the current tool. Immediately before dispatch, tell the user the selected dispatch kind, model, effort, and one-sentence reason. Then use the matching tool and parameters. An internal subagent cannot by itself provide a new independent Worktree.
+Use the exact names exposed by the current tool. First store and show the selected dispatch kind, model, effort, and one-sentence reason through the approval executor. Only after it returns the approved route for the user's exact `1` or `确认` reply may the matching tool be used with those parameters. An internal subagent cannot by itself provide a new independent Worktree.
 
 ## Fallback
 

@@ -14,9 +14,11 @@ Before material execution, choose the lowest capable model and effort, then show
 准备执行：回复 1 批准
 ```
 
-`当前任务` is valid only when the exact model and effort are visible and will actually execute the work; never output `GPT-5` as a model, or `当前会话` / `强度未暴露` as a substitute for either field. If either is unavailable and model selection matters, must use `内部子智能体` or `独立任务` with an exact route. A clear execution intent—`执行`, `开始`, `继续`, `按建议执行`, `确认`, or `1`—approves the stated task. Show the same first line, then `开始执行：已获授权`, and start immediately.
+`当前任务` is valid only when the exact model and effort are visible and will actually execute the work; never output `GPT-5` as a model, or `当前会话` / `强度未暴露` as a substitute for either field. If either is unavailable and model selection matters, must use `内部子智能体` or `独立任务` with an exact route.
 
-一次任务级授权 covers the normal closed loop: project-local 依赖安装, 测试/build, 小修复, 重试, and 验证. Do not interrupt for those steps. Ask again only for a 更贵模型 or 思考强度, 跨项目 or another workspace, 生产/凭据/付费服务, 不可逆 deletion or data migration, an unapproved 发布/推送/部署, or a material change to the task goal.
+Use the local approval executor for every material execution: first call `node scripts/approval.mjs propose <route-file> --scope <task-scope>` and show only its two-line notice. Only the user's immediately following reply exactly `1` or `确认` may be passed to `node scripts/approval.mjs approve <reply> --scope <task-scope>`; execute only when it returns an approved route. No pending route, a repeated reply, or any other wording cannot start work. A new proposal replaces the old pending route. Internal state is never shown to the user.
+
+一次任务级授权 covers the normal closed loop: project-local 依赖安装, 测试/build, 小修复, 重试, and 验证. Do not interrupt for those steps or propose again while the approved route and task boundary remain unchanged. Ask again only for a 更贵模型 or 思考强度, 跨项目 or another workspace, 生产/凭据/付费服务, 不可逆 deletion or data migration, an unapproved 发布/推送/部署, or a material change to the task goal.
 
 For real dispatch, choose `独立任务` for an independent Worktree, durable/sidebar work, user follow-up, or independent review; otherwise use `内部子智能体`. Mechanical/read-only -> Luna/low; small explicit -> Luna/medium; ordinary -> Terra/medium; cross-module or high-risk but verifiable -> Terra/high. Sol/high requires both high consequence and high uncertainty, or an evidenced Terra/high failure. `xhigh/max/ultra` also require explicit user confirmation. Risk keywords, file count, duration, missing facts, tools, or generic quality never justify Sol.
 

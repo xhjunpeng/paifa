@@ -23,6 +23,7 @@ function writeRepo(repoRoot) {
   mkdirSync(path.join(repoRoot, 'templates'), { recursive: true });
   mkdirSync(path.join(repoRoot, 'references'), { recursive: true });
   mkdirSync(path.join(repoRoot, 'evals'), { recursive: true });
+  mkdirSync(path.join(repoRoot, 'scripts', 'lib'), { recursive: true });
   writeFileSync(
     path.join(repoRoot, 'SKILL.md'),
     '---\nname: paifa\ndescription: Use when preparing to delegate Codex work.\n---\n\n# Paifa\n',
@@ -43,6 +44,8 @@ function writeRepo(repoRoot) {
     '{"shouldTrigger":[],"shouldNotTrigger":[]}\n',
     'utf8',
   );
+  writeFileSync(path.join(repoRoot, 'scripts', 'approval.mjs'), '#!/usr/bin/env node\n', 'utf8');
+  writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'approval-state.mjs'), 'export {};\n', 'utf8');
 }
 
 function fixture({ install = true } = {}) {
@@ -201,6 +204,20 @@ describe('paifa doctor', () => {
       const receipt = JSON.parse(runDoctor(value).stdout);
 
       assert.equal(checkById(receipt, 'repository-files').status, 'fail');
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('reports a missing approval executor entry point', () => {
+    const value = fixture();
+    try {
+      rmSync(path.join(value.repoRoot, 'scripts', 'approval.mjs'));
+      const receipt = JSON.parse(runDoctor(value).stdout);
+
+      assert.equal(receipt.ok, false);
+      assert.equal(checkById(receipt, 'repository-files').status, 'fail');
+      assert.match(checkById(receipt, 'repository-files').message, /scripts\/approval\.mjs/);
     } finally {
       value.cleanup();
     }

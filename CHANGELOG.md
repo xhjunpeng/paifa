@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.4.0 - 2026-08-06
+
+- Added a dependency-free local approval executor that records one pending route per task scope.
+- Execution now requires a prior proposal and a following exact `1` or `确认`; approvals are consumed once and cannot drift to a later task.
+- Replaced pending routes atomically and kept approved normal work in one uninterrupted closed loop.
+
 ## 1.3.3 - 2026-08-06
 
 - Separated every user-visible route into explicit `模型` and `思考强度` fields.
