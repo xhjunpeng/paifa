@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.4.2 - 2026-08-06
+
+- Accepted `1` and `确认` after trimming leading and trailing ASCII or Unicode whitespace, while continuing to reject added wording.
+- Made invalid-approval guidance neutral and prohibited unsupported claims that a user reply contains whitespace.
+
 ## 1.4.1 - 2026-08-06
 
 - Made approval parent-first: the main task proposes and confirms before any real delegate exists.

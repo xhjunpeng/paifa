@@ -9,7 +9,7 @@ Check the currently available dispatch tool and its accepted capabilities immedi
 | Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Use only when sharing the current directory is acceptable; provide a compact fact envelope |
 | Fork | follow-up model and effort fields, if supported | Fork preserves history and is not a clean-room mechanism |
 
-Use the exact names exposed by the current tool. First store and show the selected dispatch kind, model, effort, and one-sentence reason through the approval executor. Only after it returns the approved route for the user's exact `1` or `确认` reply may the matching tool be used with those parameters. An internal subagent cannot by itself provide a new independent Worktree.
+Use the exact names exposed by the current tool. First store and show the selected dispatch kind, model, effort, and one-sentence reason through the approval executor. Only after it returns the approved route for the user's reply whose content equals `1` or `确认` after leading and trailing whitespace is removed may the matching tool be used with those parameters. An internal subagent cannot by itself provide a new independent Worktree.
 
 Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
 

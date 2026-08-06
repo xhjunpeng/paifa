@@ -91,8 +91,12 @@ export function propose(scope, route, { stateDir } = {}) {
 }
 
 export function approve(scope, reply, { stateDir } = {}) {
-  if (reply !== '1' && reply !== '确认') {
-    return failure('APPROVAL_REPLY_INVALID', 'Reply with exactly 1 or 确认 to approve the pending route.');
+  const normalizedReply = typeof reply === 'string' ? reply.trim() : '';
+  if (normalizedReply !== '1' && normalizedReply !== '确认') {
+    return failure(
+      'APPROVAL_REPLY_INVALID',
+      'Approval requires 1 or 确认 after leading and trailing whitespace is removed.',
+    );
   }
 
   const filePath = pendingPath(scope, stateDir);

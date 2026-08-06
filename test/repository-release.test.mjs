@@ -61,7 +61,7 @@ test('global execution gate is a compact trigger while the Skill owns the policy
   assert.match(skill, /description: Use when the next action will change state/is);
   assert.match(skill, new RegExp(notice));
   assert.match(skill, /local approval executor/is);
-  assert.match(skill, /immediately following reply exactly `1` or `确认`/is);
+  assert.match(skill, /immediately following reply.*?equals `1` or `确认` after leading and trailing whitespace is removed/is);
   assert.doesNotMatch(skill, /A clear execution intent/is);
   assert.match(skill, /one approved task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
   assert.match(skill, /must not propose again or ask for confirmation/is);

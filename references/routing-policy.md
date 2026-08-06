@@ -23,7 +23,7 @@ Before dispatch show only:
 `方式：独立任务｜模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。`
 `准备执行：回复 1 批准`
 
-Store the route as pending with `node scripts/approval.mjs propose <route-file> --scope <task-scope>`, then show only those two lines. Only the immediately following reply exactly `1` or `确认` can be approved with `node scripts/approval.mjs approve <reply> --scope <task-scope>`. It consumes the pending route and returns the second line as `开始执行：已获授权`. No pending route, repeated confirmation, or any other reply must not start execution. Re-proposing replaces the prior pending route.
+Store the route as pending with `node scripts/approval.mjs propose <route-file> --scope <task-scope>`, then show only those two lines. Only the immediately following reply whose content equals `1` or `确认` after leading and trailing whitespace is removed can be approved with `node scripts/approval.mjs approve <reply> --scope <task-scope>`. It consumes the pending route and returns the second line as `开始执行：已获授权`. No pending route, repeated confirmation, or reply with added wording must start execution. Re-proposing replaces the prior pending route. Never claim whitespace without executor evidence.
 
 Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
 

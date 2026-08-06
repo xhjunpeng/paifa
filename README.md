@@ -9,7 +9,7 @@ Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 准备执行：回复 1 批准
 ```
 
-每项实际执行都先生成待确认方案，再等待用户紧接着单独回复 `1` 或 `确认`。本地审批器只会批准上一条仍待确认的方案；没有待确认方案、重复确认或其他文字都不能启动执行。批准后第二行显示 `开始执行：已获授权`，并开始工作。用户可见通知固定包含独立的 `模型` 与 `思考强度` 字段；模型仅可为 `5.6 Luna`、`5.6 Terra` 或 `5.6 Sol`，不得输出 `GPT-5`，也不得以“当前会话”或“强度未暴露”代替任一字段。`当前任务` 仅在模型与思考强度均可见且实际用于执行时使用；否则必须选择可指定精确路由的子智能体或独立任务。
+每项实际执行都先生成待确认方案，再等待用户紧接着回复内容在去除首尾空白后等于 `1` 或 `确认`。本地审批器只会批准上一条仍待确认的方案；没有待确认方案、重复确认或附加文字都不能启动执行。批准后第二行显示 `开始执行：已获授权`，并开始工作。不要在没有执行器证据时声称用户回复含有空格。用户可见通知固定包含独立的 `模型` 与 `思考强度` 字段；模型仅可为 `5.6 Luna`、`5.6 Terra` 或 `5.6 Sol`，不得输出 `GPT-5`，也不得以“当前会话”或“强度未暴露”代替任一字段。`当前任务` 仅在模型与思考强度均可见且实际用于执行时使用；否则必须选择可指定精确路由的子智能体或独立任务。
 
 Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
 
