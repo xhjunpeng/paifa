@@ -44,3 +44,37 @@ test('the main task owns completion after a dispatch', () => {
   assert.match(skill, /continues safe work.*?integrates delegated results/is);
   assert.match(routing, /main task owns completion.*?continue safe independent work.*?integrate/is);
 });
+
+test('only the main task gates a delegate before it is created', () => {
+  const documents = [
+    read('SKILL.md'),
+    read('README.md'),
+    read('references/routing-policy.md'),
+    read('references/tool-mapping.md'),
+  ];
+
+  for (const text of documents) {
+    assert.match(text, /main task.*?only.*?proposal.*?approve.*?user interaction/is);
+    assert.match(text, /before approval.*?must not create.*?(?:real )?delegate/is);
+    assert.match(text, /worker.*?inherit.*?approved route.*?scope/is);
+    assert.match(text, /worker.*?must not.*?approval CLI.*?model notice.*?user.*?confirmation/is);
+    assert.match(text, /worker.*?only.*?return.*?(?:short )?result.*?main task/is);
+    assert.match(text, /host UI.*?may show.*?worker panel.*?main task.*?final answer/is);
+  }
+});
+
+test('one approved task envelope covers delivery and closeout without repeated confirmation', () => {
+  const documents = [
+    read('SKILL.md'),
+    read('README.md'),
+    read('references/routing-policy.md'),
+    read('references/tool-mapping.md'),
+  ];
+
+  for (const text of documents) {
+    assert.match(text, /one approved task envelope.*?planning.*?implementation.*?tests.*?retries/is);
+    assert.match(text, /branch.*?push.*?PR.*?checks.*?merge.*?closeout.*?must not.*?propose.*?confirmation/is);
+    assert.match(text, /only.*?task goal.*?repository.*?workspace.*?model.*?effort.*?production.*?credentials.*?paid service.*?irreversible deletion.*?data migration/is);
+    assert.doesNotMatch(text, /write route\.json/i);
+  }
+});

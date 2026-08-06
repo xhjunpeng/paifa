@@ -11,7 +11,9 @@ Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
 
 每项实际执行都先生成待确认方案，再等待用户紧接着单独回复 `1` 或 `确认`。本地审批器只会批准上一条仍待确认的方案；没有待确认方案、重复确认或其他文字都不能启动执行。批准后第二行显示 `开始执行：已获授权`，并开始工作。用户可见通知固定包含独立的 `模型` 与 `思考强度` 字段；模型仅可为 `5.6 Luna`、`5.6 Terra` 或 `5.6 Sol`，不得输出 `GPT-5`，也不得以“当前会话”或“强度未暴露”代替任一字段。`当前任务` 仅在模型与思考强度均可见且实际用于执行时使用；否则必须选择可指定精确路由的子智能体或独立任务。
 
-一次任务级授权覆盖正常闭环：项目内依赖安装、测试/构建、小修复、重试和验证，不会因这些步骤反复打断。仅在模型或思考强度变贵、跨项目/工作区、生产/凭据/付费服务、不可逆删除/数据迁移、原先未授权的发布/推送/部署，或任务目标实质变化时重新确认。
+Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
+
+One approved task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. These stages must not propose again or ask for confirmation. Reconfirm only when the task goal or target repository/workspace materially changes; model or effort increases; production, credentials, or paid service is needed; or irreversible deletion/data migration is needed.
 
 Use an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review. Use an internal subagent only for bounded work that can share the current directory and return its result to the main task.
 

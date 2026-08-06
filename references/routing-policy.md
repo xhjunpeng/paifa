@@ -25,6 +25,8 @@ Before dispatch show only:
 
 Store the route as pending with `node scripts/approval.mjs propose <route-file> --scope <task-scope>`, then show only those two lines. Only the immediately following reply exactly `1` or `确认` can be approved with `node scripts/approval.mjs approve <reply> --scope <task-scope>`. It consumes the pending route and returns the second line as `开始执行：已获授权`. No pending route, repeated confirmation, or any other reply must not start execution. Re-proposing replaces the prior pending route.
 
-一次任务级授权覆盖依赖安装、测试/构建、小修复、重试与验证。已批准且边界不变时不重复确认；仅在成本、项目/工作区、生产或不可逆外部影响，或任务目标实质升级时重新确认。
+Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
+
+One approved task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. These stages must not propose again or ask for confirmation. Reconfirm only when the task goal or target repository/workspace materially changes; model or effort increases; production, credentials, or paid service is needed; or irreversible deletion/data migration is needed.
 
 The main task owns completion: continue safe independent work and integrate required results.

@@ -63,7 +63,8 @@ test('global execution gate is a compact trigger while the Skill owns the policy
   assert.match(skill, /local approval executor/is);
   assert.match(skill, /immediately following reply exactly `1` or `确认`/is);
   assert.doesNotMatch(skill, /A clear execution intent/is);
-  assert.match(skill, /一次任务级授权.*?依赖安装.*?测试.*?修复.*?重试.*?验证/is);
+  assert.match(skill, /one approved task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
+  assert.match(skill, /must not propose again or ask for confirmation/is);
   assert.match(skill, /当前任务.*?only when.*?exact model and effort.*?visible/is);
 });
 

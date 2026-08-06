@@ -11,6 +11,10 @@ Check the currently available dispatch tool and its accepted capabilities immedi
 
 Use the exact names exposed by the current tool. First store and show the selected dispatch kind, model, effort, and one-sentence reason through the approval executor. Only after it returns the approved route for the user's exact `1` or `确认` reply may the matching tool be used with those parameters. An internal subagent cannot by itself provide a new independent Worktree.
 
+Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
+
+One approved task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. These stages must not propose again or ask for confirmation. Reconfirm only when the task goal or target repository/workspace materially changes; model or effort increases; production, credentials, or paid service is needed; or irreversible deletion/data migration is needed.
+
 ## Fallback
 
 When a recommended model or effort is unavailable, choose the lowest-cost currently supported combination that still meets the same capability and risk floor. Do not silently choose a lower floor. If no supported combination meets the floor, stop and request user direction.

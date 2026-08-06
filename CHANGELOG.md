@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.4.1 - 2026-08-06
+
+- Made approval parent-first: the main task proposes and confirms before any real delegate exists.
+- Made workers inherit the approved route and scope, return only to the main task, and never repeat the approval conversation.
+
 ## 1.4.0 - 2026-08-06
 
 - Added a dependency-free local approval executor that records one pending route per task scope.
