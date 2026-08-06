@@ -63,7 +63,7 @@ test('only the main task gates a delegate before it is created', () => {
   }
 });
 
-test('one approved task envelope covers delivery and closeout without repeated confirmation', () => {
+test('one started task envelope covers delivery and closeout without repeated confirmation', () => {
   const documents = [
     read('SKILL.md'),
     read('README.md'),
@@ -72,9 +72,10 @@ test('one approved task envelope covers delivery and closeout without repeated c
   ];
 
   for (const text of documents) {
-    assert.match(text, /one approved task envelope.*?planning.*?implementation.*?tests.*?retries/is);
-    assert.match(text, /branch.*?push.*?PR.*?checks.*?merge.*?closeout.*?must not.*?propose.*?confirmation/is);
-    assert.match(text, /only.*?task goal.*?repository.*?workspace.*?model.*?effort.*?production.*?credentials.*?paid service.*?irreversible deletion.*?data migration/is);
+    assert.match(text, /task envelope.*?planning.*?implementation.*?tests.*?retries/is);
+    assert.match(text, /branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
+    assert.match(text, /(?:must not.*?propose.*?confirmation|(?:remain|stay) automatic)/is);
+    assert.match(text, /(?:before Sol|Sol.*?task goal).*?repository.*?production.*?credentials.*?paid service.*?irreversible deletion.*?data migration/is);
     assert.doesNotMatch(text, /write route\.json/i);
   }
 });

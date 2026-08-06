@@ -12,12 +12,6 @@ import path from 'node:path';
 
 import { formatDispatchNotice, validateRoute } from './route-validation.mjs';
 
-export const DEFAULT_CAPABILITIES = {
-  'gpt-5.6-luna': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
-  'gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
-  'gpt-5.6-sol': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
-};
-
 function failure(code, message) {
   return { ok: false, error: { code, message } };
 }
@@ -65,7 +59,18 @@ function validateProposedRoute(route) {
       'A pending route cannot already be approved for execution.',
     );
   }
-  const validation = validateRoute(route, DEFAULT_CAPABILITIES);
+  if (!route?.capabilities || typeof route.capabilities !== 'object'
+    || Array.isArray(route.capabilities)) {
+    return {
+      ok: false,
+      error: {
+        code: 'ROUTE_INVALID',
+        message: 'Route validation failed.',
+        details: [{ code: 'CAPABILITIES_REQUIRED', message: 'Dispatch capabilities must be supplied explicitly.' }],
+      },
+    };
+  }
+  const validation = validateRoute(route, route.capabilities);
   return validation.ok
     ? { ok: true, validation }
     : { ok: false, error: { code: 'ROUTE_INVALID', message: 'Route validation failed.', details: validation.errors } };
@@ -76,6 +81,14 @@ export function propose(scope, route, { stateDir } = {}) {
   if (!checked.ok) return checked;
 
   const filePath = pendingPath(scope, stateDir);
+  if (route.model !== 'gpt-5.6-sol') {
+    rmSync(filePath, { force: true });
+    return {
+      ok: true,
+      direct: true,
+      route: { ...route, executionApproved: true },
+    };
+  }
   const replaced = existsSync(filePath);
   writePending(filePath, {
     version: 1,
@@ -85,6 +98,7 @@ export function propose(scope, route, { stateDir } = {}) {
 
   return {
     ok: true,
+    direct: false,
     replaced,
     notice: checked.validation.notice,
   };

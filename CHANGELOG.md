@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.5.0 - 2026-08-07
+
+- Made Luna/Terra routes automatic; only Sol now shows the two-line approval and waits for `1` or `确认`.
+- Required explicit dispatch capabilities before proposing a model, preventing a Luna proposal when the real dispatch surface cannot run Luna.
+- Added safe installation, detection, update, and user-modification preservation for the managed Luna/medium worker.
+
 ## 1.4.2 - 2026-08-06
 
 - Accepted `1` and `确认` after trimming leading and trailing ASCII or Unicode whitespace, while continuing to reject added wording.

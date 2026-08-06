@@ -2,18 +2,18 @@
 
 Paifa is a small Codex execution gate. It loads only when the next action will change state: edit/delete files, install dependencies, commit, push, publish/deploy, create/retry real delegated work, or create or modify an executable plan document. Creating or modifying an executable plan document with `writing-plans`, or starting its follow-up work, triggers Paifa; chatting about a plan alone does not. Questions, explanations, planning discussion, source reading, and read-only inspection do not load Paifa.
 
-Normal output contains no route code, score, YAML, JSON, or follow-up receipt:
+Only Sol needs a user-facing approval. Luna and Terra start automatically and show no approval prompt. A Sol notice contains no route code, score, YAML, JSON, or follow-up receipt:
 
 ```text
-方式：当前任务｜模型：5.6 Terra｜思考强度：中｜原因：范围明确的普通实现
+方式：当前任务｜模型：5.6 Sol｜思考强度：极高｜原因：高后果且高度不确定，需先确认
 准备执行：回复 1 批准
 ```
 
-每项实际执行都先生成待确认方案，再等待用户紧接着回复内容在去除首尾空白后等于 `1` 或 `确认`。本地审批器只会批准上一条仍待确认的方案；没有待确认方案、重复确认或附加文字都不能启动执行。批准后第二行显示 `开始执行：已获授权`，并开始工作。不要在没有执行器证据时声称用户回复含有空格。用户可见通知固定包含独立的 `模型` 与 `思考强度` 字段；模型仅可为 `5.6 Luna`、`5.6 Terra` 或 `5.6 Sol`，不得输出 `GPT-5`，也不得以“当前会话”或“强度未暴露”代替任一字段。`当前任务` 仅在模型与思考强度均可见且实际用于执行时使用；否则必须选择可指定精确路由的子智能体或独立任务。
+Luna/Terra 路线直接开始。只有 Sol 路线会生成待确认方案，等待用户紧接着回复内容在去除首尾空白后等于 `1` 或 `确认`。能力必须来自实际执行入口；只有入口明确支持 Luna，或 Paifa 管理的 Luna worker 已安装且未被修改，才会提议 Luna，绝不会先承诺 Luna 再改用 Terra。用户可见通知固定包含独立的 `模型` 与 `思考强度` 字段。
 
 Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
 
-One approved task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. These stages must not propose again or ask for confirmation. Reconfirm only when the task goal or target repository/workspace materially changes; model or effort increases; production, credentials, or paid service is needed; or irreversible deletion/data migration is needed.
+One started task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. Luna/Terra changes stay automatic. Reconfirm only before Sol, or when the task goal/repository changes, production, credentials, paid service, or irreversible deletion/data migration is needed.
 
 Use an independent task for an independent Worktree, durable/sidebar visibility, direct user follow-up, or independent review. Use an internal subagent only for bounded work that can share the current directory and return its result to the main task.
 
@@ -39,7 +39,7 @@ Clone this repository, enter its root, then run:
 node scripts/doctor.mjs
 ```
 
-The installer links the Skill into Codex and adds one versioned managed block to the global `AGENTS.md`. It preserves unrelated global rules, keeps a backup, and supports safe updates and removal.
+The installer links the Skill into Codex, adds one versioned managed block to global `AGENTS.md`, and installs `~/.codex/agents/paifa-luna-worker.toml` with Luna/medium. It preserves unrelated global rules and will not delete a Luna worker that you changed.
 
 ## Maintain
 
@@ -57,7 +57,7 @@ After dispatch, the main task remains responsible for continuing independent wor
 The dependency-free local executor prevents confirmation order from drifting. It stores only the pending route in Codex's private state directory; users see the two-line notice, never the state file or its internals.
 
 ```bash
-node scripts/approval.mjs propose route.json --scope task-123
+node scripts/approval.mjs propose route.json --capabilities capabilities.json --scope task-123
 node scripts/approval.mjs approve 1 --scope task-123
 ```
 

@@ -71,6 +71,7 @@ export function performInstall(options) {
   const repoRoot = realpathSync(options.repoRoot);
   const codexHome = path.resolve(options.codexHome);
   const agentsPath = path.join(codexHome, 'AGENTS.md');
+  const lunaWorkerPath = path.join(codexHome, 'agents', 'paifa-luna-worker.toml');
   const skillDirectory = path.join(codexHome, 'skills');
   const skillPath = path.join(skillDirectory, 'paifa');
   const statePath = path.join(codexHome, 'paifa', 'install-state.json');
@@ -82,6 +83,10 @@ export function performInstall(options) {
     path.join(repoRoot, 'templates', 'global-agents-block.md'),
     'GLOBAL_BLOCK_MISSING',
   );
+  const lunaWorker = requiredFile(
+    path.join(repoRoot, 'templates', 'paifa-luna-worker.toml'),
+    'LUNA_WORKER_TEMPLATE_MISSING',
+  );
   if (!version) fail('VERSION_INVALID', 'VERSION must not be empty.');
 
   mkdirSync(skillDirectory, { recursive: true, mode: 0o700 });
@@ -92,6 +97,9 @@ export function performInstall(options) {
   const beforeSkill = inspectSkillPath(skillPath);
   const beforeStateText = existsSync(statePath) ? readFileSync(statePath, 'utf8') : null;
   const previousState = readInstallState(statePath);
+  const lunaWorkerExisted = existsSync(lunaWorkerPath);
+  const beforeLunaWorker = lunaWorkerExisted ? readFileSync(lunaWorkerPath, 'utf8') : null;
+  const beforeLunaWorkerMode = fileMode(lunaWorkerPath);
 
   if (beforeSkill.kind === 'conflict') {
     fail('SKILL_PATH_CONFLICT', `${skillPath} exists and is not a symlink.`);
@@ -104,11 +112,18 @@ export function performInstall(options) {
   if (blockState.count === 1 && !previousState) {
     fail('INSTALL_STATE_MISSING', 'A managed block exists without installation state.');
   }
+  if (lunaWorkerExisted && beforeLunaWorker !== lunaWorker
+    && sha256(beforeLunaWorker) !== previousState?.lunaWorkerHash) {
+    fail('LUNA_WORKER_CONFLICT', `${lunaWorkerPath} was not created by this Paifa installation.`);
+  }
 
   const desiredAgents = applyManagedBlock(beforeAgents, block, version);
   const linkAlreadyCorrect = beforeSkill.kind === 'symlink' && beforeSkill.target === repoRoot;
   const stateAlreadyCorrect = previousState?.version === version
-    && previousState?.repoRoot === repoRoot;
+    && previousState?.repoRoot === repoRoot
+    && previousState?.lunaWorkerPath === lunaWorkerPath
+    && previousState?.lunaWorkerHash === sha256(lunaWorker)
+    && beforeLunaWorker === lunaWorker;
   if (desiredAgents === beforeAgents && linkAlreadyCorrect && stateAlreadyCorrect) {
     return {
       status: 'unchanged',
@@ -147,6 +162,10 @@ export function performInstall(options) {
     atomicWriteFile(agentsPath, desiredAgents, beforeAgentsMode);
     options.hooks?.afterAgentsWrite?.();
 
+    if (beforeLunaWorker !== lunaWorker) {
+      atomicWriteFile(lunaWorkerPath, lunaWorker, beforeLunaWorkerMode);
+    }
+
     if (!linkAlreadyCorrect) {
       if (beforeSkill.kind === 'symlink') unlinkSync(skillPath);
       symlinkSync(repoRoot, skillPath);
@@ -161,6 +180,8 @@ export function performInstall(options) {
       agentsAfterHash: sha256(desiredAgents),
       agentsExisted: originalAgentsExisted,
       agentsOriginalMode: originalAgentsMode,
+      lunaWorkerPath,
+      lunaWorkerHash: sha256(lunaWorker),
       installedAt: now.toISOString(),
     };
     writeInstallState(statePath, state);
@@ -179,6 +200,11 @@ export function performInstall(options) {
     } else {
       rmSync(agentsPath, { force: true });
     }
+    if (lunaWorkerExisted) {
+      atomicWriteFile(lunaWorkerPath, beforeLunaWorker, beforeLunaWorkerMode);
+    } else {
+      rmSync(lunaWorkerPath, { force: true });
+    }
     restoreLink(skillPath, beforeSkill);
     if (beforeStateText === null) {
       rmSync(statePath, { force: true });
@@ -194,6 +220,7 @@ export function performUninstall(options) {
   const agentsPath = path.join(codexHome, 'AGENTS.md');
   const skillPath = path.join(codexHome, 'skills', 'paifa');
   const statePath = path.join(codexHome, 'paifa', 'install-state.json');
+  const lunaWorkerPath = path.join(codexHome, 'agents', 'paifa-luna-worker.toml');
   const stateText = existsSync(statePath) ? readFileSync(statePath, 'utf8') : null;
   const state = readInstallState(statePath);
   if (!state) fail('INSTALL_STATE_MISSING', 'Paifa is not recorded as installed.');
@@ -211,6 +238,11 @@ export function performUninstall(options) {
   const beforeAgents = existsSync(agentsPath) ? readFileSync(agentsPath, 'utf8') : '';
   const agentsExistedBeforeUninstall = existsSync(agentsPath);
   const beforeAgentsMode = fileMode(agentsPath);
+  const lunaWorkerBeforeUninstall = existsSync(lunaWorkerPath) ? readFileSync(lunaWorkerPath, 'utf8') : null;
+  const lunaWorkerMode = fileMode(lunaWorkerPath);
+  const removeLunaWorker = lunaWorkerBeforeUninstall !== null
+    && typeof state.lunaWorkerHash === 'string'
+    && sha256(lunaWorkerBeforeUninstall) === state.lunaWorkerHash;
   let desiredAgents;
   if (options.restoreBackup) {
     if (sha256(beforeAgents) !== state.agentsAfterHash) {
@@ -237,6 +269,7 @@ export function performUninstall(options) {
       atomicWriteFile(agentsPath, desiredAgents, desiredMode);
     }
     unlinkSync(skillPath);
+    if (removeLunaWorker) rmSync(lunaWorkerPath, { force: true });
     rmSync(statePath, { force: true });
     return { status: 'uninstalled', restoredBackup: Boolean(options.restoreBackup) };
   } catch (error) {
@@ -246,6 +279,9 @@ export function performUninstall(options) {
       rmSync(agentsPath, { force: true });
     }
     restoreLink(skillPath, beforeSkill);
+    if (lunaWorkerBeforeUninstall !== null) {
+      atomicWriteFile(lunaWorkerPath, lunaWorkerBeforeUninstall, lunaWorkerMode);
+    }
     if (stateText !== null) atomicWriteFile(statePath, stateText, 0o600);
     throw error;
   }

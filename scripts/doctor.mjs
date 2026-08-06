@@ -55,11 +55,13 @@ function runDoctor({ repoRoot, codexHome }) {
     'SKILL.md',
     'VERSION',
     'templates/global-agents-block.md',
+    'templates/paifa-luna-worker.toml',
     'references/routing-policy.md',
     'references/high-risk.md',
     'references/tool-mapping.md',
     'scripts/approval.mjs',
     'scripts/lib/approval-state.mjs',
+    'scripts/lib/dispatch-capabilities.mjs',
     'evals/routing-cases.json',
     'evals/trigger-cases.json',
   ];
@@ -111,7 +113,9 @@ function runDoctor({ repoRoot, codexHome }) {
           && state.agentsOriginalMode >= 0
           && state.agentsOriginalMode <= 0o777
         : state.agentsOriginalMode === null)
-      && sha256(readFileSync(state.backupPath)) === state.agentsBeforeHash;
+      && sha256(readFileSync(state.backupPath)) === state.agentsBeforeHash
+      && state.lunaWorkerPath === path.join(codexHome, 'agents', 'paifa-luna-worker.toml')
+      && hashPattern.test(state.lunaWorkerHash ?? '');
     checks.push(schemaValid
       ? check('install-state-contract', 'pass', 'Installation state paths and backup hash are valid.')
       : check('install-state-contract', 'fail', 'Installation state contract is incomplete or inconsistent.'));
@@ -152,6 +156,17 @@ function runDoctor({ repoRoot, codexHome }) {
   checks.push(versionsMatch
     ? check('version-match', 'pass', `Repository and installation are ${version}.`)
     : check('version-match', 'fail', 'Repository, state, and managed-block versions differ.'));
+
+  if (state?.lunaWorkerPath && state?.lunaWorkerHash) {
+    try {
+      const worker = readFileSync(state.lunaWorkerPath, 'utf8');
+      checks.push(sha256(worker) === state.lunaWorkerHash
+        ? check('luna-worker', 'pass', 'Managed Luna worker is installed and unchanged.')
+        : check('luna-worker', 'warn', 'Luna worker is missing or user-modified; Luna will not be proposed for delegated work.'));
+    } catch (error) {
+      checks.push(check('luna-worker', 'warn', 'Luna worker is missing or user-modified; Luna will not be proposed for delegated work.'));
+    }
+  }
 
   try {
     const routing = JSON.parse(readFileSync(path.join(repoRoot, 'evals', 'routing-cases.json'), 'utf8'));
