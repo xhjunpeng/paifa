@@ -47,4 +47,7 @@ After dispatch, the main task remains responsible for continuing independent wor
 
 Version 1 supports macOS and common Linux POSIX shell environments with Node.js 24. Windows installation is not supported. Paifa has no third-party runtime dependencies and performs no automatic network updates.
 
-MIT licensed. See [LICENSE](LICENSE).
+## License
+
+Paifa is available under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+Noncommercial use is permitted under that license. Commercial use requires a separate written license from the copyright holder before use. Commercial terms and fees are agreed separately. To request a commercial license, open a [GitHub issue](https://github.com/xhjunpeng/paifa/issues/new/).

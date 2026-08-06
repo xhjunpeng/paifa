@@ -2,6 +2,10 @@
 
 All notable changes follow semantic versioning.
 
+## Unreleased
+
+- Replaced the MIT license with PolyForm Noncommercial 1.0.0 and reserved commercial use for separately agreed written licenses.
+
 ## 1.2.0 - 2026-08-06
 
 - Made Terra the default for implementation, review, planning, and high-risk work with clear boundaries and verification.

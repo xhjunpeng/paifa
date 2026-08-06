@@ -56,3 +56,14 @@ test('released repository installs one dispatch gate without replacing existing 
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('repository allows noncommercial use and reserves commercial licensing', () => {
+  const license = readFileSync(path.join(REPOSITORY_ROOT, 'LICENSE'), 'utf8');
+  const readme = readFileSync(path.join(REPOSITORY_ROOT, 'README.md'), 'utf8');
+
+  assert.match(license, /PolyForm Noncommercial License 1\.0\.0/);
+  assert.doesNotMatch(license, /MIT License/);
+  assert.match(readme, /Commercial use requires a separate written license/);
+  assert.match(readme, /Commercial terms and fees are agreed separately/);
+  assert.match(readme, /github\.com\/xhjunpeng\/paifa\/issues\/new/);
+});
