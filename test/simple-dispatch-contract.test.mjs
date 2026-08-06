@@ -58,7 +58,7 @@ test('shows dispatch kind, model, effort, and a short reason in two compact appr
 
   assert.equal(
     notice,
-    '方式：内部子智能体｜模型：5.6 Terra 中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
+    '方式：内部子智能体｜模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
   );
   assert.equal(notice.split('\n').length, 2);
   assert.equal(notice.includes('PAIFA_'), false);
@@ -76,7 +76,7 @@ test('shows the same two-line notice but starts immediately after task-level exe
 
   assert.equal(
     notice,
-    '方式：内部子智能体｜模型：5.6 Terra 中｜原因：任务边界清晰，属于普通实现。\n开始执行：已获授权',
+    '方式：内部子智能体｜模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。\n开始执行：已获授权',
   );
   assert.equal(notice.split('\n').length, 2);
 });
@@ -88,7 +88,7 @@ test('uses the six reasoning labels shown in the Codex UI', () => {
     high: '高',
     xhigh: '极高',
     max: '最高',
-    ultra: '极高（更快消耗使用额度）',
+    ultra: 'Ultra',
   };
 
   for (const [effort, label] of Object.entries(expected)) {
@@ -99,7 +99,7 @@ test('uses the six reasoning labels shown in the Codex UI', () => {
         effort,
         reason: '匹配当前任务。',
       }),
-      new RegExp(`^方式：内部子智能体｜模型：5\\.6 Sol ${label}｜原因：`),
+      new RegExp(`^方式：内部子智能体｜模型：5\\.6 Sol｜思考强度：${label}｜原因：`),
     );
   }
 });
@@ -139,7 +139,7 @@ test('a valid route returns the plain dispatch notice and no machine receipt', (
   assert.equal(result.ok, true);
   assert.equal(
     result.notice,
-    '方式：内部子智能体｜模型：5.6 Terra 中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
+    '方式：内部子智能体｜模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
   );
   assert.equal(result.receipt, undefined);
 });

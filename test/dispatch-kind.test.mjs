@@ -27,7 +27,7 @@ test('the approval notice includes the selected dispatch kind', () => {
       effort: 'high',
       reason: '需要独立 Worktree，但边界明确可验证。',
     }),
-    '方式：独立任务｜模型：5.6 Terra 高｜原因：需要独立 Worktree，但边界明确可验证。\n准备执行：回复 1 批准',
+    '方式：独立任务｜模型：5.6 Terra｜思考强度：高｜原因：需要独立 Worktree，但边界明确可验证。\n准备执行：回复 1 批准',
   );
 });
 

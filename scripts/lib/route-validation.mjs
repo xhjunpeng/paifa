@@ -68,7 +68,7 @@ const EFFORT_LABELS = {
   high: '高',
   xhigh: '极高',
   max: '最高',
-  ultra: '极高（更快消耗使用额度）',
+  ultra: 'Ultra',
 };
 
 const DISPATCH_KIND_LABELS = {
@@ -138,7 +138,7 @@ export function formatDispatchNotice({
   const actionLine = executionApproved
     ? '开始执行：已获授权'
     : '准备执行：回复 1 批准';
-  return `方式：${dispatchKindLabel}｜模型：${modelLabel} ${effortLabel}｜原因：${shortReason}\n${actionLine}`;
+  return `方式：${dispatchKindLabel}｜模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}\n${actionLine}`;
 }
 
 export function validateRoute(route, capabilities = {}) {

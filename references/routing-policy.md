@@ -1,6 +1,6 @@
 # Simple routing ladder
 
-Use this policy only after the next action is state-changing. A route's model and effort must be the settings of the worker that actually executes it; never substitute an unknown current session for a route.
+Use this policy only after the next action is state-changing, including creating or modifying an executable plan document. Generating or saving a plan with `writing-plans`, or starting its follow-up work, is state-changing; chatting about a plan alone is not. A route's model and effort must be the settings of the worker that actually executes it; never substitute an unknown current session for a route.
 
 Choose one observable task profile. Do not calculate scores.
 
@@ -20,7 +20,7 @@ Risk keywords alone do not justify Sol. File count, duration, missing tools, fac
 
 Before dispatch show only:
 
-`方式：独立任务｜模型：5.6 Terra 高｜原因：跨模块任务，但边界明确且可验证。`
+`方式：独立任务｜模型：5.6 Terra｜思考强度：高｜原因：跨模块任务，但边界明确且可验证。`
 `准备执行：回复 1 批准`
 
 明确执行意图（`执行`、`开始`、`继续`、`按建议执行`、`确认` 或 `1`）已授权时，第二行改为：

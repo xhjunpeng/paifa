@@ -35,7 +35,9 @@ test('released repository installs a narrow Paifa trigger without replacing exis
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
     assert.match(agents, /Invoke `paifa` only when the next action will change state/is);
-    assert.match(agents, /questions, explanations, planning, source reading, or read-only inspection/is);
+    assert.match(agents, /questions, explanations, planning discussion, source reading, or read-only inspection/is);
+    assert.match(agents, /create or modify an executable plan document/is);
+    assert.match(agents, /chatting about a plan alone does not invoke Paifa/is);
     assert.match(agents, /SKILL\.md is the source of truth for model routing, approval, delegation, and completion rules/is);
     assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
   } finally {
@@ -50,9 +52,11 @@ test('global execution gate is a compact trigger while the Skill owns the policy
   );
   const skill = readFileSync(path.join(REPOSITORY_ROOT, 'SKILL.md'), 'utf8');
 
-  const notice = '方式：当前任务｜模型：5.6 Terra 中｜原因：范围明确的普通实现\n准备执行：回复 1 批准';
+  const notice = '方式：当前任务｜模型：5.6 Terra｜思考强度：中｜原因：范围明确的普通实现\n准备执行：回复 1 批准';
   assert.match(block, /next action will change state/i);
-  assert.match(block, /questions, explanations, planning, source reading, or read-only inspection/i);
+  assert.match(block, /questions, explanations, planning discussion, source reading, or read-only inspection/i);
+  assert.match(block, /create or modify an executable plan document/i);
+  assert.match(block, /chatting about a plan alone does not invoke Paifa/i);
   assert.doesNotMatch(block, /方式：|准备执行：|开始执行：|Sol|Terra|Luna/);
   assert.match(skill, /description: Use when the next action will change state/is);
   assert.match(skill, new RegExp(notice));

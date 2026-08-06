@@ -22,7 +22,9 @@ test('paifa discovery is limited to a next state-changing action', () => {
     /Invoke `paifa` only when the next action will change state/is,
   );
   for (const text of [skill, gate]) {
-    assert.match(text, /questions, explanations, planning, source reading, or read-only inspection/is);
+    assert.match(text, /questions, explanations, planning discussion, source reading, or read-only inspection/is);
+    assert.match(text, /create or modify an executable plan document/is);
+    assert.match(text, /chatting about a plan alone does not invoke Paifa/is);
   }
 });
 
