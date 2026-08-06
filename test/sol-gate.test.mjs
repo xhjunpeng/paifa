@@ -80,7 +80,7 @@ test('route validation rejects Sol when the gate is not met', () => {
   assert.ok(result.errors.some((error) => error.code === 'SOL_GATE_REQUIRED'));
 });
 
-test('xhigh, max, and ultra require explicit user confirmation', () => {
+test('Sol approval is the only model confirmation for xhigh, max, and ultra', () => {
   for (const [category, effort] of [
     ['deep', 'xhigh'],
     ['maximum', 'max'],
@@ -92,12 +92,10 @@ test('xhigh, max, and ultra require explicit user confirmation', () => {
       effort,
       risk: [],
       solGate: { terraHighFailed: true },
-      userConfirmedAboveHigh: false,
     }), CAPABILITIES);
 
-    assert.equal(result.ok, false);
-    assert.ok(result.errors.some(
-      (error) => error.code === 'STRONG_REASONING_CONFIRMATION_REQUIRED',
-    ));
+    assert.equal(result.ok, true);
+    assert.match(result.notice, /模型：5\.6 Sol/);
+    assert.match(result.notice, /准备执行：回复 1 批准$/);
   }
 });

@@ -35,6 +35,12 @@ function fixture({ agentsExisted = true } = {}) {
   writeFileSync(path.join(repoRoot, 'SKILL.md'), '---\nname: paifa\ndescription: Use when delegating Codex work.\n---\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'VERSION'), '1.0.0\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'templates', 'global-agents-block.md'), BLOCK_V1, 'utf8');
+  writeFileSync(path.join(repoRoot, 'templates', 'paifa-luna-worker.toml'), [
+    'name = "Paifa Luna Worker"',
+    'model = "gpt-5.6-luna"',
+    'model_reasoning_effort = "medium"',
+    '',
+  ].join('\n'), 'utf8');
   if (agentsExisted) {
     writeFileSync(path.join(codexHome, 'AGENTS.md'), ORIGINAL_AGENTS, 'utf8');
   }
@@ -59,20 +65,37 @@ function installOptions(value, overrides = {}) {
 }
 
 describe('install lifecycle', () => {
-  test('initial install creates one block, backup, state, and repository symlink', () => {
+  test('initial install creates one block, backup, repository symlink, and managed Luna worker', () => {
     const value = fixture();
     try {
       const receipt = performInstall(installOptions(value));
       const agents = readFileSync(path.join(value.codexHome, 'AGENTS.md'), 'utf8');
       const skillLink = path.join(value.codexHome, 'skills', 'paifa');
       const statePath = path.join(value.codexHome, 'paifa', 'install-state.json');
+      const lunaWorkerPath = path.join(value.codexHome, 'agents', 'paifa-luna-worker.toml');
 
       assert.equal(receipt.status, 'installed');
       assert.equal(inspectManagedBlock(agents).count, 1);
       assert.equal(lstatSync(skillLink).isSymbolicLink(), true);
       assert.equal(readlinkSync(skillLink), realpathSync(value.repoRoot));
       assert.equal(existsSync(statePath), true);
+      assert.match(readFileSync(lunaWorkerPath, 'utf8'), /model = "gpt-5\.6-luna"/);
       assert.equal(readFileSync(receipt.backupPath, 'utf8'), ORIGINAL_AGENTS);
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('uninstall preserves a Luna worker changed by the user', () => {
+    const value = fixture();
+    try {
+      performInstall(installOptions(value));
+      const workerPath = path.join(value.codexHome, 'agents', 'paifa-luna-worker.toml');
+      writeFileSync(workerPath, 'model = "user-owned"\n', 'utf8');
+
+      performUninstall({ repoRoot: value.repoRoot, codexHome: value.codexHome });
+
+      assert.equal(readFileSync(workerPath, 'utf8'), 'model = "user-owned"\n');
     } finally {
       value.cleanup();
     }

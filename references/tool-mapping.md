@@ -9,11 +9,11 @@ Check the currently available dispatch tool and its accepted capabilities immedi
 | Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Use only when sharing the current directory is acceptable; provide a compact fact envelope |
 | Fork | follow-up model and effort fields, if supported | Fork preserves history and is not a clean-room mechanism |
 
-Use the exact names exposed by the current tool. First store and show the selected dispatch kind, model, effort, and one-sentence reason through the approval executor. Only after it returns the approved route for the user's reply whose content equals `1` or `确认` after leading and trailing whitespace is removed may the matching tool be used with those parameters. An internal subagent cannot by itself provide a new independent Worktree.
+Use the exact names exposed by the current tool and pass its capabilities explicitly. Luna/Terra start with their selected route directly. Only Sol is stored and shown through the approval executor; use the matching tool only after the immediately following reply equals `1` or `确认` after leading and trailing whitespace is removed. An internal subagent cannot by itself provide a new independent Worktree.
 
 Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
 
-One approved task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. These stages must not propose again or ask for confirmation. Reconfirm only when the task goal or target repository/workspace materially changes; model or effort increases; production, credentials, or paid service is needed; or irreversible deletion/data migration is needed.
+One started task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. Luna/Terra changes remain automatic and must not propose again or ask for confirmation. Reconfirm only before Sol, or when the task goal/repository changes, production, credentials, paid service, or irreversible deletion/data migration is needed.
 
 ## Fallback
 

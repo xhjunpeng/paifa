@@ -35,6 +35,11 @@ function writeRepo(repoRoot) {
     '## Paifa Dispatch Gate\n\nInvoke `paifa` before delegated work.',
     'utf8',
   );
+  writeFileSync(
+    path.join(repoRoot, 'templates', 'paifa-luna-worker.toml'),
+    'name = "Paifa Luna Worker"\nmodel = "gpt-5.6-luna"\nmodel_reasoning_effort = "medium"\n',
+    'utf8',
+  );
   writeFileSync(path.join(repoRoot, 'references', 'routing-policy.md'), '# Routing\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'references', 'high-risk.md'), '# High risk\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'references', 'tool-mapping.md'), '# Tools\n', 'utf8');
@@ -46,6 +51,7 @@ function writeRepo(repoRoot) {
   );
   writeFileSync(path.join(repoRoot, 'scripts', 'approval.mjs'), '#!/usr/bin/env node\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'approval-state.mjs'), 'export {};\n', 'utf8');
+  writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'dispatch-capabilities.mjs'), 'export {};\n', 'utf8');
 }
 
 function fixture({ install = true } = {}) {

@@ -133,7 +133,6 @@ describe('validateRoute', () => {
       effort: 'xhigh',
       risk: ['security'],
       solGate: { terraHighFailed: true },
-      userConfirmedAboveHigh: true,
     }), CAPABILITIES);
     assert.equal(deeper.ok, true);
   });
@@ -196,7 +195,7 @@ describe('validate-route CLI', () => {
   }
 
   test('prints the plain notice for a valid route', () => {
-    const result = runCli(JSON.stringify(validRoute()));
+    const result = runCli(JSON.stringify(validRoute({ capabilities: CAPABILITIES })));
     const output = JSON.parse(result.stdout);
 
     assert.equal(result.status, 0, result.stderr);
@@ -207,7 +206,7 @@ describe('validate-route CLI', () => {
   });
 
   test('returns structured errors for invalid input', () => {
-    const invalid = runCli(JSON.stringify(validRoute({ reason: '' })));
+    const invalid = runCli(JSON.stringify(validRoute({ reason: '', capabilities: CAPABILITIES })));
     assert.equal(invalid.status, 1);
     assert.ok(JSON.parse(invalid.stdout).errors.some((error) => error.code === 'REASON_INVALID'));
 

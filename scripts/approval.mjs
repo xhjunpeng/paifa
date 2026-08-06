@@ -9,16 +9,16 @@ function parseOptions(args) {
   for (let index = 0; index < args.length; index += 2) {
     const flag = args[index];
     const value = args[index + 1];
-    if (!['--scope', '--state-dir'].includes(flag) || value === undefined) {
+    if (!['--scope', '--state-dir', '--capabilities'].includes(flag) || value === undefined) {
       throw new Error(`Unknown or incomplete option: ${flag ?? ''}`);
     }
-    options[flag === '--scope' ? 'scope' : 'stateDir'] = value;
+    options[flag === '--scope' ? 'scope' : flag === '--state-dir' ? 'stateDir' : 'capabilitiesPath'] = value;
   }
   return options;
 }
 
 function usage() {
-  throw new Error('Usage: approval.mjs propose <route-file> [--scope X] [--state-dir DIR] | approve <1|确认> [--scope X] [--state-dir DIR]');
+  throw new Error('Usage: approval.mjs propose <route-file> [--capabilities FILE] [--scope X] [--state-dir DIR] | approve <1|确认> [--scope X] [--state-dir DIR]');
 }
 
 try {
@@ -27,7 +27,11 @@ try {
   const options = parseOptions(optionArgs);
   let result;
   if (command === 'propose') {
-    result = propose(options.scope, JSON.parse(readFileSync(value, 'utf8')), options);
+    const route = JSON.parse(readFileSync(value, 'utf8'));
+    if (options.capabilitiesPath) {
+      route.capabilities = JSON.parse(readFileSync(options.capabilitiesPath, 'utf8'));
+    }
+    result = propose(options.scope, route, options);
   } else if (command === 'approve') {
     result = approve(options.scope, value, options);
   } else {

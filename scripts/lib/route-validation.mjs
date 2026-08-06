@@ -54,7 +54,6 @@ const CATEGORY_CANDIDATES = {
 
 const HIGH_RISK_CATEGORIES = new Set(['high-risk', 'deep', 'maximum', 'ultra']);
 const STRONG_REASONING_CATEGORIES = new Set(['deep', 'maximum', 'ultra']);
-const STRONG_REASONING_EFFORTS = new Set(['xhigh', 'max', 'ultra']);
 
 const MODEL_LABELS = {
   'gpt-5.6-luna': '5.6 Luna',
@@ -186,14 +185,6 @@ export function validateRoute(route, capabilities = {}) {
     errors.push(issue(
       'SOL_GATE_REQUIRED',
       'Sol requires both high consequence and high uncertainty, or evidenced Terra high failure.',
-    ));
-  }
-
-  if (STRONG_REASONING_EFFORTS.has(route.effort)
-    && route.userConfirmedAboveHigh !== true) {
-    errors.push(issue(
-      'STRONG_REASONING_CONFIRMATION_REQUIRED',
-      'xhigh, max, and ultra require explicit user confirmation.',
     ));
   }
 

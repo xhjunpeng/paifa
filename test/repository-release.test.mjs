@@ -52,7 +52,7 @@ test('global execution gate is a compact trigger while the Skill owns the policy
   );
   const skill = readFileSync(path.join(REPOSITORY_ROOT, 'SKILL.md'), 'utf8');
 
-  const notice = '方式：当前任务｜模型：5.6 Terra｜思考强度：中｜原因：范围明确的普通实现\n准备执行：回复 1 批准';
+  const notice = '方式：当前任务｜模型：5.6 Sol｜思考强度：极高｜原因：高后果且高度不确定，需先确认\n准备执行：回复 1 批准';
   assert.match(block, /next action will change state/i);
   assert.match(block, /questions, explanations, planning discussion, source reading, or read-only inspection/i);
   assert.match(block, /create or modify an executable plan document/i);
@@ -61,10 +61,10 @@ test('global execution gate is a compact trigger while the Skill owns the policy
   assert.match(skill, /description: Use when the next action will change state/is);
   assert.match(skill, new RegExp(notice));
   assert.match(skill, /local approval executor/is);
-  assert.match(skill, /immediately following reply.*?equals `1` or `确认` after leading and trailing whitespace is removed/is);
+  assert.match(skill, /Sol.*?immediately following reply.*?equals `1` or `确认` after trimming/is);
   assert.doesNotMatch(skill, /A clear execution intent/is);
-  assert.match(skill, /one approved task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
-  assert.match(skill, /must not propose again or ask for confirmation/is);
+  assert.match(skill, /task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
+  assert.match(skill, /Luna\/Terra upgrades remain automatic/is);
   assert.match(skill, /当前任务.*?only when.*?exact model and effort.*?visible/is);
 });
 
