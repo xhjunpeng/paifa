@@ -4,6 +4,12 @@ import path from 'node:path';
 const LUNA_WORKER_NAME = 'Paifa Luna Worker';
 const LUNA_MODEL = 'gpt-5.6-luna';
 const LUNA_EFFORT = 'medium';
+const CONTINUITY_CAPABILITIES = [
+  'resultReturn',
+  'parentWait',
+  'parentWake',
+  'checkpointStore',
+];
 
 function cloneCapabilities(capabilities) {
   const result = {};
@@ -25,6 +31,12 @@ export function hasManagedLunaWorker(codexHome) {
   } catch {
     return false;
   }
+}
+
+export function normalizeContinuityCapabilities(capabilities = {}) {
+  return Object.fromEntries(
+    CONTINUITY_CAPABILITIES.map((name) => [name, capabilities?.[name] === true]),
+  );
 }
 
 // `hostCapabilities` must come from the dispatch surface that will actually run the task.

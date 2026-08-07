@@ -4,7 +4,25 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
-import { resolveDispatchCapabilities } from '../scripts/lib/dispatch-capabilities.mjs';
+import {
+  normalizeContinuityCapabilities,
+  resolveDispatchCapabilities,
+} from '../scripts/lib/dispatch-capabilities.mjs';
+
+test('keeps only explicitly supplied continuity capabilities', () => {
+  assert.deepEqual(normalizeContinuityCapabilities({
+    resultReturn: true,
+    parentWait: 1,
+    parentWake: false,
+    checkpointStore: true,
+    inferredWakeup: true,
+  }), {
+    resultReturn: true,
+    parentWait: false,
+    parentWake: false,
+    checkpointStore: true,
+  });
+});
 
 test('does not claim Luna from host capabilities that do not explicitly offer it', () => {
   const result = resolveDispatchCapabilities({
