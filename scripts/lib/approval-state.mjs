@@ -59,6 +59,12 @@ function validateProposedRoute(route) {
       'A pending route cannot already be approved for execution.',
     );
   }
+  if (route?.dispatchKind === 'direct') {
+    const validation = validateRoute(route);
+    return validation.ok
+      ? { ok: true, validation }
+      : { ok: false, error: { code: 'ROUTE_INVALID', message: 'Route validation failed.', details: validation.errors } };
+  }
   if (!route?.capabilities || typeof route.capabilities !== 'object'
     || Array.isArray(route.capabilities)) {
     return {
@@ -81,14 +87,6 @@ export function propose(scope, route, { stateDir } = {}) {
   if (!checked.ok) return checked;
 
   const filePath = pendingPath(scope, stateDir);
-  if (route.model !== 'gpt-5.6-sol') {
-    rmSync(filePath, { force: true });
-    return {
-      ok: true,
-      direct: true,
-      route: { ...route, executionApproved: true },
-    };
-  }
   const replaced = existsSync(filePath);
   writePending(filePath, {
     version: 1,

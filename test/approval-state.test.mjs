@@ -34,19 +34,19 @@ function withStateDir(callback) {
 }
 
 describe('approval state', () => {
-  test('starts Luna and Terra routes directly without a user-facing approval notice', () => {
+  test('holds a Terra preflight until one exact approval', () => {
     withStateDir((stateDir) => {
       const result = propose('workspace-a', validRoute(), { stateDir });
 
       assert.equal(result.ok, true);
-      assert.equal(result.direct, true);
-      assert.equal(result.route.executionApproved, true);
-      assert.equal(result.notice, undefined);
-      assert.equal(approve('workspace-a', '1', { stateDir }).error.code, 'NO_PENDING_APPROVAL');
+      assert.equal(result.direct, false);
+      assert.match(result.notice, /模型：5\.6 Terra/);
+      assert.match(result.notice, /准备执行：回复 1 批准$/);
+      assert.equal(approve('workspace-a', '1', { stateDir }).route.executionApproved, true);
     });
   });
 
-  test('requires the compact two-line approval notice only for Sol routes', () => {
+  test('holds a Sol preflight until one exact approval after the Sol evidence gate', () => {
     withStateDir((stateDir) => {
       const result = propose('workspace-a', validRoute({
         category: 'deep', model: 'gpt-5.6-sol', effort: 'xhigh',
@@ -146,9 +146,9 @@ describe('approval state', () => {
       const approved = approve('workspace-a', '1', { stateDir });
 
       assert.equal(replacement.ok, true);
-      assert.equal(replacement.direct, true);
-      assert.equal(approved.ok, false);
-      assert.equal(approved.error.code, 'NO_PENDING_APPROVAL');
+      assert.equal(replacement.direct, false);
+      assert.equal(approved.ok, true);
+      assert.equal(approved.route.model, 'gpt-5.6-luna');
     });
   });
 

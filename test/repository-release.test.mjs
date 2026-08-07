@@ -16,7 +16,7 @@ import { inspectManagedBlock } from '../scripts/lib/managed-block.mjs';
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, '..');
 const ORIGINAL_AGENTS = '# Existing global rule\n\nPreserve this content exactly.\n';
 
-test('released repository installs a delegation gate without replacing existing AGENTS rules', () => {
+test('released repository installs a one-time development approval without replacing existing AGENTS rules', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'paifa-release-'));
   const codexHome = path.join(root, 'codex');
   try {
@@ -34,10 +34,9 @@ test('released repository installs a delegation gate without replacing existing 
 
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
-    assert.match(agents, /Invoke `paifa` only when considering real delegated work, a model upgrade, or a high-risk boundary/is);
-    assert.match(agents, /Ordinary direct editing, testing, debugging, retries, and integration remain with the main task/is);
-    assert.match(agents, /Delegate only when independence, parallel benefit, lower handoff cost, and a verified return\/continuation path are all present/is);
-    assert.doesNotMatch(agents, /next action will change state/is);
+    assert.match(agents, /Before the first material action in a new development package, invoke `paifa`/is);
+    assert.match(agents, /show one proposal and wait for the user's exact `1` or `确认`/is);
+    assert.match(agents, /Ask again only for an evidence-based Sol escalation/is);
     assert.match(agents, /SKILL\.md is the source of truth for model routing, approval, delegation, and completion rules/is);
     assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
   } finally {
@@ -45,26 +44,23 @@ test('released repository installs a delegation gate without replacing existing 
   }
 });
 
-test('global delegation gate is a compact trigger while the Skill owns the policy', () => {
+test('global approval gate is a compact trigger while the Skill owns the policy', () => {
   const block = readFileSync(
     path.join(REPOSITORY_ROOT, 'templates', 'global-agents-block.md'),
     'utf8',
   );
   const skill = readFileSync(path.join(REPOSITORY_ROOT, 'SKILL.md'), 'utf8');
 
-  const notice = '方式：当前任务｜模型：5.6 Sol｜思考强度：极高｜原因：高后果且高度不确定，需先确认\n准备执行：回复 1 批准';
-  assert.match(block, /considering real delegated work, a model upgrade, or a high-risk boundary/i);
-  assert.match(block, /Ordinary direct editing, testing, debugging, retries, and integration remain with the main task/i);
-  assert.match(block, /Delegate only when independence, parallel benefit, lower handoff cost, and a verified return\/continuation path are all present/i);
-  assert.doesNotMatch(block, /next action will change state/i);
-  assert.doesNotMatch(block, /方式：|准备执行：|开始执行：|Sol|Terra|Luna/);
-  assert.match(skill, /description: Use when considering real delegated work, a model upgrade, or a high-risk boundary/is);
-  assert.match(skill, new RegExp(notice));
-  assert.match(skill, /local approval executor/is);
-  assert.match(skill, /Sol.*?immediately following reply.*?equals `1` or `确认` after trimming/is);
+  assert.match(block, /Before the first material action in a new development package, invoke `paifa`/i);
+  assert.match(block, /show one proposal and wait for the user's exact `1` or `确认`/i);
+  assert.match(block, /Ask again only for an evidence-based Sol escalation/i);
+  assert.doesNotMatch(block, /方式：|准备执行：|开始执行：/);
+  assert.match(skill, /description: Use when beginning a new development package before its first material action/is);
+  assert.match(skill, /show one proposal and wait for `1`/is);
+  assert.match(skill, /A later Sol escalation requires one additional `1`/is);
   assert.doesNotMatch(skill, /A clear execution intent/is);
   assert.match(skill, /task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
-  assert.match(skill, /Luna\/Terra upgrades remain automatic/is);
+  assert.match(skill, /A later Sol escalation requires one additional `1`/is);
   assert.match(skill, /Direct execution is the default/is);
   assert.match(skill, /Direct execution does not require visible model metadata/is);
 });

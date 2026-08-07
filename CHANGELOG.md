@@ -2,6 +2,13 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.0 - 2026-08-07
+
+- Restored one explicit approval before each new development package: the initial proposal now shows the execution mode, model plan, reasoning level, and reason, then waits for `1` or `确认`.
+- Made that approval cover normal implementation, tests, debugging, retries, integration, and necessary delegation; only an evidence-based Sol escalation or changed high-risk boundary asks for another approval.
+- Represented main-task work as `direct/current/current`, so direct execution preserves the current task settings instead of forcing a model switch or a delegate merely to show a route.
+- Removed the unused DispatchRecord/checkpoint/wakeup runtime and its tests, which were never connected to the actual dispatch entry point.
+
 ## 1.6.0 - 2026-08-07
 
 - Made main-task direct execution the default; visible model metadata is no longer required to edit, test, debug, retry, or integrate work.
