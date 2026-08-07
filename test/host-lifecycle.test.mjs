@@ -9,31 +9,31 @@ function read(relativePath) {
   return readFileSync(path.join(ROOT, relativePath), 'utf8');
 }
 
-test('paifa discovery is limited to a next state-changing action', () => {
+test('paifa discovery is limited to delegation, model upgrades, and high-risk boundaries', () => {
   const skill = read('SKILL.md');
   const gate = read('templates/global-agents-block.md');
 
   assert.match(
     skill,
-    /description: Use when the next action will change state/is,
+    /description: Use when considering real delegated work, a model upgrade, or a high-risk boundary/is,
   );
   assert.match(
     gate,
-    /Invoke `paifa` only when the next action will change state/is,
+    /Invoke `paifa` only when considering real delegated work, a model upgrade, or a high-risk boundary/is,
   );
   for (const text of [skill, gate]) {
-    assert.match(text, /questions, explanations, planning discussion, source reading, or read-only inspection/is);
-    assert.match(text, /create or modify an executable plan document/is);
-    assert.match(text, /chatting about a plan alone does not invoke Paifa/is);
+    assert.match(text, /Ordinary direct editing, testing, debugging, retries, and integration remain with the main task/is);
+    assert.match(text, /Delegate only when independence, parallel benefit, lower handoff cost, and a verified return\/continuation path are all present/is);
+    assert.doesNotMatch(text, /next action will change state/is);
   }
 });
 
-test('paifa never substitutes an unknown current session for a model choice', () => {
+test('direct execution does not require visible model metadata', () => {
   const skill = read('SKILL.md');
 
-  assert.match(skill, /当前任务.*?only when.*?exact model and effort.*?visible/is);
-  assert.match(skill, /must use.*?内部子智能体.*?独立任务.*?exact route/is);
-  assert.doesNotMatch(skill, /界面未暴露具体强度档位/);
+  assert.match(skill, /Direct execution is the default/is);
+  assert.match(skill, /Direct execution does not require visible model metadata/is);
+  assert.doesNotMatch(skill, /If either is unavailable.*?must use.*?内部子智能体/is);
 });
 
 test('the main task owns completion after a dispatch', () => {
@@ -41,8 +41,8 @@ test('the main task owns completion after a dispatch', () => {
   const routing = read('references/routing-policy.md');
 
   assert.match(skill, /main task.*?owns completion/is);
-  assert.match(skill, /continues safe work.*?integrates delegated results/is);
-  assert.match(routing, /main task owns completion.*?continue safe independent work.*?integrate/is);
+  assert.match(skill, /waits for or restores a DispatchRecord before integrating delegated results/is);
+  assert.match(routing, /main task owns completion.*?continue direct work.*?integrate delegated results/is);
 });
 
 test('only the main task gates a delegate before it is created', () => {
@@ -74,7 +74,7 @@ test('one started task envelope covers delivery and closeout without repeated co
   for (const text of documents) {
     assert.match(text, /task envelope.*?planning.*?implementation.*?tests.*?retries/is);
     assert.match(text, /branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
-    assert.match(text, /(?:must not.*?propose.*?confirmation|(?:remain|stay) automatic)/is);
+    assert.match(text, /Direct execution.*?default/is);
     assert.match(text, /(?:before Sol|Sol.*?task goal).*?repository.*?production.*?credentials.*?paid service.*?irreversible deletion.*?data migration/is);
     assert.doesNotMatch(text, /write route\.json/i);
   }

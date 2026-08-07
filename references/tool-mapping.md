@@ -1,24 +1,17 @@
-# Tool mapping and capability fallback
+# Tool mapping and continuity requirements
 
-Check the currently available dispatch tool and its accepted capabilities immediately before a real dispatch. Do not treat this file as a permanent model-price or capability list.
+Direct execution is the default. Do not dispatch merely because the current task does not expose model metadata. Before an actual dispatch, inspect the dispatch surface for its explicit model/effort support and for these continuity capabilities: `resultReturn`, `parentWait`, `parentWake`, and `checkpointStore`. A tool name or a displayed worker panel does not establish wakeup support.
 
-| Dispatch action | Explicit fields | Execution rule |
+| Mode | Required capabilities | Rule |
 | --- | --- | --- |
-| New user-visible task | model and thinking/reasoning effort | Use when independent Worktree, durability, direct follow-up, or independent review is required |
-| Continue an existing task | model and thinking/reasoning effort for the next turn when changing capability | Pass the selected override explicitly |
-| Internal subagent | `model`, `reasoning_effort`, and `fork_turns` | Use only when sharing the current directory is acceptable; provide a compact fact envelope |
-| Fork | follow-up model and effort fields, if supported | Fork preserves history and is not a clean-room mechanism |
+| `direct` | None | Main task continues directly. |
+| `subagent` | `resultReturn`, `parentWait`, `checkpointStore` | Parent stays active, checkpoints first, waits for one result. |
+| `task` | `resultReturn`, `parentWake`, `checkpointStore` | Parent can restore the checkpoint after a cross-turn result event. |
 
-Use the exact names exposed by the current tool and pass its capabilities explicitly. Luna/Terra start with their selected route directly. Only Sol is stored and shown through the approval executor; use the matching tool only after the immediately following reply equals `1` or `确认` after leading and trailing whitespace is removed. An internal subagent cannot by itself provide a new independent Worktree.
+If a required capability is missing, choose `direct` before creating a delegate. The main task owns completion and waits for or restores a DispatchRecord before integrating delegated results. Do not claim automatic continuation without a verified return path.
 
-Parent-first dispatch: the main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not run the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the user the final answer.
+The main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope. A worker must not use the approval CLI, show a model notice, reply to the user, or request confirmation; it only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the final answer.
 
-One started task envelope covers necessary planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. Luna/Terra changes remain automatic and must not propose again or ask for confirmation. Reconfirm only before Sol, or when the task goal/repository changes, production, credentials, paid service, or irreversible deletion/data migration is needed.
+Once work begins, its task envelope covers planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. Direct execution is the default throughout the envelope. Reconfirm only before Sol, or when the task goal, repository, production, credentials, paid service, irreversible deletion, or data migration changes.
 
-## Fallback
-
-When a recommended model or effort is unavailable, choose the lowest-cost currently supported combination that still meets the same capability and risk floor. Do not silently choose a lower floor. If no supported combination meets the floor, stop and request user direction.
-
-## Internal-subagent fact package
-
-An overridden internal subagent gets only the compact verified facts needed to act: goal, scope, allowed and forbidden changes, worktree, verified observations, unresolved facts, acceptance commands, stopping conditions, and return format. Do not pass private repository data, credentials, or unverified root-cause theories.
+Luna/Terra upgrades remain automatic and must not propose confirmation.

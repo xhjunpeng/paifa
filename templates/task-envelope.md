@@ -1,6 +1,6 @@
 # Fact-only task envelope
 
-Use this compact envelope for a new, clean-room, or explicitly model-overridden delegated session. Fill every applicable field with verified facts; omit a field only when it does not apply.
+Direct execution is the default and does not need a task envelope. Use this compact envelope only after a real delegation has passed Paifa's four evidence checks and host capability checks.
 
 ```text
 Goal:
@@ -12,12 +12,10 @@ Unresolved facts:
 Risk boundary:
 Acceptance commands and expected evidence:
 Stopping conditions:
+Dispatch ID:
+Return contract:
+Resume checkpoint:
 Return format:
 ```
 
-Rules:
-
-- State observations, commands, and decisions that are already supported by evidence.
-- Label uncertainty as unresolved; do not present a suspected cause as fact.
-- Exclude credentials, private project data, and unrelated conversation history.
-- Keep the envelope no larger than the facts needed for the assigned outcome.
+State observations, commands, and decisions already supported by evidence. Label uncertainty as unresolved, exclude credentials and unrelated context, and keep the envelope no larger than needed. The Dispatch ID, return contract, and resume checkpoint are required for delegated work and omitted for `direct` execution.
