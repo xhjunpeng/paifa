@@ -1,6 +1,6 @@
 ---
 name: paifa
-description: Use before the first material action in a new development package to propose the execution mode and model plan, then wait for approval; use again only for a justified Sol escalation or a changed high-risk boundary.
+description: Use when beginning a new development package before its first material action, or when evidence requires a Sol escalation or a changed high-risk boundary.
 ---
 
 # Paifa

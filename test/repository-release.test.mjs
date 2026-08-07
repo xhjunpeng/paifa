@@ -55,7 +55,7 @@ test('global approval gate is a compact trigger while the Skill owns the policy'
   assert.match(block, /show one proposal and wait for the user's exact `1` or `确认`/i);
   assert.match(block, /Ask again only for an evidence-based Sol escalation/i);
   assert.doesNotMatch(block, /方式：|准备执行：|开始执行：/);
-  assert.match(skill, /description: Use before the first material action in a new development package/is);
+  assert.match(skill, /description: Use when beginning a new development package before its first material action/is);
   assert.match(skill, /show one proposal and wait for `1`/is);
   assert.match(skill, /A later Sol escalation requires one additional `1`/is);
   assert.doesNotMatch(skill, /A clear execution intent/is);

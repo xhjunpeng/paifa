@@ -15,7 +15,7 @@ test('paifa requires one proposal before a new development package begins', () =
 
   assert.match(
     skill,
-    /description: Use before the first material action in a new development package/is,
+    /description: Use when beginning a new development package before its first material action/is,
   );
   assert.match(
     gate,
