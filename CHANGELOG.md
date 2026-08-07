@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.6.0 - 2026-08-07
+
+- Made main-task direct execution the default; visible model metadata is no longer required to edit, test, debug, retry, or integrate work.
+- Restricted Paifa to real delegation, model upgrades, and high-risk boundaries; delegation now requires factual evidence of independence, parallel benefit, lower handoff cost, and a verified return/continuation path.
+- Added explicit continuity capabilities and durable, idempotent DispatchRecords so missing wakeup support falls back to direct work instead of promising automatic continuation.
+
 ## 1.5.0 - 2026-08-07
 
 - Made Luna/Terra routes automatic; only Sol now shows the two-line approval and waits for `1` or `确认`.
