@@ -56,12 +56,14 @@ const HIGH_RISK_CATEGORIES = new Set(['high-risk', 'deep', 'maximum', 'ultra']);
 const STRONG_REASONING_CATEGORIES = new Set(['deep', 'maximum', 'ultra']);
 
 const MODEL_LABELS = {
+  current: '保持当前主任务',
   'gpt-5.6-luna': '5.6 Luna',
   'gpt-5.6-terra': '5.6 Terra',
   'gpt-5.6-sol': '5.6 Sol',
 };
 
 const EFFORT_LABELS = {
+  current: '保持当前设置',
   low: '轻度',
   medium: '中',
   high: '高',
@@ -71,6 +73,7 @@ const EFFORT_LABELS = {
 };
 
 const DISPATCH_KIND_LABELS = {
+  direct: '主任务直接执行',
   task: '独立任务',
   subagent: '内部子智能体',
 };
@@ -154,7 +157,14 @@ export function validateRoute(route, capabilities = {}) {
   }
 
   if (!Object.hasOwn(DISPATCH_KIND_LABELS, route.dispatchKind)) {
-    errors.push(issue('DISPATCH_KIND_INVALID', 'Dispatch kind must be task or subagent.'));
+    errors.push(issue('DISPATCH_KIND_INVALID', 'Dispatch kind must be direct, task, or subagent.'));
+  } else if (route.dispatchKind === 'direct') {
+    if (route.model !== 'current' || route.effort !== 'current') {
+      errors.push(issue(
+        'DIRECT_ROUTE_CURRENT_TASK_REQUIRED',
+        'Direct work must preserve the current task model and effort.',
+      ));
+    }
   } else {
     const expectedDispatchKind = selectDispatchKind(route.dispatchRequirements);
     if (route.dispatchKind !== expectedDispatchKind) {
@@ -189,12 +199,15 @@ export function validateRoute(route, capabilities = {}) {
   }
 
   const effectiveCategory = route.category;
-  const expected = selectRoute(effectiveCategory, capabilities, route.solGate);
-  if (!expected && Object.hasOwn(CATEGORY_CANDIDATES, effectiveCategory)) {
+  const expected = route.dispatchKind === 'direct'
+    ? null
+    : selectRoute(effectiveCategory, capabilities, route.solGate);
+  if (route.dispatchKind !== 'direct'
+    && !expected && Object.hasOwn(CATEGORY_CANDIDATES, effectiveCategory)) {
     errors.push(issue('NO_CAPABLE_ROUTE', 'No supported model and effort meet this category.'));
   }
 
-  if (route.model && route.effort) {
+  if (route.dispatchKind !== 'direct' && route.model && route.effort) {
     const efforts = supportedEfforts(capabilities, route.model);
     if (!efforts?.includes(route.effort)) {
       errors.push(issue(

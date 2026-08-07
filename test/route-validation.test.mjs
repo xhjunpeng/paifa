@@ -30,6 +30,19 @@ function validRoute(overrides = {}) {
   };
 }
 
+function directRoute(overrides = {}) {
+  return {
+    dispatchKind: 'direct',
+    dispatchRequirements: {},
+    category: 'ordinary',
+    model: 'current',
+    effort: 'current',
+    reason: '主任务保留当前上下文，直接连续执行。',
+    risk: [],
+    ...overrides,
+  };
+}
+
 function errorCodes(result) {
   return result.errors.map((error) => error.code);
 }
@@ -75,6 +88,16 @@ describe('selectRoute', () => {
 });
 
 describe('validateRoute', () => {
+  test('formats direct work without inventing a model switch', () => {
+    const result = validateRoute(directRoute());
+
+    assert.equal(result.ok, true);
+    assert.equal(
+      result.notice,
+      '方式：主任务直接执行｜模型：保持当前主任务｜思考强度：保持当前设置｜原因：主任务保留当前上下文，直接连续执行。\n准备执行：回复 1 批准',
+    );
+  });
+
   test('returns the compact two-line approval notice for a valid route', () => {
     const result = validateRoute(validRoute(), CAPABILITIES);
 
