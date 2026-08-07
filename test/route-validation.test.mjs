@@ -37,6 +37,8 @@ function directRoute(overrides = {}) {
     category: 'ordinary',
     model: 'current',
     effort: 'current',
+    recommendedModel: 'gpt-5.6-terra',
+    recommendedEffort: 'medium',
     reason: '主任务保留当前上下文，直接连续执行。',
     risk: [],
     ...overrides,
@@ -88,14 +90,24 @@ describe('selectRoute', () => {
 });
 
 describe('validateRoute', () => {
-  test('formats direct work without inventing a model switch', () => {
+  test('shows a concrete manual model recommendation for direct work without inventing a switch', () => {
     const result = validateRoute(directRoute());
 
     assert.equal(result.ok, true);
     assert.equal(
       result.notice,
-      '方式：主任务直接执行｜模型：保持当前主任务｜思考强度：保持当前设置｜原因：主任务保留当前上下文，直接连续执行。\n准备执行：回复 1 批准',
+      '方式：主任务直接执行｜推荐模型：5.6 Terra｜推荐思考强度：中｜执行：保持当前主任务设置（可在 Codex UI 手动切换）｜原因：主任务保留当前上下文，直接连续执行。\n准备执行：回复 1 批准',
     );
+  });
+
+  test('rejects a direct recommendation that is not the lowest suitable route', () => {
+    const result = validateRoute(directRoute({
+      recommendedModel: 'gpt-5.6-sol',
+      recommendedEffort: 'high',
+    }));
+
+    assert.equal(result.ok, false);
+    assert.ok(errorCodes(result).includes('DIRECT_RECOMMENDATION_MISMATCH'));
   });
 
   test('returns the compact two-line approval notice for a valid route', () => {

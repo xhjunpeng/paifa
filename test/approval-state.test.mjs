@@ -24,6 +24,21 @@ function validRoute(overrides = {}) {
   };
 }
 
+function directRoute(overrides = {}) {
+  return {
+    dispatchKind: 'direct',
+    dispatchRequirements: {},
+    category: 'ordinary',
+    model: 'current',
+    effort: 'current',
+    recommendedModel: 'gpt-5.6-terra',
+    recommendedEffort: 'medium',
+    reason: '主任务保留当前上下文，直接连续执行。',
+    risk: [],
+    ...overrides,
+  };
+}
+
 function withStateDir(callback) {
   const stateDir = mkdtempSync(path.join(os.tmpdir(), 'paifa-approval-'));
   try {
@@ -34,6 +49,21 @@ function withStateDir(callback) {
 }
 
 describe('approval state', () => {
+  test('holds a direct preflight with a manual Terra recommendation until one exact approval', () => {
+    withStateDir((stateDir) => {
+      const proposed = propose('workspace-a', directRoute(), { stateDir });
+
+      assert.equal(proposed.ok, true);
+      assert.match(proposed.notice, /推荐模型：5\.6 Terra/);
+      assert.match(proposed.notice, /可在 Codex UI 手动切换/);
+
+      const approved = approve('workspace-a', '1', { stateDir });
+      assert.equal(approved.route.executionApproved, true);
+      assert.match(approved.notice, /开始执行：已获授权$/);
+      assert.match(approved.notice, /执行：保持当前主任务设置/);
+    });
+  });
+
   test('holds a Terra preflight until one exact approval', () => {
     withStateDir((stateDir) => {
       const result = propose('workspace-a', validRoute(), { stateDir });

@@ -7,9 +7,9 @@ description: Use when beginning a new development package before its first mater
 
 Before the first material action in a new development package, show one proposal and wait for `1`. State the execution mode, model plan, reasoning level, and a short reason. That approval covers normal implementation, tests, debugging, retries, integration, and necessary delegation until completion.
 
-Direct execution is the default. Use `方式：主任务直接执行｜模型：保持当前主任务｜思考强度：保持当前设置` when the main task should continue in its existing context; do not invent a model switch or create a delegate merely to name a model. Delegate only when the work is genuinely independent, has useful parallel benefit, and has a clear return path.
+Direct execution is the default. For a direct proposal, use `方式：主任务直接执行｜推荐模型：<具体模型>｜推荐思考强度：<具体强度>｜执行：保持当前主任务设置（可在 Codex UI 手动切换）｜原因：<短原因>`. Select the recommendation from the task category, then state that execution keeps the current main-task settings and that the user may manually switch in the Codex UI. The recommendation is a plan, not a claim that the main task has switched. Do not create a delegate merely to name a model. Delegate only when the work is genuinely independent, has useful parallel benefit, and has a clear return path.
 
-Direct execution does not require visible model metadata.
+Direct execution does not require visible model metadata. Its recommendation still follows the same lowest-suitable routing ladder: simple work Luna/low, clear work Luna/medium, ordinary work Terra/medium, and complex or high-risk-but-verifiable work Terra/high. A direct Sol recommendation requires the same evidence gate and second `1` as an actual Sol escalation.
 
 For actual delegation, select the lowest capable route from the current execution surface. Mechanical work may use Luna, ordinary work Terra, and complex or high-risk-but-verifiable work Terra/high. Sol requires both high consequence and high uncertainty, or evidence that Terra/high failed. A later Sol escalation requires one additional `1`; ordinary progress after the first approval never needs another confirmation.
 

@@ -28,10 +28,12 @@ test('paifa requires one proposal before a new development package begins', () =
   }
 });
 
-test('direct execution does not require visible model metadata', () => {
+test('direct execution shows a concrete manual model recommendation without claiming a switch', () => {
   const skill = read('SKILL.md');
 
   assert.match(skill, /Direct execution is the default/is);
+  assert.match(skill, /推荐模型：<具体模型>.*?推荐思考强度：<具体强度>/is);
+  assert.match(skill, /Codex UI 手动切换/is);
   assert.match(skill, /Direct execution does not require visible model metadata/is);
   assert.doesNotMatch(skill, /If either is unavailable.*?must use.*?内部子智能体/is);
 });

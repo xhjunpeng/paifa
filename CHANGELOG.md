@@ -2,6 +2,10 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.1 - 2026-08-07
+
+- Added a concrete model and reasoning recommendation to every main-task direct proposal, while clearly marking it as a manual Codex UI choice rather than an automatic switch.
+
 ## 1.7.0 - 2026-08-07
 
 - Restored one explicit approval before each new development package: the initial proposal now shows the execution mode, model plan, reasoning level, and reason, then waits for `1` or `确认`.

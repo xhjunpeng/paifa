@@ -1,6 +1,6 @@
 # One-time development approval
 
-Before the first material action in a new development package, show one proposal and wait for `1`. Select `direct` by default; select `subagent` or `task` only for independent work whose parallel benefit exceeds the handoff cost. A direct proposal keeps the current main task model and setting.
+Before the first material action in a new development package, show one proposal and wait for `1`. Select `direct` by default; select `subagent` or `task` only for independent work whose parallel benefit exceeds the handoff cost. A direct proposal gives a concrete recommended model and effort for manual selection in the Codex UI, while execution keeps the current main-task model and setting until the user changes it.
 
 The first approval covers normal implementation, tests, debugging, retries, integration, and necessary delegation until completion. A later Sol escalation requires one additional `1`; it needs both high consequence and high uncertainty, or evidence that Terra/high failed. Project-specific Gates are separate.
 

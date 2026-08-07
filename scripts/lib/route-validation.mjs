@@ -120,6 +120,20 @@ export function selectRoute(category, capabilities = {}, solGate = {}) {
   return null;
 }
 
+export function selectRecommendedRoute(category, solGate = {}) {
+  let candidates = CATEGORY_CANDIDATES[category];
+  if (!candidates) return null;
+
+  const allowSol = solGateMet(solGate);
+  if (STRONG_REASONING_CATEGORIES.has(category) && !allowSol) return null;
+  if (allowSol && !STRONG_REASONING_CATEGORIES.has(category)) {
+    candidates = [['gpt-5.6-sol', 'high']];
+  }
+
+  const [model, effort] = candidates[0];
+  return { model, effort };
+}
+
 export function selectDispatchKind(requirements = {}) {
   return INDEPENDENT_TASK_REQUIREMENTS.some((field) => requirements[field] === true)
     ? 'task'
@@ -130,6 +144,8 @@ export function formatDispatchNotice({
   dispatchKind,
   model,
   effort,
+  recommendedModel,
+  recommendedEffort,
   reason,
   executionApproved = false,
 }) {
@@ -137,9 +153,14 @@ export function formatDispatchNotice({
   const dispatchKindLabel = DISPATCH_KIND_LABELS[dispatchKind] ?? dispatchKind;
   const modelLabel = MODEL_LABELS[model] ?? model;
   const effortLabel = EFFORT_LABELS[effort] ?? effort;
+  const recommendedModelLabel = MODEL_LABELS[recommendedModel] ?? recommendedModel;
+  const recommendedEffortLabel = EFFORT_LABELS[recommendedEffort] ?? recommendedEffort;
   const actionLine = executionApproved
     ? '开始执行：已获授权'
     : '准备执行：回复 1 批准';
+  if (dispatchKind === 'direct') {
+    return `方式：${dispatchKindLabel}｜推荐模型：${recommendedModelLabel}｜推荐思考强度：${recommendedEffortLabel}｜执行：保持当前主任务设置（可在 Codex UI 手动切换）｜原因：${shortReason}\n${actionLine}`;
+  }
   return `方式：${dispatchKindLabel}｜模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}\n${actionLine}`;
 }
 
@@ -163,6 +184,20 @@ export function validateRoute(route, capabilities = {}) {
       errors.push(issue(
         'DIRECT_ROUTE_CURRENT_TASK_REQUIRED',
         'Direct work must preserve the current task model and effort.',
+      ));
+    }
+    const expectedRecommendation = selectRecommendedRoute(route.category, route.solGate);
+    if (!route.recommendedModel || !route.recommendedEffort) {
+      errors.push(issue(
+        'DIRECT_RECOMMENDATION_REQUIRED',
+        'Direct work must include a concrete model and effort recommendation for manual switching.',
+      ));
+    } else if (!expectedRecommendation
+      || route.recommendedModel !== expectedRecommendation.model
+      || route.recommendedEffort !== expectedRecommendation.effort) {
+      errors.push(issue(
+        'DIRECT_RECOMMENDATION_MISMATCH',
+        'Direct work must recommend the lowest suitable model and effort for its category.',
       ));
     }
   } else {
@@ -191,7 +226,7 @@ export function validateRoute(route, capabilities = {}) {
   }
 
   const allowSol = solGateMet(route.solGate);
-  if (route.model === 'gpt-5.6-sol' && !allowSol) {
+  if ((route.model === 'gpt-5.6-sol' || route.recommendedModel === 'gpt-5.6-sol') && !allowSol) {
     errors.push(issue(
       'SOL_GATE_REQUIRED',
       'Sol requires both high consequence and high uncertainty, or evidenced Terra high failure.',
@@ -240,6 +275,8 @@ export function validateRoute(route, capabilities = {}) {
         dispatchKind: route.dispatchKind,
         model: route.model,
         effort: route.effort,
+        recommendedModel: route.recommendedModel,
+        recommendedEffort: route.recommendedEffort,
         reason,
         executionApproved: route.executionApproved === true,
       }),
