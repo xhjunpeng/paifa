@@ -18,7 +18,7 @@ function parseOptions(args) {
 }
 
 function usage() {
-  throw new Error('Usage: approval.mjs propose <route-file> [--capabilities FILE] [--scope X] [--state-dir DIR] | approve <1|确认> [--scope X] [--state-dir DIR]');
+  throw new Error('Usage: approval.mjs propose <route-file> [--capabilities FILE] [--scope X] [--state-dir DIR] | approve <1> [--scope X] [--state-dir DIR]');
 }
 
 try {

@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.3 - 2026-08-10
+
+- Unified every Codex-initiated confirmation and choice around numbered replies: the recommended option is always `1`, and a confirmation accepts only `1`.
+- Removed user-facing requests to type “确认”, “授权”, “yes”, or similar words; operating-system, browser, and third-party prompts remain outside Paifa's control.
+
 ## 1.7.2 - 2026-08-10
 
 - Added a mandatory, safe task-closeout command: after merge it updates the base branch, removes only the verified task branch, and prunes stale worktree records.

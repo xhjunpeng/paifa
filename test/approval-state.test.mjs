@@ -120,9 +120,9 @@ describe('approval state', () => {
     });
   });
 
-  test('approves 1 or 确认 after trimming only leading and trailing whitespace', () => {
+  test('approves only numeric 1 after trimming leading and trailing whitespace', () => {
     withStateDir((stateDir) => {
-      for (const reply of ['1', ' 1 ', '\n1\n', '\u30001\u3000', '确认', ' 确认 ', '\n确认\n', '\u3000确认\u3000']) {
+      for (const reply of ['1', ' 1 ', '\n1\n', '\u30001\u3000']) {
         propose('workspace-a', validRoute({
           category: 'deep', model: 'gpt-5.6-sol', effort: 'xhigh',
           solGate: { terraHighFailed: true },
@@ -140,9 +140,9 @@ describe('approval state', () => {
     });
   });
 
-  test('rejects confirmation text with added content without consuming the pending route', () => {
+  test('rejects words and added text without consuming the pending route', () => {
     withStateDir((stateDir) => {
-      for (const reply of ['1, 按照最新 Paifa 标准', '1 说明', '确认，请继续', '', '   ', '\n\t']) {
+      for (const reply of ['确认', '授权', 'yes', '1, 按照最新 Paifa 标准', '1 说明', '确认，请继续', '', '   ', '\n\t']) {
         propose('workspace-a', validRoute({
           category: 'deep', model: 'gpt-5.6-sol', effort: 'xhigh',
           solGate: { terraHighFailed: true },

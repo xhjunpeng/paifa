@@ -13,6 +13,6 @@ Use Sol only when the last row applies. An independent Checker must be a new cle
 
 ## Stronger reasoning and confirmation
 
-Use Sol `xhigh`, `max`, or `ultra` only after Sol/high is insufficient and the user explicitly confirms. Irreversible operations or changes that increase high-risk consequences still require explicit confirmation.
+Use Sol `xhigh`, `max`, or `ultra` only after Sol/high is insufficient and the user replies `1` to the explicit numeric proposal. Irreversible operations or changes that increase high-risk consequences use the same numeric confirmation.
 
 If the user specifies a model below a floor, explain the minimum and route at that floor. If no model combination can meet the floor, stop and request direction rather than silently downgrade.

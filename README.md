@@ -1,6 +1,8 @@
 # Paifa
 
-Paifa gives one visible execution proposal before a new development package starts. The user replies `1` or `确认` once; then the main task continues implementation, tests, debugging, retries, integration, and normal delegation without repeated approval prompts. A later Sol escalation requires one additional `1`.
+Paifa gives one visible execution proposal before a new development package starts. The user replies `1` once; then the main task continues implementation, tests, debugging, retries, integration, and normal delegation without repeated approval prompts. A later Sol escalation requires one additional `1`.
+
+All Codex-initiated confirmations and choices use numbers: the recommended option is always `1`; confirmations say `回复 1 执行`; alternatives accept only the selected number. Codex never asks users to type confirmation, authorization, yes, or similar words.
 
 Direct execution is the default. Its proposal gives a concrete recommended model and effort for you to optionally select in the Codex UI, while honestly stating that the main task is still using its current setting. Delegation remains exceptional: use it only for genuinely independent, useful parallel work with a clear return path. The main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope, must not use the approval CLI or ask the user for confirmation, and only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the final answer.
 

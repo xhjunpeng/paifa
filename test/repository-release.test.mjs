@@ -35,7 +35,8 @@ test('released repository installs a one-time development approval without repla
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
     assert.match(agents, /Before the first material action in a new development package, invoke `paifa`/is);
-    assert.match(agents, /show one proposal and wait for the user's exact `1` or `确认`/is);
+    assert.match(agents, /show one proposal and wait for the user's exact `1`/is);
+    assert.match(agents, /all Codex-initiated confirmations and choices.*?recommended option.*?`1`/is);
     assert.match(agents, /Ask again only for an evidence-based Sol escalation/is);
     assert.match(agents, /SKILL\.md is the source of truth for model routing, approval, delegation, and completion rules/is);
     assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
@@ -52,7 +53,8 @@ test('global approval gate is a compact trigger while the Skill owns the policy'
   const skill = readFileSync(path.join(REPOSITORY_ROOT, 'SKILL.md'), 'utf8');
 
   assert.match(block, /Before the first material action in a new development package, invoke `paifa`/i);
-  assert.match(block, /show one proposal and wait for the user's exact `1` or `确认`/i);
+  assert.match(block, /show one proposal and wait for the user's exact `1`/i);
+  assert.match(block, /all Codex-initiated confirmations and choices.*?recommended option.*?`1`/is);
   assert.match(block, /Ask again only for an evidence-based Sol escalation/i);
   assert.doesNotMatch(block, /方式：|准备执行：|开始执行：/);
   assert.match(skill, /description: Use when beginning a new development package before its first material action/is);

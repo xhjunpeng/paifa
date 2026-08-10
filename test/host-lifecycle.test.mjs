@@ -38,6 +38,17 @@ test('direct execution shows a concrete manual model recommendation without clai
   assert.doesNotMatch(skill, /If either is unavailable.*?must use.*?内部子智能体/is);
 });
 
+test('normalizes every Codex-initiated confirmation and choice to numbered replies', () => {
+  const skill = read('SKILL.md');
+  const gate = read('templates/global-agents-block.md');
+
+  for (const text of [skill, gate]) {
+    assert.match(text, /all Codex-initiated confirmations and choices.*?recommended option.*?`1`/is);
+    assert.match(text, /回复 1 执行/is);
+    assert.match(text, /never ask.*?(?:confirmation|authorization|yes)/is);
+  }
+});
+
 test('the policy does not claim an unimplemented dispatch runtime', () => {
   const documents = [read('SKILL.md'), read('README.md'), read('references/routing-policy.md')];
   for (const text of documents) {
