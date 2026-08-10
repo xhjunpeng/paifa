@@ -60,6 +60,7 @@ function runDoctor({ repoRoot, codexHome }) {
     'references/high-risk.md',
     'references/tool-mapping.md',
     'scripts/approval.mjs',
+    'scripts/closeout.mjs',
     'scripts/lib/approval-state.mjs',
     'scripts/lib/dispatch-capabilities.mjs',
     'evals/routing-cases.json',

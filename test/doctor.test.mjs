@@ -50,6 +50,7 @@ function writeRepo(repoRoot) {
     'utf8',
   );
   writeFileSync(path.join(repoRoot, 'scripts', 'approval.mjs'), '#!/usr/bin/env node\n', 'utf8');
+  writeFileSync(path.join(repoRoot, 'scripts', 'closeout.mjs'), '#!/usr/bin/env node\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'approval-state.mjs'), 'export {};\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'dispatch-capabilities.mjs'), 'export {};\n', 'utf8');
 }
@@ -224,6 +225,20 @@ describe('paifa doctor', () => {
       assert.equal(receipt.ok, false);
       assert.equal(checkById(receipt, 'repository-files').status, 'fail');
       assert.match(checkById(receipt, 'repository-files').message, /scripts\/approval\.mjs/);
+    } finally {
+      value.cleanup();
+    }
+  });
+
+  test('reports a missing closeout executor entry point', () => {
+    const value = fixture();
+    try {
+      rmSync(path.join(value.repoRoot, 'scripts', 'closeout.mjs'));
+      const receipt = JSON.parse(runDoctor(value).stdout);
+
+      assert.equal(receipt.ok, false);
+      assert.equal(checkById(receipt, 'repository-files').status, 'fail');
+      assert.match(checkById(receipt, 'repository-files').message, /scripts\/closeout\.mjs/);
     } finally {
       value.cleanup();
     }
