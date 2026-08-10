@@ -74,6 +74,8 @@ test('one started task envelope covers delivery and closeout without repeated co
   for (const text of documents) {
     assert.match(text, /task envelope.*?planning.*?implementation.*?tests.*?retries/is);
     assert.match(text, /branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
+    assert.match(text, /before declaring complete.*?node scripts\/closeout\.mjs --base <base> --branch <task-branch>/is);
+    assert.match(text, /must not delete.*?(?:unmerged|dirty|unrelated|active worktree)/is);
     assert.match(text, /Direct execution.*?default/is);
     assert.match(text, /later Sol escalation requires one additional `1`/is);
     assert.doesNotMatch(text, /write route\.json/i);

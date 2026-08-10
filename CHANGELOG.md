@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.2 - 2026-08-10
+
+- Added a mandatory, safe task-closeout command: after merge it updates the base branch, removes only the verified task branch, and prunes stale worktree records.
+- Refuses cleanup for dirty, unmerged, unrelated, or active-worktree branches so unfinished work is never silently removed.
+
 ## 1.7.1 - 2026-08-07
 
 - Added a concrete model and reasoning recommendation to every main-task direct proposal, while clearly marking it as a manual Codex UI choice rather than an automatic switch.

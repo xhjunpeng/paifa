@@ -17,4 +17,6 @@ The main task is the only actor for proposal, approve, and user interaction. Bef
 
 Once approved, the task envelope covers planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. Keep business-direction, production, credentials, paid-service, irreversible-operation, and project-specific Gates separate from Paifa; they may still need their own authorization.
 
+Before declaring complete, switch to the merged base branch and run `node scripts/closeout.mjs --base <base> --branch <task-branch>`. It pulls the base, removes only that merged task branch locally and remotely, then prunes stale worktree records. It must not delete unmerged, dirty, unrelated, or active worktree branches; report those blockers instead of calling the task complete.
+
 Ask again only for an evidence-based Sol escalation or a changed high-risk boundary.

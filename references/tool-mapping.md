@@ -7,3 +7,5 @@ The first approval covers normal implementation, tests, debugging, retries, inte
 The main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope, must not use the approval CLI or ask the user for confirmation, and only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the final answer.
 
 Once approved, the task envelope covers planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. Direct execution is the default throughout. A later Sol escalation requires one additional `1`.
+
+Before declaring complete, switch to the merged base branch and run `node scripts/closeout.mjs --base <base> --branch <task-branch>`. It removes only that merged task branch and stale worktree records; it must not delete unmerged, dirty, unrelated, or active worktree branches.
