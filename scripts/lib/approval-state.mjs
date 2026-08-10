@@ -104,10 +104,10 @@ export function propose(scope, route, { stateDir } = {}) {
 
 export function approve(scope, reply, { stateDir } = {}) {
   const normalizedReply = typeof reply === 'string' ? reply.trim() : '';
-  if (normalizedReply !== '1' && normalizedReply !== '确认') {
+  if (normalizedReply !== '1') {
     return failure(
       'APPROVAL_REPLY_INVALID',
-      'Approval requires 1 or 确认 after leading and trailing whitespace is removed.',
+      'Approval requires only 1 after leading and trailing whitespace is removed.',
     );
   }
 
