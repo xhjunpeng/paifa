@@ -52,6 +52,25 @@ const CATEGORY_CANDIDATES = {
   ],
 };
 
+const DEVELOPMENT_CANDIDATES = {
+  simple: [
+    ['gpt-5.6-terra', 'medium'],
+    ['gpt-5.6-terra', 'high'],
+    ['gpt-5.6-sol', 'high'],
+  ],
+  clear: [
+    ['gpt-5.6-terra', 'medium'],
+    ['gpt-5.6-terra', 'high'],
+    ['gpt-5.6-sol', 'high'],
+  ],
+  ordinary: CATEGORY_CANDIDATES.ordinary,
+  complex: CATEGORY_CANDIDATES.complex,
+  'high-risk': CATEGORY_CANDIDATES['high-risk'],
+  deep: CATEGORY_CANDIDATES.deep,
+  maximum: CATEGORY_CANDIDATES.maximum,
+  ultra: CATEGORY_CANDIDATES.ultra,
+};
+
 const HIGH_RISK_CATEGORIES = new Set(['high-risk', 'deep', 'maximum', 'ultra']);
 const STRONG_REASONING_CATEGORIES = new Set(['deep', 'maximum', 'ultra']);
 
@@ -101,8 +120,11 @@ export function solGateMet(solGate = {}) {
     || (solGate.highConsequence === true && solGate.highUncertainty === true);
 }
 
-export function selectRoute(category, capabilities = {}, solGate = {}) {
-  let candidates = CATEGORY_CANDIDATES[category];
+export function selectRoute(category, capabilities = {}, solGate = {}, workType = 'development') {
+  const candidateSet = workType === 'mechanical-acceptance'
+    ? CATEGORY_CANDIDATES
+    : DEVELOPMENT_CANDIDATES;
+  let candidates = candidateSet[category];
   if (!candidates) return null;
 
   const allowSol = solGateMet(solGate);
@@ -236,7 +258,7 @@ export function validateRoute(route, capabilities = {}) {
   const effectiveCategory = route.category;
   const expected = route.dispatchKind === 'direct'
     ? null
-    : selectRoute(effectiveCategory, capabilities, route.solGate);
+    : selectRoute(effectiveCategory, capabilities, route.solGate, route.workType);
   if (route.dispatchKind !== 'direct'
     && !expected && Object.hasOwn(CATEGORY_CANDIDATES, effectiveCategory)) {
     errors.push(issue('NO_CAPABLE_ROUTE', 'No supported model and effort meet this category.'));
@@ -252,8 +274,8 @@ export function validateRoute(route, capabilities = {}) {
     } else if (expected
       && (route.model !== expected.model || route.effort !== expected.effort)) {
       errors.push(issue(
-        'NOT_LOWEST_CAPABLE',
-        `Use ${expected.model}/${expected.effort}, the lowest supported route for ${effectiveCategory}.`,
+        'NOT_FASTEST_SUITABLE',
+        `Use ${expected.model}/${expected.effort}, the fastest suitable route for ${effectiveCategory}.`,
       ));
     }
   }

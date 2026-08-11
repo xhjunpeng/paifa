@@ -166,6 +166,7 @@ describe('approval state', () => {
         model: 'gpt-5.6-luna',
         effort: 'medium',
         category: 'clear',
+        workType: 'mechanical-acceptance',
         reason: '新方案范围更小，易于验证。',
         capabilities: {
           'gpt-5.6-luna': ['low', 'medium'],
