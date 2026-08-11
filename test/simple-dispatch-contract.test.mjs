@@ -9,15 +9,15 @@ const CAPABILITIES = {
   'gpt-5.6-sol': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
 };
 
-test('chooses the lowest capable model from the full model and effort ladder', () => {
+test('chooses the fastest suitable model from the full model and effort ladder', () => {
   assert.equal(typeof routing.selectRoute, 'function');
 
   assert.deepEqual(routing.selectRoute('simple', CAPABILITIES), {
-    model: 'gpt-5.6-luna',
-    effort: 'low',
+    model: 'gpt-5.6-terra',
+    effort: 'medium',
   });
   assert.deepEqual(routing.selectRoute('clear', CAPABILITIES), {
-    model: 'gpt-5.6-luna',
+    model: 'gpt-5.6-terra',
     effort: 'medium',
   });
   assert.deepEqual(routing.selectRoute('ordinary', CAPABILITIES), {
@@ -104,7 +104,7 @@ test('uses the six reasoning labels shown in the Codex UI', () => {
   }
 });
 
-test('rejects a more expensive route when a cheaper capable route exists', () => {
+test('rejects a route that is slower than the fastest suitable worker route', () => {
   const result = routing.validateRoute({
     dispatchKind: 'subagent',
     dispatchRequirements: {},
@@ -122,7 +122,7 @@ test('rejects a more expensive route when a cheaper capable route exists', () =>
   }, CAPABILITIES);
 
   assert.equal(result.ok, false);
-  assert.ok(result.errors.some((error) => error.code === 'NOT_LOWEST_CAPABLE'));
+  assert.ok(result.errors.some((error) => error.code === 'NOT_FASTEST_SUITABLE'));
 });
 
 test('a valid route returns the plain dispatch notice and no machine receipt', () => {

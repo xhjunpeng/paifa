@@ -50,12 +50,27 @@ function errorCodes(result) {
 }
 
 describe('selectRoute', () => {
-  test('uses the lowest supported route for each category', () => {
+  test('uses Terra for development workers and reserves Luna for mechanical acceptance', () => {
     assert.deepEqual(selectRoute('simple', CAPABILITIES), {
-      model: 'gpt-5.6-luna', effort: 'low',
+      model: 'gpt-5.6-terra', effort: 'medium',
     });
     assert.deepEqual(selectRoute('clear', CAPABILITIES), {
+      model: 'gpt-5.6-terra', effort: 'medium',
+    });
+    assert.deepEqual(selectRoute('simple', CAPABILITIES, {}, 'mechanical-acceptance'), {
+      model: 'gpt-5.6-luna', effort: 'low',
+    });
+    assert.deepEqual(selectRoute('clear', CAPABILITIES, {}, 'mechanical-acceptance'), {
       model: 'gpt-5.6-luna', effort: 'medium',
+    });
+  });
+
+  test('uses the fastest suitable development route for each category', () => {
+    assert.deepEqual(selectRoute('simple', CAPABILITIES), {
+      model: 'gpt-5.6-terra', effort: 'medium',
+    });
+    assert.deepEqual(selectRoute('clear', CAPABILITIES), {
+      model: 'gpt-5.6-terra', effort: 'medium',
     });
     assert.deepEqual(selectRoute('ordinary', CAPABILITIES), {
       model: 'gpt-5.6-terra', effort: 'medium',
@@ -123,6 +138,23 @@ describe('validateRoute', () => {
     assert.equal(result.receipt, undefined);
   });
 
+  test('rejects Luna for a development worker but accepts it for mechanical acceptance', () => {
+    const development = validateRoute(validRoute({
+      category: 'simple',
+      model: 'gpt-5.6-luna',
+      effort: 'low',
+    }), CAPABILITIES);
+    assert.ok(errorCodes(development).includes('NOT_FASTEST_SUITABLE'));
+
+    const acceptance = validateRoute(validRoute({
+      category: 'simple',
+      model: 'gpt-5.6-luna',
+      effort: 'low',
+      workType: 'mechanical-acceptance',
+    }), CAPABILITIES);
+    assert.equal(acceptance.ok, true);
+  });
+
   test('returns the immediate-start notice when task-level execution is already approved', () => {
     const result = validateRoute(validRoute({ executionApproved: true }), CAPABILITIES);
 
@@ -137,14 +169,14 @@ describe('validateRoute', () => {
     assert.doesNotMatch(notice, /GPT-5|当前会话|强度未暴露/);
   });
 
-  test('rejects a route that is stronger and more expensive than necessary', () => {
+  test('rejects a route that is slower than the fastest suitable worker route', () => {
     const result = validateRoute(validRoute({
       model: 'gpt-5.6-sol',
       effort: 'high',
     }), CAPABILITIES);
 
     assert.equal(result.ok, false);
-    assert.ok(errorCodes(result).includes('NOT_LOWEST_CAPABLE'));
+    assert.ok(errorCodes(result).includes('NOT_FASTEST_SUITABLE'));
   });
 
   test('requires the high-risk category without upgrading on the keyword alone', () => {

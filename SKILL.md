@@ -13,7 +13,7 @@ First assess whether safe parallel work shortens total completion time. If it do
 
 Direct execution does not require visible model metadata. Its recommendation still follows the same lowest-suitable routing ladder: simple work Luna/low, clear work Luna/medium, ordinary work Terra/medium, and complex or high-risk-but-verifiable work Terra/high. A direct Sol recommendation requires the same evidence gate and second `1` as an actual Sol escalation.
 
-For actual delegation, select the lowest capable route from the current execution surface. Mechanical work may use Luna, ordinary work Terra, and complex or high-risk-but-verifiable work Terra/high. Sol requires both high consequence and high uncertainty, or evidence that Terra/high failed. A later Sol escalation requires one additional `1`; ordinary progress after the first approval never needs another confirmation.
+For actual delegation, route for time-to-completion: development workers use Terra (medium for simple through ordinary work and high for complex or high-risk-but-verifiable work). Luna is only for mechanical acceptance that it can finish sooner. Sol requires both high consequence and high uncertainty, or evidence that Terra/high failed. A later Sol escalation requires one additional `1`; ordinary progress after the first approval never needs another confirmation.
 
 The main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope, must not use the approval CLI or ask the user for confirmation, and only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the final answer.
 

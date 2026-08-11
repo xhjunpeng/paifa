@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.5 - 2026-08-11
+
+- Made worker model routing time-first: development workers route to Terra, while Luna is reserved for bounded mechanical acceptance work that completes sooner.
+- Preserved the Sol evidence gate and a separate numeric `1` approval for every Sol escalation.
+
 ## 1.7.4 - 2026-08-11
 
 - Made delegation time-first: when safe parallel work shortens total completion time, the main task delegates bounded implementation, testing, or acceptance work instead of defaulting to direct execution.

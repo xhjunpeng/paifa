@@ -53,6 +53,21 @@ test('prioritizes child agents when safe parallel work finishes the development 
   }
 });
 
+test('uses Terra for development workers, Luna only for mechanical acceptance, and keeps Sol approved', () => {
+  const documents = [
+    read('SKILL.md'),
+    read('README.md'),
+    read('references/routing-policy.md'),
+    read('references/tool-mapping.md'),
+  ];
+
+  for (const text of documents) {
+    assert.match(text, /development workers.*?Terra/is);
+    assert.match(text, /Luna.*?only.*?mechanical acceptance/is);
+    assert.match(text, /Sol.*?one additional `1`/is);
+  }
+});
+
 test('normalizes every Codex-initiated confirmation and choice to numbered replies', () => {
   const skill = read('SKILL.md');
   const gate = read('templates/global-agents-block.md');
