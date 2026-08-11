@@ -63,7 +63,7 @@ test('global approval gate is a compact trigger while the Skill owns the policy'
   assert.doesNotMatch(skill, /A clear execution intent/is);
   assert.match(skill, /task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
   assert.match(skill, /A later Sol escalation requires one additional `1`/is);
-  assert.match(skill, /Direct execution is the default/is);
+  assert.match(skill, /Use direct execution only when safe parallel work would not finish sooner/is);
   assert.match(skill, /Direct execution does not require visible model metadata/is);
 });
 
