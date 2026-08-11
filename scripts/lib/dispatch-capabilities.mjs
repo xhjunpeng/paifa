@@ -7,6 +7,7 @@ const LUNA_EFFORT = 'medium';
 const CONTINUITY_CAPABILITIES = [
   'resultReturn',
   'parentWait',
+  'hostManagedCollection',
   'parentWake',
   'checkpointStore',
 ];

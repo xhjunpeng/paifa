@@ -19,6 +19,7 @@ test('keeps only explicitly supplied continuity capabilities', () => {
   }), {
     resultReturn: true,
     parentWait: false,
+    hostManagedCollection: false,
     parentWake: false,
     checkpointStore: true,
   });

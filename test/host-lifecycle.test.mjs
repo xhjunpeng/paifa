@@ -104,7 +104,7 @@ test('only the main task gates a delegate before it is created', () => {
   }
 });
 
-test('uses a real host wait-and-result barrier instead of fire-and-forget delegation', () => {
+test('uses host-managed collection instead of fire-and-forget delegation', () => {
   const documents = [
     read('SKILL.md'),
     read('README.md'),
@@ -113,9 +113,24 @@ test('uses a real host wait-and-result barrier instead of fire-and-forget delega
   ];
 
   for (const text of documents) {
-    assert.match(text, /host.*?(?:wait|等待).*?(?:return|返回).*?worker result/is);
-    assert.match(text, /return path.*?(?:unclear|不可用).*?direct/is);
+    assert.match(text, /host-managed.*?(?:collect|collection).*?result/is);
+    assert.match(text, /host-managed.*?if it does not.*?direct/is);
     assert.match(text, /(?:must not.*?(?:final answer|最终答复).*?(?:every|全部).*?result|collects.*?every.*?result.*?before.*?final)/is);
+  }
+});
+
+test('waits for host-managed result delivery without status polling or waiting commentary', () => {
+  const documents = [
+    read('SKILL.md'),
+    read('README.md'),
+    read('references/routing-policy.md'),
+    read('references/tool-mapping.md'),
+  ];
+
+  for (const text of documents) {
+    assert.match(text, /host-managed.*?(?:collect|collection).*?result/is);
+    assert.match(text, /must not.*?(?:poll|status).*?(?:commentary|update)/is);
+    assert.match(text, /(?:timeout|blocked).*?(?:one|single).*?(?:status|update)/is);
   }
 });
 

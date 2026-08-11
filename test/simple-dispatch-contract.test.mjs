@@ -134,7 +134,7 @@ test('a valid route returns the plain dispatch notice and no machine receipt', (
     model: 'gpt-5.6-terra',
     effort: 'medium',
     risk: [],
-    hostCapabilities: { resultReturn: true, parentWait: true },
+    hostCapabilities: { resultReturn: true, parentWait: true, hostManagedCollection: true },
   }, CAPABILITIES);
 
   assert.equal(result.ok, true);
@@ -154,7 +154,7 @@ test('refuses a subagent route unless the real dispatch surface can wait for and
     model: 'gpt-5.6-terra',
     effort: 'medium',
     risk: [],
-    hostCapabilities: { resultReturn: true, parentWait: false },
+    hostCapabilities: { resultReturn: true, parentWait: false, hostManagedCollection: true },
   }, CAPABILITIES);
 
   assert.equal(result.ok, false);
@@ -171,7 +171,7 @@ test('a task-level approved route returns the immediate-start notice', () => {
     effort: 'medium',
     risk: [],
     executionApproved: true,
-    hostCapabilities: { resultReturn: true, parentWait: true },
+    hostCapabilities: { resultReturn: true, parentWait: true, hostManagedCollection: true },
   }, CAPABILITIES);
 
   assert.equal(result.ok, true);

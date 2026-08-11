@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.7 - 2026-08-11
+
+- Replaced parent status polling with host-managed collection: completion results return to the main task without waiting commentary.
+- Refused delegation unless the host explicitly supports automatic result collection; only a host-reported timeout or block may produce one status update.
+
 ## 1.7.6 - 2026-08-11
 
 - Made delegation fail closed unless the real host can both wait for workers and return their results to the parent.

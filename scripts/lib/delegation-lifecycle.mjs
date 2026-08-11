@@ -12,6 +12,12 @@ function capabilityErrors(hostCapabilities = {}) {
   if (hostCapabilities.parentWait !== true) {
     errors.push(issue('PARENT_WAIT_REQUIRED', 'The active host cannot wait for worker completion.'));
   }
+  if (hostCapabilities.hostManagedCollection !== true) {
+    errors.push(issue(
+      'HOST_MANAGED_COLLECTION_REQUIRED',
+      'The active host cannot collect completion results without parent polling.',
+    ));
+  }
   return errors;
 }
 

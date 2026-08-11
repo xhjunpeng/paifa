@@ -26,7 +26,7 @@ function validRoute(overrides = {}) {
     effort: 'medium',
     reason: '任务边界清晰，属于普通实现。',
     risk: [],
-    hostCapabilities: { resultReturn: true, parentWait: true },
+    hostCapabilities: { resultReturn: true, parentWait: true, hostManagedCollection: true },
     ...overrides,
   };
 }
