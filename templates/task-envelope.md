@@ -15,4 +15,6 @@ Stopping conditions:
 Return format:
 ```
 
+The return must state terminal status, changed files or commit, test evidence, and any blocker. The main task records the worker id before dispatch and collects this result before it can finish.
+
 Keep only verified facts, label uncertainty, and exclude credentials or unrelated history.

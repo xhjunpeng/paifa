@@ -1,3 +1,5 @@
+import { evaluateDelegationLifecycle } from './delegation-lifecycle.mjs';
+
 const HIGH_RISK = new Set([
   'authentication',
   'authorization',
@@ -229,6 +231,13 @@ export function validateRoute(route, capabilities = {}) {
         'DISPATCH_KIND_MISMATCH',
         `Use ${expectedDispatchKind}; the selected dispatch kind cannot satisfy the task requirements.`,
       ));
+    }
+    if (route.dispatchKind === 'subagent') {
+      errors.push(...evaluateDelegationLifecycle({
+        phase: 'start',
+        hostCapabilities: route.hostCapabilities,
+        workers: [],
+      }).errors);
     }
   }
 

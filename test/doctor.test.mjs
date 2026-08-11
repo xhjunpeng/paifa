@@ -53,6 +53,7 @@ function writeRepo(repoRoot) {
   writeFileSync(path.join(repoRoot, 'scripts', 'closeout.mjs'), '#!/usr/bin/env node\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'approval-state.mjs'), 'export {};\n', 'utf8');
   writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'dispatch-capabilities.mjs'), 'export {};\n', 'utf8');
+  writeFileSync(path.join(repoRoot, 'scripts', 'lib', 'delegation-lifecycle.mjs'), 'export {};\n', 'utf8');
 }
 
 function fixture({ install = true } = {}) {

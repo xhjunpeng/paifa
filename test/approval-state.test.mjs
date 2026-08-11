@@ -16,6 +16,7 @@ function validRoute(overrides = {}) {
     effort: 'medium',
     reason: '任务边界清晰，属于普通实现。',
     risk: [],
+    hostCapabilities: { resultReturn: true, parentWait: true },
     capabilities: {
       'gpt-5.6-terra': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],
       'gpt-5.6-sol': ['low', 'medium', 'high', 'xhigh', 'max', 'ultra'],

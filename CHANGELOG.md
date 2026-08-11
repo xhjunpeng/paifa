@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.6 - 2026-08-11
+
+- Made delegation fail closed unless the real host can both wait for workers and return their results to the parent.
+- Added a lifecycle validator: the parent cannot finish until every dispatched worker has reached a terminal state and its result is collected.
+- Required the main task to keep progress as commentary while waiting, then integrate all results in its single final answer.
+
 ## 1.7.5 - 2026-08-11
 
 - Made worker model routing time-first: development workers route to Terra, while Luna is reserved for bounded mechanical acceptance work that completes sooner.

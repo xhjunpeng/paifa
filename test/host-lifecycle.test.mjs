@@ -104,6 +104,21 @@ test('only the main task gates a delegate before it is created', () => {
   }
 });
 
+test('uses a real host wait-and-result barrier instead of fire-and-forget delegation', () => {
+  const documents = [
+    read('SKILL.md'),
+    read('README.md'),
+    read('references/routing-policy.md'),
+    read('references/tool-mapping.md'),
+  ];
+
+  for (const text of documents) {
+    assert.match(text, /host.*?(?:wait|等待).*?(?:return|返回).*?worker result/is);
+    assert.match(text, /return path.*?(?:unclear|不可用).*?direct/is);
+    assert.match(text, /(?:must not.*?(?:final answer|最终答复).*?(?:every|全部).*?result|collects.*?every.*?result.*?before.*?final)/is);
+  }
+});
+
 test('one started task envelope covers delivery and closeout without repeated confirmation', () => {
   const documents = [
     read('SKILL.md'),

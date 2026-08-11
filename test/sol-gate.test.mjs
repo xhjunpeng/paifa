@@ -22,6 +22,7 @@ function route(overrides = {}) {
     reason: '高风险领域，但边界明确且可验证。',
     risk: ['identity'],
     solGate: {},
+    hostCapabilities: { resultReturn: true, parentWait: true },
     ...overrides,
   };
 }

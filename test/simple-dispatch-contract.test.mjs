@@ -134,6 +134,7 @@ test('a valid route returns the plain dispatch notice and no machine receipt', (
     model: 'gpt-5.6-terra',
     effort: 'medium',
     risk: [],
+    hostCapabilities: { resultReturn: true, parentWait: true },
   }, CAPABILITIES);
 
   assert.equal(result.ok, true);
@@ -142,6 +143,22 @@ test('a valid route returns the plain dispatch notice and no machine receipt', (
     '方式：内部子智能体｜模型：5.6 Terra｜思考强度：中｜原因：任务边界清晰，属于普通实现。\n准备执行：回复 1 批准',
   );
   assert.equal(result.receipt, undefined);
+});
+
+test('refuses a subagent route unless the real dispatch surface can wait for and return results', () => {
+  const result = routing.validateRoute({
+    dispatchKind: 'subagent',
+    dispatchRequirements: {},
+    category: 'ordinary',
+    reason: '任务边界清晰，属于普通实现。',
+    model: 'gpt-5.6-terra',
+    effort: 'medium',
+    risk: [],
+    hostCapabilities: { resultReturn: true, parentWait: false },
+  }, CAPABILITIES);
+
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.code === 'PARENT_WAIT_REQUIRED'));
 });
 
 test('a task-level approved route returns the immediate-start notice', () => {
@@ -154,6 +171,7 @@ test('a task-level approved route returns the immediate-start notice', () => {
     effort: 'medium',
     risk: [],
     executionApproved: true,
+    hostCapabilities: { resultReturn: true, parentWait: true },
   }, CAPABILITIES);
 
   assert.equal(result.ok, true);

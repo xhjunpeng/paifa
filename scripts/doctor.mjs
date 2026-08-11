@@ -63,6 +63,7 @@ function runDoctor({ repoRoot, codexHome }) {
     'scripts/closeout.mjs',
     'scripts/lib/approval-state.mjs',
     'scripts/lib/dispatch-capabilities.mjs',
+    'scripts/lib/delegation-lifecycle.mjs',
     'evals/routing-cases.json',
     'evals/trigger-cases.json',
   ];

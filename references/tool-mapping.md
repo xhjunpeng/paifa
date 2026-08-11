@@ -8,7 +8,7 @@ All Codex-initiated confirmations and choices use numbered replies: put the reco
 
 The first approval covers normal implementation, tests, debugging, retries, integration, and necessary delegation until completion. A direct proposal must show a concrete recommended model and effort, but must label it as a manual Codex UI choice rather than claim the main task already switched. A later Sol escalation requires one additional `1`.
 
-The main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. A worker inherits the approved route and scope, must not use the approval CLI or ask the user for confirmation, and only returns a short result to the main task. The host UI may show a worker panel, but the main task gives the final answer.
+The main task is the only actor for proposal, approve, and user interaction. Before approval it must not create a real delegate. Before actual delegation, verify that the active host can wait for workers and return each worker result; if the return path is unclear or unavailable, use direct execution. Record every dispatched worker id, wait with the host primitive, and collect every terminal result. The main task must not give a final answer until every worker result is collected. A worker inherits the approved route and scope, must not use the approval CLI or ask the user for confirmation, and only returns a short result to the main task. The host UI may show a worker panel, but only the main task integrates the results and gives the final answer.
 
 Once approved, the task envelope covers planning, implementation, tests, retries, branch, push, PR, checks, merge, and closeout. A later Sol escalation requires one additional `1`.
 
