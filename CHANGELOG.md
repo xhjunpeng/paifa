@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.7.4 - 2026-08-11
+
+- Made delegation time-first: when safe parallel work shortens total completion time, the main task delegates bounded implementation, testing, or acceptance work instead of defaulting to direct execution.
+- Kept one branch per task: workers share the task branch and may not create branches or worktrees; the main task coordinates, integrates, and gives the final answer.
+
 ## 1.7.3 - 2026-08-10
 
 - Unified every Codex-initiated confirmation and choice around numbered replies: the recommended option is always `1`, and a confirmation accepts only `1`.

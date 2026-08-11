@@ -31,11 +31,26 @@ test('paifa requires one proposal before a new development package begins', () =
 test('direct execution shows a concrete manual model recommendation without claiming a switch', () => {
   const skill = read('SKILL.md');
 
-  assert.match(skill, /Direct execution is the default/is);
+  assert.match(skill, /Use direct execution only when safe parallel work would not finish sooner/is);
   assert.match(skill, /推荐模型：<具体模型>.*?推荐思考强度：<具体强度>/is);
   assert.match(skill, /Codex UI 手动切换/is);
   assert.match(skill, /Direct execution does not require visible model metadata/is);
   assert.doesNotMatch(skill, /If either is unavailable.*?must use.*?内部子智能体/is);
+});
+
+test('prioritizes child agents when safe parallel work finishes the development task sooner', () => {
+  const documents = [
+    read('SKILL.md'),
+    read('README.md'),
+    read('references/routing-policy.md'),
+    read('references/tool-mapping.md'),
+  ];
+
+  for (const text of documents) {
+    assert.match(text, /first assess whether safe parallel work shortens total completion time/is);
+    assert.match(text, /if it does, delegate implementation, testing, or acceptance to worker(s)/is);
+    assert.match(text, /workers.*?same task branch.*?must not create.*?(?:branch|worktree)/is);
+  }
 });
 
 test('normalizes every Codex-initiated confirmation and choice to numbered replies', () => {
@@ -87,7 +102,7 @@ test('one started task envelope covers delivery and closeout without repeated co
     assert.match(text, /branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
     assert.match(text, /before declaring complete.*?node scripts\/closeout\.mjs --base <base> --branch <task-branch>/is);
     assert.match(text, /must not delete.*?(?:unmerged|dirty|unrelated|active worktree)/is);
-    assert.match(text, /Direct execution.*?default/is);
+    assert.match(text, /Use direct execution only when safe parallel work would not finish sooner/is);
     assert.match(text, /later Sol escalation requires one additional `1`/is);
     assert.doesNotMatch(text, /write route\.json/i);
   }
