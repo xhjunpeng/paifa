@@ -2,6 +2,13 @@
 
 All notable changes follow semantic versioning.
 
+## 1.8.0 - 2026-08-18
+
+- Fixed the approved-task lifecycle: when native Goal tools are available, Paifa now creates or resumes a persistent Goal after the exact `1`, continues it after compaction, and requires a goal-state check before a final answer.
+- Made an active Goal a hard continuation contract: progress stays in commentary; only verified completion may mark it complete and end the task, while qualified genuine blockers use the host blocked lifecycle.
+- Scoped the numeric reply to Paifa's own development and Sol gates, removing the global takeover of ordinary confirmations and choices.
+- Replaced stale wording-only lifecycle checks with regression coverage for Goal creation, resume, continuation, terminal states, and the installed global managed block.
+
 ## 1.7.7 - 2026-08-11
 
 - Replaced parent status polling with host-managed collection: completion results return to the main task without waiting commentary.

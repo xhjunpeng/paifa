@@ -36,7 +36,10 @@ test('released repository installs a one-time development approval without repla
     assert.equal(managed.count, 1);
     assert.match(agents, /Before the first material action in a new development package, invoke `paifa`/is);
     assert.match(agents, /show one proposal and wait for the user's exact `1`/is);
-    assert.match(agents, /all Codex-initiated confirmations and choices.*?recommended option.*?`1`/is);
+    assert.match(agents, /numbered reply applies only to the Paifa development gate and an evidence-based Sol escalation/is);
+    assert.doesNotMatch(agents, /all Codex-initiated confirmations and choices/is);
+    assert.match(agents, /create_goal.*?approved task envelope/is);
+    assert.match(agents, /while the Goal is active.*?do not send `final_answer`/is);
     assert.match(agents, /Ask again only for an evidence-based Sol escalation/is);
     assert.match(agents, /SKILL\.md is the source of truth for model routing, approval, delegation, and completion rules/is);
     assert.doesNotMatch(agents, /PAIFA_ROUTE|PAIFA_DISPATCHED|PAIFA_CONTEXT|expanded route YAML/is);
@@ -54,16 +57,19 @@ test('global approval gate is a compact trigger while the Skill owns the policy'
 
   assert.match(block, /Before the first material action in a new development package, invoke `paifa`/i);
   assert.match(block, /show one proposal and wait for the user's exact `1`/i);
-  assert.match(block, /all Codex-initiated confirmations and choices.*?recommended option.*?`1`/is);
+    assert.match(block, /numbered reply applies only to the Paifa development gate and an evidence-based Sol escalation/is);
+    assert.doesNotMatch(block, /all Codex-initiated confirmations and choices/is);
+    assert.match(block, /create_goal.*?approved task envelope/is);
+    assert.match(block, /while the Goal is active.*?do not send `final_answer`/is);
   assert.match(block, /Ask again only for an evidence-based Sol escalation/i);
   assert.doesNotMatch(block, /方式：|准备执行：|开始执行：/);
   assert.match(skill, /description: Use when beginning a new development package before its first material action/is);
-  assert.match(skill, /show one proposal and wait for `1`/is);
+  assert.match(skill, /show one proposal and wait for the user's exact `1`/is);
   assert.match(skill, /A later Sol escalation requires one additional `1`/is);
   assert.doesNotMatch(skill, /A clear execution intent/is);
   assert.match(skill, /task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
   assert.match(skill, /A later Sol escalation requires one additional `1`/is);
-  assert.match(skill, /Use direct execution only when safe parallel work would not finish sooner/is);
+  assert.match(skill, /Choose direct execution when the task is small/is);
   assert.match(skill, /Direct execution does not require visible model metadata/is);
 });
 

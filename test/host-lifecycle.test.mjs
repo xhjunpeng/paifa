@@ -4,151 +4,80 @@ import path from 'node:path';
 import { test } from 'node:test';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
+const POLICY_FILES = [
+  'SKILL.md',
+  'README.md',
+  'references/routing-policy.md',
+  'references/tool-mapping.md',
+];
 
 function read(relativePath) {
   return readFileSync(path.join(ROOT, relativePath), 'utf8');
 }
 
-test('paifa requires one proposal before a new development package begins', () => {
+function policyDocuments() {
+  return POLICY_FILES.map((relativePath) => ({ relativePath, text: read(relativePath) }));
+}
+
+test('paifa keeps the one-time development approval, without taking over ordinary conversation choices', () => {
   const skill = read('SKILL.md');
   const gate = read('templates/global-agents-block.md');
 
-  assert.match(
-    skill,
-    /description: Use when beginning a new development package before its first material action/is,
-  );
-  assert.match(
-    gate,
-    /Before the first material action in a new development package, invoke `paifa`/is,
-  );
-  for (const text of [skill, gate]) {
-    assert.match(text, /show one proposal and wait for.*`1`/is);
-    assert.match(text, /covers normal implementation, tests, debugging, retries, integration, and necessary delegation until completion/is);
-    assert.match(text, /Ask again only for an evidence-based Sol escalation/is);
+  assert.match(skill, /Before the first material action.*?wait for.*?exact `1`/is);
+  assert.match(gate, /Before the first material action.*?exact `1`/is);
+  assert.match(gate, /only to the Paifa development gate and an evidence-based Sol escalation/is);
+  for (const { relativePath, text } of policyDocuments()) {
+    assert.doesNotMatch(
+      text,
+      /all Codex-initiated confirmations and choices.*?numbered replies/is,
+      `${relativePath} must not globally control ordinary conversation choices`,
+    );
   }
 });
 
-test('direct execution shows a concrete manual model recommendation without claiming a switch', () => {
-  const skill = read('SKILL.md');
-
-  assert.match(skill, /Use direct execution only when safe parallel work would not finish sooner/is);
-  assert.match(skill, /推荐模型：<具体模型>.*?推荐思考强度：<具体强度>/is);
-  assert.match(skill, /Codex UI 手动切换/is);
-  assert.match(skill, /Direct execution does not require visible model metadata/is);
-  assert.doesNotMatch(skill, /If either is unavailable.*?must use.*?内部子智能体/is);
-});
-
-test('prioritizes child agents when safe parallel work finishes the development task sooner', () => {
-  const documents = [
-    read('SKILL.md'),
-    read('README.md'),
-    read('references/routing-policy.md'),
-    read('references/tool-mapping.md'),
-  ];
-
-  for (const text of documents) {
-    assert.match(text, /first assess whether safe parallel work shortens total completion time/is);
-    assert.match(text, /if it does, delegate implementation, testing, or acceptance to worker(s)/is);
-    assert.match(text, /workers.*?same task branch.*?must not create.*?(?:branch|worktree)/is);
+test('approval creates or resumes a native Goal for the whole approved task envelope', () => {
+  for (const { relativePath, text } of policyDocuments()) {
+    assert.match(text, /after the user replies with the exact `1`.*?create_goal/is, relativePath);
+    assert.match(text, /if an active Goal already covers the same task.*?(?:keep|keeps|resume|resumes) it/is, relativePath);
+    assert.match(text, /objective.*?approved task envelope/is, relativePath);
   }
 });
 
-test('uses Terra for development workers, Luna only for mechanical acceptance, and keeps Sol approved', () => {
-  const documents = [
-    read('SKILL.md'),
-    read('README.md'),
-    read('references/routing-policy.md'),
-    read('references/tool-mapping.md'),
-  ];
-
-  for (const text of documents) {
-    assert.match(text, /development workers.*?Terra/is);
-    assert.match(text, /Luna.*?only.*?mechanical acceptance/is);
-    assert.match(text, /Sol.*?one additional `1`/is);
+test('an active Goal prevents a premature final answer and keeps progress in commentary', () => {
+  for (const { relativePath, text } of policyDocuments()) {
+    assert.match(text, /while the Goal is active.*?(?:do not|does not).*?final_answer/is, relativePath);
+    assert.match(text, /progress.*?commentary/is, relativePath);
+    assert.match(text, /before sending a final answer.*?get_goal/is, relativePath);
   }
 });
 
-test('normalizes every Codex-initiated confirmation and choice to numbered replies', () => {
-  const skill = read('SKILL.md');
+test('an active Goal resumes after compaction and may end only at a real lifecycle boundary', () => {
+  for (const { relativePath, text } of policyDocuments()) {
+    assert.match(text, /after compaction.*?get_goal.*?continue/is, relativePath);
+    assert.match(text, /verified completion.*?update_goal.*?complete/is, relativePath);
+    assert.match(text, /genuine blocker.*?update_goal.*?blocked/is, relativePath);
+    assert.match(text, /changed high-risk boundary/is, relativePath);
+  }
+});
+
+test('the global managed block carries the lifecycle guard that is installed into projects', () => {
   const gate = read('templates/global-agents-block.md');
 
-  for (const text of [skill, gate]) {
-    assert.match(text, /all Codex-initiated confirmations and choices.*?recommended option.*?`1`/is);
-    assert.match(text, /回复 1 执行/is);
-    assert.match(text, /never ask.*?(?:confirmation|authorization|yes)/is);
-  }
+  assert.match(gate, /create_goal/is);
+  assert.match(gate, /while the Goal is active.*?do not.*?final_answer/is);
+  assert.match(gate, /after compaction.*?get_goal.*?continue/is);
+  assert.match(gate, /only after verified completion.*?update_goal.*?complete/is);
 });
 
-test('the policy does not claim an unimplemented dispatch runtime', () => {
-  const documents = [read('SKILL.md'), read('README.md'), read('references/routing-policy.md')];
-  for (const text of documents) {
-    assert.doesNotMatch(text, /DispatchRecord|parentWake|checkpointStore/);
-  }
-});
-
-test('only the main task gates a delegate before it is created', () => {
-  const documents = [
-    read('SKILL.md'),
-    read('README.md'),
-    read('references/routing-policy.md'),
-    read('references/tool-mapping.md'),
-  ];
-
-  for (const text of documents) {
-    assert.match(text, /main task.*?only.*?proposal.*?approve.*?user interaction/is);
-    assert.match(text, /before approval.*?must not create.*?(?:real )?delegate/is);
-    assert.match(text, /worker.*?inherit.*?approved route.*?scope/is);
-    assert.match(text, /worker.*?must not.*?approval CLI.*?ask the user.*?confirmation/is);
-    assert.match(text, /worker.*?only.*?return.*?(?:short )?result.*?main task/is);
-    assert.match(text, /host UI.*?may show.*?worker panel.*?main task.*?final answer/is);
-  }
-});
-
-test('uses host-managed collection instead of fire-and-forget delegation', () => {
-  const documents = [
-    read('SKILL.md'),
-    read('README.md'),
-    read('references/routing-policy.md'),
-    read('references/tool-mapping.md'),
-  ];
-
-  for (const text of documents) {
-    assert.match(text, /host-managed.*?(?:collect|collection).*?result/is);
-    assert.match(text, /host-managed.*?if it does not.*?direct/is);
-    assert.match(text, /(?:must not.*?(?:final answer|最终答复).*?(?:every|全部).*?result|collects.*?every.*?result.*?before.*?final)/is);
-  }
-});
-
-test('waits for host-managed result delivery without status polling or waiting commentary', () => {
-  const documents = [
-    read('SKILL.md'),
-    read('README.md'),
-    read('references/routing-policy.md'),
-    read('references/tool-mapping.md'),
-  ];
-
-  for (const text of documents) {
-    assert.match(text, /host-managed.*?(?:collect|collection).*?result/is);
-    assert.match(text, /must not.*?(?:poll|status).*?(?:commentary|update)/is);
-    assert.match(text, /(?:timeout|blocked).*?(?:one|single).*?(?:status|update)/is);
-  }
-});
-
-test('one started task envelope covers delivery and closeout without repeated confirmation', () => {
-  const documents = [
-    read('SKILL.md'),
-    read('README.md'),
-    read('references/routing-policy.md'),
-    read('references/tool-mapping.md'),
-  ];
-
-  for (const text of documents) {
-    assert.match(text, /task envelope.*?planning.*?implementation.*?tests.*?retries/is);
-    assert.match(text, /branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
-    assert.match(text, /before declaring complete.*?node scripts\/closeout\.mjs --base <base> --branch <task-branch>/is);
-    assert.match(text, /must not delete.*?(?:unmerged|dirty|unrelated|active worktree)/is);
-    assert.match(text, /Use direct execution only when safe parallel work would not finish sooner/is);
-    assert.match(text, /later Sol escalation requires one additional `1`/is);
-    assert.doesNotMatch(text, /write route\.json/i);
+test('delegation remains host-managed and does not bypass the main task lifecycle', () => {
+  for (const { relativePath, text } of policyDocuments()) {
+    assert.match(text, /before actual delegation.*?host-managed collection/is, relativePath);
+    assert.match(
+      text,
+      /(?:every worker result.*?before.*?final answer|final answer.*?every worker result)/is,
+      relativePath,
+    );
+    assert.match(text, /final answer only when the Goal lifecycle permits it/is, relativePath);
+    assert.match(text, /worker.*?must not.*?ask the user.*?confirmation/is, relativePath);
   }
 });
