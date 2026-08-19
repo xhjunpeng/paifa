@@ -1,5 +1,13 @@
 # Paifa
 
+If a project's `AGENTS.md` explicitly declares Loop OS as its sole control plane, Paifa does not run for that project: Loop OS owns the workflow's Gate, context, dispatch, checks, acceptance, and closeout. Otherwise Paifa applies normally.
+
+For a Loop OS project, add this project-level declaration to `AGENTS.md`:
+
+```md
+本项目由 Loop OS 作为唯一控制平面；先执行 Loop Gate 和 Context；Paifa 的授权、Goal、派发、验收和收口规则不适用。
+```
+
 Paifa gives one visible execution proposal before a new development package starts. The user replies with the exact `1` once; then the main task continues the approved task envelope—planning, implementation, tests, debugging, retries, integration, and normal delegation—until verified completion. A later evidence-based Sol escalation requires one additional `1`. This numbered reply applies only to the Paifa development gate and Sol escalation, not to ordinary conversation choices or project-specific Gates. A second approval for risk is allowed only for an actual new external consequence: the next action newly touches production data, makes a real vendor call or cost, uses credentials, is irreversible, changes a permission/public interface, or changes business direction. Review findings, test failures, more necessary files, and required async/concurrency/idempotency/security/availability/duplicate-charge repairs remain inside an active Goal.
 
 After the user replies with the exact `1`, the main task calls `get_goal`: if an active Goal already covers the same task, it keeps or resumes it; otherwise it calls `create_goal` with an objective for the approved task envelope. While the Goal is active, it does not send `final_answer`; it reports meaningful progress through commentary and continues execution. Before sending a final answer, it calls `get_goal`. After compaction, it calls `get_goal` and continues any active Goal. Only after verified completion does it call `update_goal` with `complete` and send the final answer. For a genuine blocker meeting the host's blocked threshold, it calls `update_goal` with `blocked`; an internal repair is never a blocker merely because its defect is severe.

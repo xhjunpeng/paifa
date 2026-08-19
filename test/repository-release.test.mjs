@@ -15,6 +15,7 @@ import { inspectManagedBlock } from '../scripts/lib/managed-block.mjs';
 
 const REPOSITORY_ROOT = path.resolve(import.meta.dirname, '..');
 const ORIGINAL_AGENTS = '# Existing global rule\n\nPreserve this content exactly.\n';
+const LOOP_OS_CONTROL_PLANE_DECLARATION = '本项目由 Loop OS 作为唯一控制平面；先执行 Loop Gate 和 Context；Paifa 的授权、Goal、派发、验收和收口规则不适用。';
 
 test('released repository installs a one-time development approval without replacing existing AGENTS rules', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'paifa-release-'));
@@ -35,6 +36,12 @@ test('released repository installs a one-time development approval without repla
     assert.ok(agents.startsWith(ORIGINAL_AGENTS));
     assert.equal(managed.count, 1);
     assert.match(agents, /Before the first material action in a new development package, invoke `paifa`/is);
+    assert.match(agents, /Before applying this rule, inspect the applicable project `AGENTS\.md`/is);
+    assert.match(agents, /Loop OS as the sole control plane/is);
+    assert.ok(agents.includes(LOOP_OS_CONTROL_PLANE_DECLARATION));
+    assert.match(agents, /Do not invoke Paifa or apply its proposal, `1`, Goal, delegation, validation, or closeout rules to that project/is);
+    assert.match(agents, /Do not propose, wait for `1`, create or resume a Goal, dispatch, validate, accept, or close out under Paifa/is);
+    assert.match(agents, /Merely mentioning Loop OS, Loop Gate, or Context does not activate this exception/is);
     assert.match(agents, /show one proposal and wait for the user's exact `1`/is);
     assert.match(agents, /numbered reply applies only to the Paifa development gate and an evidence-based Sol escalation/is);
     assert.doesNotMatch(agents, /all Codex-initiated confirmations and choices/is);
@@ -56,6 +63,12 @@ test('global approval gate is a compact trigger while the Skill owns the policy'
   const skill = readFileSync(path.join(REPOSITORY_ROOT, 'SKILL.md'), 'utf8');
 
   assert.match(block, /Before the first material action in a new development package, invoke `paifa`/i);
+  assert.match(block, /Before applying this rule, inspect the applicable project `AGENTS\.md`/i);
+  assert.match(block, /Loop OS as the sole control plane/i);
+  assert.ok(block.includes(LOOP_OS_CONTROL_PLANE_DECLARATION));
+  assert.match(block, /Do not invoke Paifa or apply its proposal, `1`, Goal, delegation, validation, or closeout rules to that project/i);
+  assert.match(block, /Do not propose, wait for `1`, create or resume a Goal, dispatch, validate, accept, or close out under Paifa/i);
+  assert.match(block, /Merely mentioning Loop OS, Loop Gate, or Context does not activate this exception/i);
   assert.match(block, /show one proposal and wait for the user's exact `1`/i);
     assert.match(block, /numbered reply applies only to the Paifa development gate and an evidence-based Sol escalation/is);
     assert.doesNotMatch(block, /all Codex-initiated confirmations and choices/is);
@@ -65,6 +78,11 @@ test('global approval gate is a compact trigger while the Skill owns the policy'
   assert.doesNotMatch(block, /方式：|准备执行：|开始执行：/);
   assert.match(skill, /description: Use when beginning a new development package before its first material action/is);
   assert.match(skill, /show one proposal and wait for the user's exact `1`/is);
+  assert.match(skill, /Loop OS as the sole control plane/is);
+  assert.ok(skill.includes(LOOP_OS_CONTROL_PLANE_DECLARATION));
+  assert.match(skill, /Do not invoke Paifa or apply its proposal, `1`, Goal, delegation, validation, or closeout rules to that project/is);
+  assert.match(skill, /Do not propose, wait for `1`, create or resume a Goal, dispatch, validate, accept, or close out under Paifa/is);
+  assert.match(skill, /Merely mentioning Loop OS, Loop Gate, or Context does not activate this exception/is);
   assert.match(skill, /A later Sol escalation requires one additional `1`/is);
   assert.doesNotMatch(skill, /A clear execution intent/is);
   assert.match(skill, /task envelope.*?planning.*?implementation.*?tests.*?retries.*?branch.*?push.*?PR.*?checks.*?merge.*?closeout/is);
@@ -82,4 +100,5 @@ test('repository allows noncommercial use and reserves commercial licensing', ()
   assert.match(readme, /Commercial use requires a separate written license/);
   assert.match(readme, /Commercial terms and fees are agreed separately/);
   assert.match(readme, /github\.com\/xhjunpeng\/paifa\/issues\/new/);
+  assert.ok(readme.includes(LOOP_OS_CONTROL_PLANE_DECLARATION));
 });

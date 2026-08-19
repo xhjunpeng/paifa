@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.8.2 - 2026-08-20
+
+- Added a project-level Loop OS exception: when the applicable `AGENTS.md` explicitly declares Loop OS the sole control plane, Paifa does not apply its approval, Goal, delegation, validation, or closeout workflow.
+- Kept Paifa active for all other projects, so the exception cannot silently disable the normal development gate.
+
 ## 1.8.1 - 2026-08-20
 
 - Defined a second risk approval by the next action's actual external consequence, rather than the severity of a defect or the number of affected files.
