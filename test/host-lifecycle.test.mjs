@@ -51,12 +51,14 @@ test('an active Goal prevents a premature final answer and keeps progress in com
   }
 });
 
-test('an active Goal resumes after compaction and may end only at a real lifecycle boundary', () => {
+test('an active Goal resumes after compaction and may end only at a real lifecycle or external-consequence boundary', () => {
   for (const { relativePath, text } of policyDocuments()) {
     assert.match(text, /after compaction.*?get_goal.*?continue/is, relativePath);
     assert.match(text, /verified completion.*?update_goal.*?complete/is, relativePath);
     assert.match(text, /genuine blocker.*?update_goal.*?blocked/is, relativePath);
-    assert.match(text, /changed high-risk boundary/is, relativePath);
+    assert.match(text, /actual (?:new )?external (?:high-risk )?consequence/is, relativePath);
+    assert.match(text, /review finding.*?test failure.*?more necessary files/is, relativePath);
+    assert.match(text, /remain inside (?:(?:an?|the) )?(?:active Goal|first approval)/is, relativePath);
   }
 });
 

@@ -106,8 +106,23 @@ const INDEPENDENT_TASK_REQUIREMENTS = [
   'independentReview',
 ];
 
+const EXTERNAL_HIGH_RISK_BOUNDARY_FIELDS = [
+  'productionData',
+  'realVendorCall',
+  'credentialUse',
+  'realCost',
+  'irreversibleOperation',
+  'permissionOrPublicInterfaceChange',
+  'businessDirectionChange',
+];
+
 function issue(code, message) {
   return { code, message };
+}
+
+function changesExternalHighRiskBoundary(boundary) {
+  return Boolean(boundary && typeof boundary === 'object'
+    && EXTERNAL_HIGH_RISK_BOUNDARY_FIELDS.some((field) => boundary[field] === true));
 }
 
 function supportedEfforts(capabilities, model) {
@@ -289,11 +304,11 @@ export function validateRoute(route, capabilities = {}) {
     }
   }
 
-  if ((route.irreversible === true || route.increasesHighRiskConsequences === true)
+  if (changesExternalHighRiskBoundary(route.highRiskBoundary)
     && route.userConfirmedHighRiskBoundary !== true) {
     errors.push(issue(
       'HIGH_RISK_CONFIRMATION_REQUIRED',
-      'Irreversible or increased high-risk consequences require explicit confirmation.',
+      'An actual external high-risk consequence change requires explicit confirmation.',
     ));
   }
 

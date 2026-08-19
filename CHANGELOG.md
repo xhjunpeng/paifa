@@ -2,6 +2,12 @@
 
 All notable changes follow semantic versioning.
 
+## 1.8.1 - 2026-08-20
+
+- Defined a second risk approval by the next action's actual external consequence, rather than the severity of a defect or the number of affected files.
+- Kept active-Goal review findings, test failures, and required async/concurrency/idempotency/security/availability/duplicate-charge repairs inside the first approval.
+- Added regression coverage for the real failure mode: local safety repairs continue, while real vendor cost and other external consequence changes still require confirmation.
+
 ## 1.8.0 - 2026-08-18
 
 - Fixed the approved-task lifecycle: when native Goal tools are available, Paifa now creates or resumes a persistent Goal after the exact `1`, continues it after compaction, and requires a goal-state check before a final answer.

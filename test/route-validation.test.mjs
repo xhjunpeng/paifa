@@ -210,17 +210,72 @@ describe('validateRoute', () => {
     assert.ok(errorCodes(validateRoute(validRoute({ category: 'D' }), CAPABILITIES)).includes('CATEGORY_INVALID'));
   });
 
-  test('requires confirmation for irreversible or increased high-risk consequences', () => {
-    for (const field of ['irreversible', 'increasesHighRiskConsequences']) {
-      const rejected = validateRoute(validRoute({ [field]: true }), CAPABILITIES);
+  test('requires confirmation for an actual external high-risk consequence', () => {
+    for (const highRiskBoundary of [
+      { irreversibleOperation: true },
+      { productionData: true },
+      { realVendorCall: true, realCost: true },
+      { credentialUse: true },
+      { permissionOrPublicInterfaceChange: true },
+      { businessDirectionChange: true },
+    ]) {
+      const rejected = validateRoute(validRoute({ highRiskBoundary }), CAPABILITIES);
       assert.ok(errorCodes(rejected).includes('HIGH_RISK_CONFIRMATION_REQUIRED'));
 
       const accepted = validateRoute(validRoute({
-        [field]: true,
+        highRiskBoundary,
         userConfirmedHighRiskBoundary: true,
       }), CAPABILITIES);
       assert.equal(accepted.ok, true);
     }
+  });
+
+  test('continues an active Goal when review findings require only local safety repairs', () => {
+    const result = validateRoute(validRoute({
+      category: 'high-risk',
+      model: 'gpt-5.6-terra',
+      effort: 'high',
+      risk: ['security', 'billing'],
+      activeGoal: true,
+      reviewFindings: ['async-task', 'retirement-concurrency', 'duplicate-charge-prevention'],
+      requiresMoreFiles: true,
+      increasesHighRiskConsequences: true,
+      highRiskBoundary: {
+        productionData: false,
+        realVendorCall: false,
+        credentialUse: false,
+        realCost: false,
+        irreversibleOperation: false,
+        permissionOrPublicInterfaceChange: false,
+        businessDirectionChange: false,
+      },
+    }), CAPABILITIES);
+
+    assert.equal(result.ok, true);
+    assert.ok(!errorCodes(result).includes('HIGH_RISK_CONFIRMATION_REQUIRED'));
+  });
+
+  test('requires a second confirmation only for an evidenced external consequence change', () => {
+    const unconfirmed = validateRoute(validRoute({
+      category: 'high-risk',
+      model: 'gpt-5.6-terra',
+      effort: 'high',
+      risk: ['billing'],
+      activeGoal: true,
+      highRiskBoundary: { realVendorCall: true, realCost: true },
+    }), CAPABILITIES);
+    assert.ok(errorCodes(unconfirmed).includes('HIGH_RISK_CONFIRMATION_REQUIRED'));
+
+    const confirmed = validateRoute(validRoute({
+      category: 'high-risk',
+      model: 'gpt-5.6-terra',
+      effort: 'high',
+      risk: ['billing'],
+      activeGoal: true,
+      highRiskBoundary: { realVendorCall: true, realCost: true },
+      userConfirmedHighRiskBoundary: true,
+    }), CAPABILITIES);
+    assert.equal(confirmed.ok, true);
   });
 });
 
