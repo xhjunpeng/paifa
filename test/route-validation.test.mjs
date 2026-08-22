@@ -6,6 +6,7 @@ import path from 'node:path';
 import { describe, test } from 'node:test';
 
 import {
+  formatDispatchNotice,
   selectRoute,
   validateDispatch,
   validateRoute,
@@ -106,6 +107,30 @@ describe('selectRoute', () => {
 });
 
 describe('validateRoute', () => {
+  test('shows a readable branch and closeout card before asking for approval', () => {
+    const notice = formatDispatchNotice({
+      dispatchKind: 'direct',
+      model: 'current',
+      effort: 'current',
+      recommendedModel: 'gpt-5.6-terra',
+      recommendedEffort: 'medium',
+      reason: '改动集中在同一技能，主任务可连续完成。',
+      approvalCard: {
+        goal: '让 Paifa 的确认提示说明分支安排',
+        branch: { action: '新建', name: 'skill-paifa-tishi' },
+        worktree: '是，避免影响当前未完成工作',
+        closeout: '完成检查后提交、合并并清理本次分支',
+      },
+    });
+
+    assert.match(notice, /^任务：让 Paifa 的确认提示说明分支安排$/m);
+    assert.match(notice, /^模型与方式：主任务直接执行；推荐 5\.6 Terra／中$/m);
+    assert.match(notice, /^分支：新建 codex\/skill-paifa-tishi$/m);
+    assert.match(notice, /^独立开发目录：是，避免影响当前未完成工作$/m);
+    assert.match(notice, /^完成与收口：完成检查后提交、合并并清理本次分支$/m);
+    assert.match(notice, /\n准备执行：回复 1 批准$/);
+  });
+
   test('shows a concrete manual model recommendation for direct work without inventing a switch', () => {
     const result = validateRoute(directRoute());
 

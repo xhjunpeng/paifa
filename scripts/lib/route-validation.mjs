@@ -106,6 +106,31 @@ const INDEPENDENT_TASK_REQUIREMENTS = [
   'independentReview',
 ];
 
+function oneLine(value) {
+  return String(value ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function formatApprovalCard({ approvalCard, dispatchKind, recommendedModel, recommendedEffort }) {
+  if (!approvalCard || typeof approvalCard !== 'object') return '';
+  const goal = oneLine(approvalCard.goal);
+  const branchAction = oneLine(approvalCard.branch?.action);
+  const branchName = oneLine(approvalCard.branch?.name);
+  const worktree = oneLine(approvalCard.worktree);
+  const closeout = oneLine(approvalCard.closeout);
+  if (!goal || !branchAction || !branchName || !worktree || !closeout) return '';
+
+  const mode = DISPATCH_KIND_LABELS[dispatchKind] ?? dispatchKind;
+  const model = MODEL_LABELS[recommendedModel] ?? recommendedModel;
+  const effort = EFFORT_LABELS[recommendedEffort] ?? recommendedEffort;
+  return [
+    `任务：${goal}`,
+    `模型与方式：${mode}；推荐 ${model}／${effort}`,
+    `分支：${branchAction} codex/${branchName}`,
+    `独立开发目录：${worktree}`,
+    `完成与收口：${closeout}`,
+  ].join('\n');
+}
+
 const EXTERNAL_HIGH_RISK_BOUNDARY_FIELDS = [
   'productionData',
   'realVendorCall',
@@ -186,9 +211,10 @@ export function formatDispatchNotice({
   recommendedModel,
   recommendedEffort,
   reason,
+  approvalCard,
   executionApproved = false,
 }) {
-  const shortReason = String(reason ?? '').replace(/\s+/g, ' ').trim();
+  const shortReason = oneLine(reason);
   const dispatchKindLabel = DISPATCH_KIND_LABELS[dispatchKind] ?? dispatchKind;
   const modelLabel = MODEL_LABELS[model] ?? model;
   const effortLabel = EFFORT_LABELS[effort] ?? effort;
@@ -197,10 +223,16 @@ export function formatDispatchNotice({
   const actionLine = executionApproved
     ? '开始执行：已获授权'
     : '准备执行：回复 1 批准';
-  if (dispatchKind === 'direct') {
-    return `方式：${dispatchKindLabel}｜推荐模型：${recommendedModelLabel}｜推荐思考强度：${recommendedEffortLabel}｜执行：保持当前主任务设置（可在 Codex UI 手动切换）｜原因：${shortReason}\n${actionLine}`;
-  }
-  return `方式：${dispatchKindLabel}｜模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}\n${actionLine}`;
+  const routeLine = dispatchKind === 'direct'
+    ? `方式：${dispatchKindLabel}｜推荐模型：${recommendedModelLabel}｜推荐思考强度：${recommendedEffortLabel}｜执行：保持当前主任务设置（可在 Codex UI 手动切换）｜原因：${shortReason}`
+    : `方式：${dispatchKindLabel}｜模型：${modelLabel}｜思考强度：${effortLabel}｜原因：${shortReason}`;
+  const card = formatApprovalCard({
+    approvalCard,
+    dispatchKind,
+    recommendedModel: dispatchKind === 'direct' ? recommendedModel : model,
+    recommendedEffort: dispatchKind === 'direct' ? recommendedEffort : effort,
+  });
+  return [card, routeLine, actionLine].filter(Boolean).join('\n');
 }
 
 export function validateRoute(route, capabilities = {}) {
@@ -324,6 +356,7 @@ export function validateRoute(route, capabilities = {}) {
         recommendedModel: route.recommendedModel,
         recommendedEffort: route.recommendedEffort,
         reason,
+        approvalCard: route.approvalCard,
         executionApproved: route.executionApproved === true,
       }),
     } : {}),
