@@ -2,6 +2,11 @@
 
 All notable changes follow semantic versioning.
 
+## 1.8.3 - 2026-08-23
+
+- Confirmations now show a readable card with task, model and execution mode, branch reuse or creation, independent worktree, and closeout.
+- Branch names shown to users use a short `类型-拼音-对象` format; the same goal reuses its existing branch.
+
 ## 1.8.2 - 2026-08-20
 
 - Added a project-level Loop OS exception: when the applicable `AGENTS.md` explicitly declares Loop OS the sole control plane, Paifa does not apply its approval, Goal, delegation, validation, or closeout workflow.
